@@ -1,0 +1,92 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm test:*)",
+      "Bash(npx:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git merge:*)",
+      "Bash(git fetch:*)",
+      "Bash(git stash:*)",
+      "Bash(git rebase:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh issue:*)",
+      "Bash(gh repo:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(bash:*)",
+      "Bash(echo:*)",
+      "Edit",
+      "Read",
+      "Write",
+      "Glob",
+      "Grep",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "mcp__next-devtools__nextjs_call",
+      "mcp__next-devtools__nextjs_docs",
+      "mcp__playwright__browser_eval",
+      "mcp__github__create_pull_request",
+      "mcp__github__list_issues",
+      "mcp__github__create_issue"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=\"$CLAUDE_FILE_PATHS\"; if [[ \"$FILE\" =~ \\.(ts|tsx)$ ]]; then npx eslint --fix \"$FILE\" 2>/dev/null || true; fi",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ \"$(git branch --show-current)\" != \"main\" ] || echo '{\"feedback\": \"⚠️ Estás en main. Considera crear una branch con: git checkout -b feature/nombre\"}' >&2",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/quality-check.sh 2>&1 || true",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}
