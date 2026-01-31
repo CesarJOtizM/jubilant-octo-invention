@@ -4,6 +4,13 @@
 
 Este documento define el plan de trabajo para desarrollar el frontend que consumirá el backend NestJS de gestión de inventario. El backend cuenta con **21 controladores** y más de **120 endpoints** organizados en **11 módulos principales**.
 
+### Información del Backend
+
+- **Ubicación del Backend**: `C:\Users\Usuario\Documents\GitHub\improved-parakeet`
+- **Documentación de Endpoints**: La documentación completa de los endpoints está disponible en [`docs/postman`](./postman) de este repositorio
+- **Tecnología Backend**: NestJS con PostgreSQL
+- **API Base URL**: Se configurará según el entorno (desarrollo/producción)
+
 ### Principios Arquitectónicos
 
 Este frontend sigue tres principios arquitectónicos fundamentales:

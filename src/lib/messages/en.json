@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "actions": "Actions",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "description": "Enter your credentials to access your account",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "logout": "Log out"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Overview of your inventory system"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "backHome": "Back to home",
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Try again"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "sales": "Sales",
+    "returns": "Returns",
+    "reports": "Reports",
+    "users": "Users",
+    "settings": "Settings"
+  }
+}

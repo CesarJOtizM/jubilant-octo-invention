@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "actions": "Acciones",
+    "yes": "Sí",
+    "no": "No",
+    "confirm": "Confirmar"
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "description": "Ingresa tus credenciales para acceder a tu cuenta",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUp": "Registrarse"
+    },
+    "logout": "Cerrar sesión"
+  },
+  "dashboard": {
+    "title": "Panel de control",
+    "description": "Resumen de tu sistema de inventario"
+  },
+  "errors": {
+    "notFound": "Página no encontrada",
+    "backHome": "Volver al inicio",
+    "somethingWentWrong": "Algo salió mal",
+    "tryAgain": "Intentar de nuevo"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "inventory": "Inventario",
+    "sales": "Ventas",
+    "returns": "Devoluciones",
+    "reports": "Reportes",
+    "users": "Usuarios",
+    "settings": "Configuración"
+  }
+}
