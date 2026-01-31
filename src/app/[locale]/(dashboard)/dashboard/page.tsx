@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { DashboardMetricsGrid } from "@/modules/dashboard";
 
 interface DashboardPageProps {
   params: Promise<{ locale: string }>;
@@ -16,9 +17,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
         <p className="text-muted-foreground">{t("description")}</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Dashboard cards will go here */}
-      </div>
+      <DashboardMetricsGrid />
     </div>
   );
 }

@@ -41,7 +41,35 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "description": "Overview of your inventory system"
+    "description": "Overview of your inventory system",
+    "metrics": {
+      "totalProducts": {
+        "title": "Total Products",
+        "description": "{quantity} units in stock"
+      },
+      "inventoryValue": {
+        "title": "Inventory Value",
+        "description": "Total value across all products"
+      },
+      "lowStock": {
+        "title": "Low Stock Alerts",
+        "descriptionAlert": "Products require immediate attention",
+        "descriptionOk": "All products have sufficient stock"
+      },
+      "monthlySales": {
+        "title": "Monthly Sales",
+        "description": "{count, plural, =0 {No sales} =1 {1 order} other {# orders}} this month"
+      },
+      "error": {
+        "title": "Unable to load metrics",
+        "description": "There was an error loading the dashboard data.",
+        "retry": "Try Again"
+      },
+      "empty": {
+        "title": "No data available",
+        "description": "Start adding products to see your metrics."
+      }
+    }
   },
   "errors": {
     "notFound": "Page not found",

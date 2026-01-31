@@ -64,6 +64,12 @@ export class AuthApiAdapter implements AuthRepositoryPort {
     TokenService.setUser(data.user);
     TokenService.setOrganizationSlug(organizationSlug);
 
+    // Extract and store org_id from JWT
+    const orgId = TokenService.extractOrgIdFromToken();
+    if (orgId) {
+      TokenService.setOrganizationId(orgId);
+    }
+
     return {
       user: UserMapper.toDomain(data.user),
       tokens,

@@ -41,7 +41,35 @@
   },
   "dashboard": {
     "title": "Panel de control",
-    "description": "Resumen de tu sistema de inventario"
+    "description": "Resumen de tu sistema de inventario",
+    "metrics": {
+      "totalProducts": {
+        "title": "Total de Productos",
+        "description": "{quantity} unidades en stock"
+      },
+      "inventoryValue": {
+        "title": "Valor del Inventario",
+        "description": "Valor total de todos los productos"
+      },
+      "lowStock": {
+        "title": "Alertas de Stock Bajo",
+        "descriptionAlert": "Productos requieren atención inmediata",
+        "descriptionOk": "Todos los productos tienen stock suficiente"
+      },
+      "monthlySales": {
+        "title": "Ventas del Mes",
+        "description": "{count, plural, =0 {Sin ventas} =1 {1 pedido} other {# pedidos}} este mes"
+      },
+      "error": {
+        "title": "Error al cargar métricas",
+        "description": "Hubo un error al cargar los datos del panel.",
+        "retry": "Intentar de nuevo"
+      },
+      "empty": {
+        "title": "Sin datos disponibles",
+        "description": "Comienza agregando productos para ver tus métricas."
+      }
+    }
   },
   "errors": {
     "notFound": "Página no encontrada",

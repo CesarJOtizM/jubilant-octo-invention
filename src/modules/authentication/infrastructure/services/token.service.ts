@@ -9,6 +9,7 @@ interface StoredTokens {
 const TOKEN_KEY = env.NEXT_PUBLIC_AUTH_COOKIE_NAME;
 const REFRESH_TOKEN_KEY = env.NEXT_PUBLIC_REFRESH_COOKIE_NAME;
 const ORG_SLUG_KEY = 'nevada_org_slug';
+const ORG_ID_KEY = 'nevada_org_id';
 const USER_KEY = 'nevada_user';
 
 export interface StoredUser {
@@ -33,6 +34,9 @@ export class TokenService {
       localStorage.setItem(TOKEN_KEY, tokens.accessToken);
       localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
       localStorage.setItem(`${TOKEN_KEY}_expires`, tokens.expiresAt);
+
+      // Sync with cookie for middleware auth check
+      document.cookie = `${TOKEN_KEY}=${tokens.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
     } catch (error) {
       console.error('Failed to store tokens:', error);
     }
@@ -90,7 +94,11 @@ export class TokenService {
       localStorage.removeItem(REFRESH_TOKEN_KEY);
       localStorage.removeItem(`${TOKEN_KEY}_expires`);
       localStorage.removeItem(ORG_SLUG_KEY);
+      localStorage.removeItem(ORG_ID_KEY);
       localStorage.removeItem(USER_KEY);
+
+      // Clear auth cookie
+      document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; SameSite=Lax`;
     } catch (error) {
       console.error('Failed to clear tokens:', error);
     }
@@ -132,6 +140,39 @@ export class TokenService {
 
     try {
       return localStorage.getItem(ORG_SLUG_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  static setOrganizationId(orgId: string): void {
+    if (!isClient()) return;
+
+    try {
+      localStorage.setItem(ORG_ID_KEY, orgId);
+    } catch (error) {
+      console.error('Failed to store organization id:', error);
+    }
+  }
+
+  static getOrganizationId(): string | null {
+    if (!isClient()) return null;
+
+    try {
+      return localStorage.getItem(ORG_ID_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  static extractOrgIdFromToken(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      return decoded.org_id || null;
     } catch {
       return null;
     }
