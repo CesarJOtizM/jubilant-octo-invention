@@ -1,0 +1,148 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import type { User } from '../../domain/entities/user';
+import type { LoginCredentials } from '../../domain/ports/auth-repository.port';
+import { AuthApiAdapter } from '../../infrastructure/adapters/auth-api.adapter';
+import { TokenService } from '../../infrastructure/services/token.service';
+
+interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  isHydrated: boolean;
+  error: string | null;
+}
+
+interface AuthActions {
+  login: (credentials: LoginCredentials) => Promise<void>;
+  logout: () => Promise<void>;
+  hydrate: () => Promise<void>;
+  setHydrated: (hydrated: boolean) => void;
+  clearError: () => void;
+}
+
+type AuthStore = AuthState & AuthActions;
+
+const authRepository = new AuthApiAdapter();
+
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      // State
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      isHydrated: false,
+      error: null,
+
+      // Actions
+      login: async (credentials: LoginCredentials) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const { user } = await authRepository.login(credentials);
+
+          set({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Login failed';
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: message,
+          });
+          throw error;
+        }
+      },
+
+      logout: async () => {
+        set({ isLoading: true });
+
+        try {
+          await authRepository.logout();
+        } finally {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+          });
+        }
+      },
+
+      hydrate: async () => {
+        const hasToken = TokenService.hasValidToken();
+
+        if (!hasToken) {
+          set({ isHydrated: true, isAuthenticated: false, user: null });
+          return;
+        }
+
+        set({ isLoading: true });
+
+        try {
+          // Check if token is about to expire and refresh if needed
+          if (TokenService.isTokenAboutToExpire()) {
+            const refreshToken = TokenService.getRefreshToken();
+            if (refreshToken) {
+              await authRepository.refreshToken(refreshToken);
+            }
+          }
+
+          const user = await authRepository.getCurrentUser();
+
+          if (user) {
+            set({
+              user,
+              isAuthenticated: true,
+              isLoading: false,
+              isHydrated: true,
+            });
+          } else {
+            TokenService.clearTokens();
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              isHydrated: true,
+            });
+          }
+        } catch {
+          TokenService.clearTokens();
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            isHydrated: true,
+          });
+        }
+      },
+
+      setHydrated: (hydrated: boolean) => {
+        set({ isHydrated: hydrated });
+      },
+
+      clearError: () => {
+        set({ error: null });
+      },
+    }),
+    {
+      name: 'nevada-auth-store',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        // Only persist minimal data, tokens are handled by TokenService
+        isAuthenticated: state.isAuthenticated,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHydrated(true);
+        }
+      },
+    }
+  )
+);

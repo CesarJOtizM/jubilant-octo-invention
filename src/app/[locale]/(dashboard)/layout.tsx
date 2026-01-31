@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { Sidebar } from "@/ui/layout/sidebar";
+import { DashboardHeader } from "@/ui/layout/header";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -7,22 +9,11 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar will go here */}
-      <aside className="hidden w-64 border-r bg-card lg:block">
-        <div className="flex h-14 items-center border-b px-4">
-          <span className="font-semibold">Nevada Inventory</span>
-        </div>
-        <nav className="p-4">{/* Navigation items will go here */}</nav>
-      </aside>
-
-      {/* Main content */}
-      <main className="flex-1">
-        {/* Header will go here */}
-        <header className="flex h-14 items-center border-b px-4">
-          {/* Header content */}
-        </header>
-        <div className="p-6">{children}</div>
-      </main>
+      <Sidebar />
+      <div className="flex flex-1 flex-col">
+        <DashboardHeader />
+        <main className="flex-1 p-6">{children}</main>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,13 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
+  organizationSlug: z
+    .string()
+    .min(2, "Organization slug must be at least 2 characters")
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug can only contain lowercase letters, numbers, and hyphens",
+    ),
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
@@ -8,21 +15,23 @@ export const loginSchema = z.object({
 export type LoginDto = z.infer<typeof loginSchema>;
 
 export interface LoginResponseDto {
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    organizationId: string;
-    roles: string[];
-    permissions: string[];
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-  };
-  tokens: {
+  success: boolean;
+  message: string;
+  data: {
+    user: {
+      id: string;
+      email: string;
+      username: string;
+      firstName: string;
+      lastName: string;
+      roles: string[];
+      permissions: string[];
+    };
     accessToken: string;
     refreshToken: string;
-    expiresIn: number;
+    accessTokenExpiresAt: string;
+    refreshTokenExpiresAt: string;
+    sessionId: string;
   };
+  timestamp: string;
 }

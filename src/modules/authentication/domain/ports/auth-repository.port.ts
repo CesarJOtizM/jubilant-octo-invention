@@ -2,6 +2,7 @@ import { User } from "../entities/user";
 import { Tokens } from "../value-objects/tokens";
 
 export interface LoginCredentials {
+  organizationSlug: string;
   email: string;
   password: string;
 }

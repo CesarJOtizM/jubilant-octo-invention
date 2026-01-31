@@ -7,6 +7,11 @@ import { Tokens } from "../../domain/value-objects/tokens";
 import { UserMapper } from "../mappers/user.mapper";
 import type { LoginResponseDto } from "../../application/dto/login.dto";
 import { env } from "@/config/env";
+import { TokenService } from "../services/token.service";
+import {
+  AuthApiError,
+  getAuthErrorCode,
+} from "../errors/auth-api.error";
 
 export class AuthApiAdapter implements AuthRepositoryPort {
   private readonly baseUrl = env.NEXT_PUBLIC_API_URL;
@@ -14,70 +19,118 @@ export class AuthApiAdapter implements AuthRepositoryPort {
   async login(
     credentials: LoginCredentials,
   ): Promise<{ user: User; tokens: Tokens }> {
+    const { organizationSlug, email, password } = credentials;
+
     const response = await fetch(`${this.baseUrl}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Organization-Slug": organizationSlug,
       },
-      body: JSON.stringify(credentials),
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
-      throw new Error("Login failed");
+      const errorData = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        error?: string;
+        statusCode?: number;
+      };
+      const statusCode = errorData.statusCode ?? response.status;
+      const code = getAuthErrorCode(statusCode, errorData.error);
+      throw new AuthApiError(
+        errorData.message ?? "Authentication failed",
+        code,
+        statusCode
+      );
     }
 
-    const data: LoginResponseDto = await response.json();
+    const result: LoginResponseDto = await response.json();
+    const { data } = result;
 
-    const expiresAt = new Date(Date.now() + data.tokens.expiresIn * 1000);
+    const expiresAt = new Date(data.accessTokenExpiresAt);
+    const tokens = Tokens.create(
+      data.accessToken,
+      data.refreshToken,
+      expiresAt,
+    );
+
+    // Store tokens, user and organization slug
+    TokenService.setTokens({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      expiresAt: data.accessTokenExpiresAt,
+    });
+    TokenService.setUser(data.user);
+    TokenService.setOrganizationSlug(organizationSlug);
+
     return {
       user: UserMapper.toDomain(data.user),
-      tokens: Tokens.create(
-        data.tokens.accessToken,
-        data.tokens.refreshToken,
-        expiresAt,
-      ),
+      tokens,
     };
   }
 
   async logout(): Promise<void> {
-    await fetch(`${this.baseUrl}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-  }
+    const accessToken = TokenService.getAccessToken();
+    const organizationSlug = TokenService.getOrganizationSlug();
 
-  async getCurrentUser(): Promise<User | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/auth/me`, {
-        credentials: "include",
+      await fetch(`${this.baseUrl}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          ...(organizationSlug && { "X-Organization-Slug": organizationSlug }),
+        },
       });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const data = await response.json();
-      return UserMapper.toDomain(data);
-    } catch {
-      return null;
+    } finally {
+      TokenService.clearTokens();
     }
   }
 
-  async refreshToken(refreshToken: string): Promise<Tokens> {
+  async getCurrentUser(): Promise<User | null> {
+    const accessToken = TokenService.getAccessToken();
+
+    if (!accessToken || TokenService.isTokenExpired()) {
+      return null;
+    }
+
+    // Get user from local storage (saved during login)
+    const storedUser = TokenService.getUser();
+    if (!storedUser) {
+      return null;
+    }
+
+    return UserMapper.toDomain(storedUser);
+  }
+
+  async refreshToken(refreshTokenValue: string): Promise<Tokens> {
+    const organizationSlug = TokenService.getOrganizationSlug();
+
     const response = await fetch(`${this.baseUrl}/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(organizationSlug && { "X-Organization-Slug": organizationSlug }),
       },
-      body: JSON.stringify({ refreshToken }),
+      body: JSON.stringify({ refreshToken: refreshTokenValue }),
     });
 
     if (!response.ok) {
+      TokenService.clearTokens();
       throw new Error("Token refresh failed");
     }
 
-    const data = await response.json();
-    const expiresAt = new Date(Date.now() + data.expiresIn * 1000);
+    const result = await response.json();
+    const data = result.data || result;
+    const expiresAt = new Date(data.accessTokenExpiresAt);
+
+    TokenService.setTokens({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      expiresAt: data.accessTokenExpiresAt,
+    });
+
     return Tokens.create(data.accessToken, data.refreshToken, expiresAt);
   }
 }

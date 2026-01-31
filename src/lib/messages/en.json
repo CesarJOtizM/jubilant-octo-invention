@@ -16,9 +16,17 @@
     "confirm": "Confirm"
   },
   "auth": {
+    "errors": {
+      "unauthorized": "Invalid organization, email or password. Please try again.",
+      "forbidden": "You do not have access to this resource.",
+      "serverError": "Server error. Please try again later.",
+      "generic": "Authentication failed. Please try again."
+    },
     "login": {
       "title": "Welcome back",
       "description": "Enter your credentials to access your account",
+      "organization": "Organization",
+      "organizationPlaceholder": "your-organization",
       "email": "Email",
       "emailPlaceholder": "Enter your email",
       "password": "Password",
@@ -44,10 +52,35 @@
   "navigation": {
     "dashboard": "Dashboard",
     "inventory": "Inventory",
+    "products": "Products",
+    "warehouses": "Warehouses",
+    "movements": "Movements",
+    "transfers": "Transfers",
+    "stock": "Stock",
     "sales": "Sales",
     "returns": "Returns",
     "reports": "Reports",
+    "imports": "Imports",
     "users": "Users",
+    "roles": "Roles",
+    "audit": "Audit Log",
     "settings": "Settings"
+  },
+  "pages": {
+    "inventory": {
+      "products": { "title": "Products", "description": "Manage your product catalog" },
+      "warehouses": { "title": "Warehouses", "description": "Manage storage locations" },
+      "movements": { "title": "Movements", "description": "Track inventory movements" },
+      "transfers": { "title": "Transfers", "description": "Transfer stock between warehouses" },
+      "stock": { "title": "Stock Levels", "description": "View current stock levels" }
+    },
+    "sales": { "title": "Sales", "description": "Manage sales orders" },
+    "returns": { "title": "Returns", "description": "Process product returns" },
+    "reports": { "title": "Reports", "description": "View and generate reports" },
+    "imports": { "title": "Data Imports", "description": "Import data from external sources" },
+    "users": { "title": "Users", "description": "Manage system users" },
+    "roles": { "title": "Roles", "description": "Configure user roles and permissions" },
+    "audit": { "title": "Audit Log", "description": "Review system activity" },
+    "settings": { "title": "Settings", "description": "Configure system settings" }
   }
 }
