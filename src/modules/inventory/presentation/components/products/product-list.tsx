@@ -1,0 +1,245 @@
+"use client";
+
+import { useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import {
+  Package,
+  Plus,
+  Edit,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { Button } from "@/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
+import { useProducts, useProductFilters, useSetProductFilters } from "../../hooks";
+import { ProductFilters } from "./product-filters";
+import type { Product } from "../../../domain/entities/product.entity";
+import type { ProductFilters as ProductFiltersType } from "../../../application/dto/product.dto";
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+}
+
+function ProductRow({ product }: { product: Product }) {
+  const t = useTranslations("inventory.products");
+
+  return (
+    <tr className="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
+      <td className="px-4 py-3">
+        <Link
+          href={`/dashboard/inventory/products/${product.id}`}
+          className="flex items-center gap-3 hover:opacity-80"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
+            <Package className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+          </div>
+          <div>
+            <p className="font-medium text-neutral-900 dark:text-neutral-100">
+              {product.name}
+            </p>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              {product.sku}
+            </p>
+          </div>
+        </Link>
+      </td>
+      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300">
+        {product.categoryName || "-"}
+      </td>
+      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300">
+        {formatCurrency(product.cost)}
+      </td>
+      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300">
+        {formatCurrency(product.price)}
+      </td>
+      <td className="px-4 py-3">
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+            product.isActive
+              ? "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
+              : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400"
+          }`}
+        >
+          {product.isActive ? t("status.active") : t("status.inactive")}
+        </span>
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-1">
+          <Button asChild variant="ghost" size="icon" title={t("actions.view")}>
+            <Link href={`/dashboard/inventory/products/${product.id}`}>
+              <Eye className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="icon" title={t("actions.edit")}>
+            <Link href={`/dashboard/inventory/products/${product.id}/edit`}>
+              <Edit className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function ProductListSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[...Array(5)].map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-700"
+        >
+          <div className="h-10 w-10 animate-pulse rounded-lg bg-neutral-200 dark:bg-neutral-700" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-1/3 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700" />
+            <div className="h-3 w-1/4 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmptyState() {
+  const t = useTranslations("inventory.products");
+
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <Package className="mb-4 h-12 w-12 text-neutral-400 dark:text-neutral-500" />
+      <h3 className="mb-2 text-lg font-medium text-neutral-900 dark:text-neutral-100">
+        {t("empty.title")}
+      </h3>
+      <p className="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
+        {t("empty.description")}
+      </p>
+      <Button asChild>
+        <Link href="/dashboard/inventory/products/new">
+          <Plus className="mr-2 h-4 w-4" />
+          {t("actions.new")}
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+export function ProductList() {
+  const t = useTranslations("inventory.products");
+  const tCommon = useTranslations("common");
+  const filters = useProductFilters();
+  const setFilters = useSetProductFilters();
+  const { data, isLoading, isError, error } = useProducts(filters);
+
+  const handleFiltersChange = useCallback(
+    (newFilters: ProductFiltersType) => {
+      setFilters(newFilters);
+    },
+    [setFilters]
+  );
+
+  const handlePageChange = (newPage: number) => {
+    setFilters({ page: newPage });
+  };
+
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <div className="text-center text-destructive">
+            {t("error.loading")}: {error?.message}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-xl">{t("list.title")}</CardTitle>
+        <Button asChild>
+          <Link href="/dashboard/inventory/products/new">
+            <Plus className="mr-2 h-4 w-4" />
+            {t("actions.new")}
+          </Link>
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {/* Search and Filters */}
+        <div className="mb-6">
+          <ProductFilters filters={filters} onFiltersChange={handleFiltersChange} />
+        </div>
+
+        {/* Table */}
+        {isLoading ? (
+          <ProductListSkeleton />
+        ) : !data?.data.length ? (
+          <EmptyState />
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-neutral-200 text-left text-sm font-medium text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+                    <th className="px-4 py-3">{t("fields.product")}</th>
+                    <th className="px-4 py-3">{t("fields.category")}</th>
+                    <th className="px-4 py-3">{t("fields.cost")}</th>
+                    <th className="px-4 py-3">{t("fields.price")}</th>
+                    <th className="px-4 py-3">{t("fields.status")}</th>
+                    <th className="px-4 py-3">{tCommon("actions")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.data.map((product) => (
+                    <ProductRow key={product.id} product={product} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {data.pagination.totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-between border-t border-neutral-200 pt-4 dark:border-neutral-700">
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  {t("pagination.showing", {
+                    from: (data.pagination.page - 1) * data.pagination.limit + 1,
+                    to: Math.min(
+                      data.pagination.page * data.pagination.limit,
+                      data.pagination.total
+                    ),
+                    total: data.pagination.total,
+                  })}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(data.pagination.page - 1)}
+                    disabled={data.pagination.page <= 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm text-neutral-600 dark:text-neutral-300">
+                    {data.pagination.page} / {data.pagination.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(data.pagination.page + 1)}
+                    disabled={data.pagination.page >= data.pagination.totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

@@ -1,0 +1,87 @@
+import { apiClient } from "@/shared/infrastructure/http";
+import type { Stock } from "../../domain/entities/stock.entity";
+import type {
+  StockRepositoryPort,
+  PaginatedResult,
+} from "../../application/ports/stock.repository.port";
+import type {
+  StockListResponseDto,
+  StockResponseDto,
+  StockFilters,
+} from "../../application/dto/stock.dto";
+import { StockMapper } from "../../application/mappers/stock.mapper";
+
+interface ApiResponse<T> {
+  data: T;
+}
+
+export class StockApiAdapter implements StockRepositoryPort {
+  private readonly basePath = "/inventory/stock";
+
+  async findAll(filters?: StockFilters): Promise<PaginatedResult<Stock>> {
+    const response = await apiClient.get<StockListResponseDto>(this.basePath, {
+      params: this.buildQueryParams(filters),
+    });
+
+    return {
+      data: response.data.data.map(StockMapper.toDomain),
+      pagination: response.data.pagination,
+    };
+  }
+
+  async findByProductAndWarehouse(
+    productId: string,
+    warehouseId: string
+  ): Promise<Stock | null> {
+    try {
+      const response = await apiClient.get<ApiResponse<StockResponseDto>>(
+        `${this.basePath}/product/${productId}/warehouse/${warehouseId}`
+      );
+      return StockMapper.toDomain(response.data.data);
+    } catch (error) {
+      if (this.isNotFoundError(error)) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  private buildQueryParams(filters?: StockFilters): Record<string, unknown> {
+    if (!filters) return {};
+
+    const params: Record<string, unknown> = {};
+
+    if (filters.productId) {
+      params.productId = filters.productId;
+    }
+    if (filters.warehouseId) {
+      params.warehouseId = filters.warehouseId;
+    }
+    if (filters.search) {
+      params.search = filters.search;
+    }
+    if (filters.lowStock !== undefined) {
+      params.lowStock = filters.lowStock;
+    }
+    if (filters.page) {
+      params.page = filters.page;
+    }
+    if (filters.limit) {
+      params.limit = filters.limit;
+    }
+
+    return params;
+  }
+
+  private isNotFoundError(error: unknown): boolean {
+    return (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      typeof (error as { response?: { status?: number } }).response === "object" &&
+      (error as { response: { status?: number } }).response?.status === 404
+    );
+  }
+}
+
+export const stockApiAdapter = new StockApiAdapter();

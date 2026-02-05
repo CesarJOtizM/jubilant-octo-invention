@@ -1,0 +1,28 @@
+import { Warehouse } from "../../domain/entities/warehouse.entity";
+import type { WarehouseResponseDto } from "../dto/warehouse.dto";
+
+export class WarehouseMapper {
+  static toDomain(dto: WarehouseResponseDto): Warehouse {
+    return Warehouse.create({
+      id: dto.id,
+      code: dto.code,
+      name: dto.name,
+      address: dto.address,
+      isActive: dto.isActive,
+      createdAt: new Date(dto.createdAt),
+      updatedAt: new Date(dto.updatedAt),
+    });
+  }
+
+  static toDto(entity: Warehouse): WarehouseResponseDto {
+    return {
+      id: entity.id,
+      code: entity.code,
+      name: entity.name,
+      address: entity.address,
+      isActive: entity.isActive,
+      createdAt: entity.createdAt.toISOString(),
+      updatedAt: entity.updatedAt.toISOString(),
+    };
+  }
+}

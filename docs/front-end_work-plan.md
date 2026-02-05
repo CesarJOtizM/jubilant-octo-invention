@@ -1661,11 +1661,12 @@ describe('ProductsPage', () => {
 
 ### Fase 1: Fundamentos (Semana 1-2)
 
-- [ ] Setup proyecto con estructura de carpetas
-- [ ] Configurar shared kernel (errors, value objects base)
-- [ ] Implementar módulo de Authentication completo
-- [ ] Configurar DI container y providers
-- [ ] Crear componentes UI base
+- [x] Setup proyecto con estructura de carpetas
+- [x] Configurar shared kernel (errors, value objects base, HTTP client)
+- [x] Implementar módulo de Authentication completo
+- [x] Configurar DI container y providers
+- [x] Crear componentes UI base
+- [x] Dashboard Home con métricas reales (4 cards: Productos, Valor Inventario, Stock Bajo, Ventas)
 
 ### Fase 2: Inventario Core (Semana 3-4)
 

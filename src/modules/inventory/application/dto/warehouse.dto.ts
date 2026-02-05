@@ -1,0 +1,43 @@
+/**
+ * API Response DTOs for Warehouses
+ */
+
+export interface WarehouseResponseDto {
+  id: string;
+  code: string;
+  name: string;
+  address: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WarehouseListResponseDto {
+  data: WarehouseResponseDto[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateWarehouseDto {
+  code: string;
+  name: string;
+  address?: string;
+}
+
+export interface UpdateWarehouseDto {
+  code?: string;
+  name?: string;
+  address?: string;
+  isActive?: boolean;
+}
+
+export interface WarehouseFilters {
+  search?: string;
+  isActive?: boolean;
+  page?: number;
+  limit?: number;
+}

@@ -1,5 +1,4 @@
-import { env } from "@/config/env";
-import { TokenService } from "@/modules/authentication/infrastructure/services/token.service";
+import { apiClient } from "@/shared/infrastructure/http";
 import type {
   DashboardMetricsDto,
   InventoryAvailableResponseDto,
@@ -7,24 +6,11 @@ import type {
   SalesReportResponseDto,
 } from "../../application/dto/metrics.dto";
 
+/**
+ * Dashboard API Service
+ * Uses centralized axios HTTP client with interceptors for auth
+ */
 export class DashboardApiService {
-  private readonly baseUrl = env.NEXT_PUBLIC_API_URL;
-
-  private getHeaders(): HeadersInit {
-    const accessToken = TokenService.getAccessToken();
-    const organizationSlug = TokenService.getOrganizationSlug();
-    const organizationId = TokenService.getOrganizationId();
-    const user = TokenService.getUser();
-
-    return {
-      "Content-Type": "application/json",
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-      ...(organizationSlug && { "X-Organization-Slug": organizationSlug }),
-      ...(organizationId && { "X-Organization-ID": organizationId }),
-      ...(user?.id && { "X-User-ID": user.id }),
-    };
-  }
-
   private getMonthDateRange(): { startDate: string; endDate: string } {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -37,48 +23,25 @@ export class DashboardApiService {
   }
 
   async getMetrics(): Promise<DashboardMetricsDto> {
-    const headers = this.getHeaders();
     const { startDate, endDate } = this.getMonthDateRange();
 
     const [inventoryResponse, lowStockResponse, salesResponse] =
       await Promise.all([
-        fetch(`${this.baseUrl}/reports/inventory/available/view`, {
-          method: "GET",
-          headers,
-        }),
-        fetch(`${this.baseUrl}/reports/inventory/low-stock/view`, {
-          method: "GET",
-          headers,
-        }),
-        fetch(
-          `${this.baseUrl}/reports/sales/view?dateRange[startDate]=${startDate}&dateRange[endDate]=${endDate}`,
-          {
-            method: "GET",
-            headers,
-          }
+        apiClient.get<InventoryAvailableResponseDto>(
+          "/reports/inventory/available/view"
         ),
+        apiClient.get<LowStockResponseDto>("/reports/inventory/low-stock/view"),
+        apiClient.get<SalesReportResponseDto>("/reports/sales/view", {
+          params: {
+            "dateRange[startDate]": startDate,
+            "dateRange[endDate]": endDate,
+          },
+        }),
       ]);
 
-    // Handle API errors
-    if (!inventoryResponse.ok || !lowStockResponse.ok || !salesResponse.ok) {
-      const failedResponses = [
-        !inventoryResponse.ok && "inventory",
-        !lowStockResponse.ok && "low-stock",
-        !salesResponse.ok && "sales",
-      ].filter(Boolean);
-
-      throw new Error(`Failed to fetch dashboard metrics: ${failedResponses.join(", ")}`);
-    }
-
-    const [inventoryData, lowStockData, salesData]: [
-      InventoryAvailableResponseDto,
-      LowStockResponseDto,
-      SalesReportResponseDto
-    ] = await Promise.all([
-      inventoryResponse.json(),
-      lowStockResponse.json(),
-      salesResponse.json(),
-    ]);
+    const inventoryData = inventoryResponse.data;
+    const lowStockData = lowStockResponse.data;
+    const salesData = salesResponse.data;
 
     return {
       inventory: {

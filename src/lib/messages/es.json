@@ -71,6 +71,391 @@
       }
     }
   },
+  "inventory": {
+    "products": {
+      "title": "Productos",
+      "description": "Gestiona tu catálogo de productos",
+      "fields": {
+        "product": "Producto",
+        "sku": "SKU",
+        "skuPlaceholder": "Ingresa el SKU (ej: PROD-001)",
+        "name": "Nombre",
+        "namePlaceholder": "Ingresa el nombre del producto",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Ingresa la descripción del producto",
+        "category": "Categoría",
+        "categoryPlaceholder": "Selecciona o ingresa una categoría",
+        "unitOfMeasure": "Unidad de Medida",
+        "unitOfMeasurePlaceholder": "ej: unidad, kg, litro",
+        "cost": "Costo",
+        "price": "Precio",
+        "minStock": "Stock Mínimo",
+        "maxStock": "Stock Máximo",
+        "status": "Estado"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "actions": {
+        "new": "Nuevo Producto",
+        "edit": "Editar",
+        "view": "Ver",
+        "more": "Más opciones"
+      },
+      "list": {
+        "title": "Productos"
+      },
+      "detail": {
+        "description": "Descripción",
+        "pricing": "Precios",
+        "margin": "Margen",
+        "inventory": "Inventario",
+        "classification": "Clasificación",
+        "dates": "Fechas",
+        "createdAt": "Creado el",
+        "updatedAt": "Actualizado el",
+        "notFound": "Producto no encontrado",
+        "backToList": "Volver a productos"
+      },
+      "search": {
+        "placeholder": "Buscar productos..."
+      },
+      "filter": "Filtros",
+      "pagination": {
+        "showing": "Mostrando {from} a {to} de {total} productos"
+      },
+      "empty": {
+        "title": "Sin productos aún",
+        "description": "Comienza agregando tu primer producto."
+      },
+      "error": {
+        "loading": "Error al cargar productos"
+      },
+      "form": {
+        "createTitle": "Crear Producto",
+        "editTitle": "Editar Producto",
+        "createDescription": "Completa los datos para crear un nuevo producto",
+        "editDescription": "Actualiza la información del producto",
+        "productInfo": "Información del Producto",
+        "pricing": "Precios",
+        "stockLevels": "Niveles de Stock",
+        "error": "Ocurrió un error al guardar el producto."
+      },
+      "messages": {
+        "created": "Producto creado exitosamente",
+        "updated": "Producto actualizado exitosamente",
+        "deleted": "Producto eliminado exitosamente"
+      }
+    },
+    "warehouses": {
+      "title": "Almacenes",
+      "description": "Gestiona ubicaciones de almacenamiento",
+      "fields": {
+        "warehouse": "Almacén",
+        "code": "Código",
+        "codePlaceholder": "Ingresa el código del almacén (ej: ALM-01)",
+        "name": "Nombre",
+        "namePlaceholder": "Ingresa el nombre del almacén",
+        "address": "Dirección",
+        "addressPlaceholder": "Ingresa la dirección del almacén",
+        "status": "Estado"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "actions": {
+        "new": "Nuevo Almacén",
+        "edit": "Editar",
+        "view": "Ver",
+        "more": "Más opciones"
+      },
+      "list": {
+        "title": "Almacenes"
+      },
+      "detail": {
+        "info": "Información",
+        "stats": "Estadísticas",
+        "totalProducts": "Total de productos",
+        "productsInWarehouse": "Productos en Almacén",
+        "noProducts": "Sin productos en este almacén",
+        "createdAt": "Creado el",
+        "updatedAt": "Actualizado el",
+        "notFound": "Almacén no encontrado",
+        "backToList": "Volver a almacenes"
+      },
+      "search": {
+        "placeholder": "Buscar almacenes..."
+      },
+      "pagination": {
+        "showing": "Mostrando {from} a {to} de {total} almacenes"
+      },
+      "empty": {
+        "title": "Sin almacenes aún",
+        "description": "Comienza agregando tu primer almacén."
+      },
+      "error": {
+        "loading": "Error al cargar almacenes"
+      },
+      "form": {
+        "createTitle": "Crear Almacén",
+        "editTitle": "Editar Almacén",
+        "createDescription": "Completa los datos para crear un nuevo almacén",
+        "editDescription": "Actualiza la información del almacén",
+        "warehouseInfo": "Información del Almacén",
+        "error": "Ocurrió un error al guardar el almacén."
+      },
+      "selector": {
+        "label": "Seleccionar almacén",
+        "all": "Todos los Almacenes",
+        "loading": "Cargando..."
+      },
+      "messages": {
+        "created": "Almacén creado exitosamente",
+        "updated": "Almacén actualizado exitosamente",
+        "deleted": "Almacén eliminado exitosamente"
+      }
+    },
+    "stock": {
+      "title": "Niveles de Stock",
+      "description": "Ver niveles actuales de stock en todos los almacenes",
+      "fields": {
+        "product": "Producto",
+        "warehouse": "Almacén",
+        "quantity": "Cantidad Total",
+        "reserved": "Reservado",
+        "available": "Disponible",
+        "lastMovement": "Último Movimiento"
+      },
+      "search": {
+        "placeholder": "Buscar por producto o SKU..."
+      },
+      "pagination": {
+        "showing": "Mostrando {from} a {to} de {total} items"
+      },
+      "empty": {
+        "title": "Sin datos de stock",
+        "description": "Los niveles de stock aparecerán aquí una vez que agregues productos y almacenes."
+      },
+      "error": {
+        "loading": "Error al cargar datos de stock"
+      }
+    },
+    "categories": {
+      "title": "Categorías",
+      "description": "Organiza tus productos en categorías",
+      "fields": {
+        "name": "Nombre",
+        "namePlaceholder": "Ingresa el nombre de la categoría",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Ingresa la descripción de la categoría",
+        "parent": "Categoría Padre",
+        "parentPlaceholder": "Selecciona categoría padre",
+        "noParent": "Sin padre (categoría raíz)",
+        "products": "Productos",
+        "status": "Estado"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "actions": {
+        "new": "Nueva Categoría",
+        "edit": "Editar",
+        "view": "Ver"
+      },
+      "list": {
+        "title": "Categorías"
+      },
+      "search": {
+        "placeholder": "Buscar categorías..."
+      },
+      "pagination": {
+        "showing": "Mostrando {from} a {to} de {total} categorías"
+      },
+      "empty": {
+        "title": "Sin categorías aún",
+        "description": "Comienza agregando tu primera categoría."
+      },
+      "error": {
+        "loading": "Error al cargar categorías"
+      },
+      "form": {
+        "createTitle": "Crear Categoría",
+        "editTitle": "Editar Categoría",
+        "createDescription": "Completa los datos para crear una nueva categoría",
+        "editDescription": "Actualiza la información de la categoría",
+        "categoryInfo": "Información de la Categoría",
+        "error": "Ocurrió un error al guardar la categoría."
+      },
+      "delete": {
+        "title": "Eliminar Categoría",
+        "description": "¿Estás seguro de que quieres eliminar esta categoría? Esta acción no se puede deshacer."
+      },
+      "selector": {
+        "label": "Seleccionar categoría",
+        "all": "Todas las Categorías",
+        "loading": "Cargando..."
+      },
+      "messages": {
+        "created": "Categoría creada exitosamente",
+        "updated": "Categoría actualizada exitosamente",
+        "deleted": "Categoría eliminada exitosamente"
+      }
+    },
+    "movements": {
+      "title": "Movimientos de Stock",
+      "description": "Rastrea entradas, salidas y ajustes de inventario",
+      "types": {
+        "in": "Entrada",
+        "out": "Salida",
+        "adjustment": "Ajuste"
+      },
+      "fields": {
+        "type": "Tipo",
+        "product": "Producto",
+        "productPlaceholder": "Selecciona un producto",
+        "warehouse": "Almacén",
+        "warehousePlaceholder": "Selecciona un almacén",
+        "quantity": "Cantidad",
+        "previousQty": "Cant. Anterior",
+        "newQty": "Cant. Nueva",
+        "reason": "Motivo",
+        "reasonPlaceholder": "Ingresa el motivo del movimiento",
+        "reference": "Referencia",
+        "referencePlaceholder": "Ingresa número de referencia (opcional)",
+        "createdBy": "Creado Por",
+        "createdAt": "Fecha"
+      },
+      "actions": {
+        "new": "Nuevo Movimiento",
+        "filter": "Filtrar"
+      },
+      "list": {
+        "title": "Movimientos"
+      },
+      "search": {
+        "placeholder": "Buscar movimientos..."
+      },
+      "pagination": {
+        "showing": "Mostrando {from} a {to} de {total} movimientos"
+      },
+      "empty": {
+        "title": "Sin movimientos aún",
+        "description": "Los movimientos de stock aparecerán aquí una vez que comiences a registrar cambios de inventario."
+      },
+      "error": {
+        "loading": "Error al cargar movimientos"
+      },
+      "form": {
+        "createTitle": "Registrar Movimiento de Stock",
+        "createDescription": "Ingresa los detalles para registrar un nuevo movimiento de inventario",
+        "movementInfo": "Detalles del Movimiento",
+        "error": "Ocurrió un error al registrar el movimiento."
+      },
+      "filters": {
+        "type": "Tipo de Movimiento",
+        "allTypes": "Todos los Tipos",
+        "dateFrom": "Desde Fecha",
+        "dateTo": "Hasta Fecha",
+        "clear": "Limpiar Filtros"
+      },
+      "messages": {
+        "created": "Movimiento registrado exitosamente"
+      }
+    },
+    "transfers": {
+      "title": "Transferencias",
+      "description": "Transfiere stock entre almacenes",
+      "status": {
+        "pending": "Pendiente",
+        "in_transit": "En Tránsito",
+        "completed": "Completado",
+        "cancelled": "Cancelado"
+      },
+      "fields": {
+        "product": "Producto",
+        "productPlaceholder": "Selecciona un producto",
+        "from": "Almacén Origen",
+        "fromPlaceholder": "Selecciona almacén origen",
+        "to": "Almacén Destino",
+        "toPlaceholder": "Selecciona almacén destino",
+        "quantity": "Cantidad",
+        "quantityPlaceholder": "Ingresa cantidad a transferir",
+        "notes": "Notas",
+        "notesPlaceholder": "Ingresa notas (opcional)",
+        "status": "Estado",
+        "createdBy": "Creado Por",
+        "createdAt": "Creado El",
+        "completedAt": "Completado El"
+      },
+      "actions": {
+        "new": "Nueva Transferencia",
+        "complete": "Marcar Completo",
+        "cancel": "Cancelar Transferencia",
+        "startTransit": "Iniciar Tránsito"
+      },
+      "list": {
+        "title": "Transferencias"
+      },
+      "detail": {
+        "title": "Detalles de Transferencia",
+        "subtitle": "Transferencia #{id}",
+        "information": "Información de Transferencia",
+        "timeline": "Línea de Tiempo de Estado",
+        "backToList": "Volver a transferencias",
+        "notFound": "Transferencia No Encontrada",
+        "notFoundDescription": "La transferencia que buscas no existe o ha sido eliminada."
+      },
+      "timeline": {
+        "created": "Creada",
+        "createdDescription": "Se creó la solicitud de transferencia",
+        "pending": "Pendiente",
+        "pendingDescription": "Esperando iniciar tránsito",
+        "inTransit": "En Tránsito",
+        "inTransitDescription": "El stock está siendo transferido",
+        "completed": "Completada",
+        "completedDescription": "Transferencia completada exitosamente",
+        "cancelled": "Cancelada",
+        "cancelledDescription": "La transferencia fue cancelada"
+      },
+      "search": {
+        "placeholder": "Buscar transferencias..."
+      },
+      "pagination": {
+        "showing": "Mostrando {from} a {to} de {total} transferencias"
+      },
+      "empty": {
+        "title": "Sin transferencias aún",
+        "description": "Comienza creando tu primera transferencia de stock."
+      },
+      "error": {
+        "loading": "Error al cargar transferencias"
+      },
+      "form": {
+        "createTitle": "Crear Transferencia",
+        "createDescription": "Ingresa los detalles para transferir stock entre almacenes",
+        "transferInfo": "Detalles de Transferencia",
+        "error": "Ocurrió un error al crear la transferencia."
+      },
+      "messages": {
+        "created": "Transferencia creada exitosamente",
+        "updated": "Estado de transferencia actualizado",
+        "completed": "Transferencia completada exitosamente",
+        "cancelled": "Transferencia cancelada"
+      }
+    },
+    "common": {
+      "confirmDelete": "¿Estás seguro?",
+      "confirmDeleteDesc": "Esta acción no se puede deshacer.",
+      "filters": {
+        "clear": "Limpiar filtros",
+        "status": "Estado",
+        "dateRange": "Rango de Fechas"
+      }
+    }
+  },
   "errors": {
     "notFound": "Página no encontrada",
     "backHome": "Volver al inicio",
@@ -81,6 +466,7 @@
     "dashboard": "Panel",
     "inventory": "Inventario",
     "products": "Productos",
+    "categories": "Categorías",
     "warehouses": "Almacenes",
     "movements": "Movimientos",
     "transfers": "Transferencias",
@@ -97,6 +483,7 @@
   "pages": {
     "inventory": {
       "products": { "title": "Productos", "description": "Gestiona tu catálogo de productos" },
+      "categories": { "title": "Categorías", "description": "Organiza productos en categorías" },
       "warehouses": { "title": "Almacenes", "description": "Gestiona ubicaciones de almacenamiento" },
       "movements": { "title": "Movimientos", "description": "Rastrea movimientos de inventario" },
       "transfers": { "title": "Transferencias", "description": "Transfiere stock entre almacenes" },

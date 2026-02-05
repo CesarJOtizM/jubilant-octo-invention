@@ -71,6 +71,391 @@
       }
     }
   },
+  "inventory": {
+    "products": {
+      "title": "Products",
+      "description": "Manage your product catalog",
+      "fields": {
+        "product": "Product",
+        "sku": "SKU",
+        "skuPlaceholder": "Enter SKU (e.g., PROD-001)",
+        "name": "Name",
+        "namePlaceholder": "Enter product name",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter product description",
+        "category": "Category",
+        "categoryPlaceholder": "Select or enter category",
+        "unitOfMeasure": "Unit of Measure",
+        "unitOfMeasurePlaceholder": "e.g., unit, kg, liter",
+        "cost": "Cost",
+        "price": "Price",
+        "minStock": "Minimum Stock",
+        "maxStock": "Maximum Stock",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "new": "New Product",
+        "edit": "Edit",
+        "view": "View",
+        "more": "More options"
+      },
+      "list": {
+        "title": "Products"
+      },
+      "detail": {
+        "description": "Description",
+        "pricing": "Pricing",
+        "margin": "Margin",
+        "inventory": "Inventory",
+        "classification": "Classification",
+        "dates": "Dates",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "notFound": "Product not found",
+        "backToList": "Back to products"
+      },
+      "search": {
+        "placeholder": "Search products..."
+      },
+      "filter": "Filters",
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} products"
+      },
+      "empty": {
+        "title": "No products yet",
+        "description": "Get started by adding your first product."
+      },
+      "error": {
+        "loading": "Failed to load products"
+      },
+      "form": {
+        "createTitle": "Create Product",
+        "editTitle": "Edit Product",
+        "createDescription": "Fill in the details to create a new product",
+        "editDescription": "Update the product information",
+        "productInfo": "Product Information",
+        "pricing": "Pricing",
+        "stockLevels": "Stock Levels",
+        "error": "An error occurred while saving the product."
+      },
+      "messages": {
+        "created": "Product created successfully",
+        "updated": "Product updated successfully",
+        "deleted": "Product deleted successfully"
+      }
+    },
+    "warehouses": {
+      "title": "Warehouses",
+      "description": "Manage storage locations",
+      "fields": {
+        "warehouse": "Warehouse",
+        "code": "Code",
+        "codePlaceholder": "Enter warehouse code (e.g., WH-01)",
+        "name": "Name",
+        "namePlaceholder": "Enter warehouse name",
+        "address": "Address",
+        "addressPlaceholder": "Enter warehouse address",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "new": "New Warehouse",
+        "edit": "Edit",
+        "view": "View",
+        "more": "More options"
+      },
+      "list": {
+        "title": "Warehouses"
+      },
+      "detail": {
+        "info": "Information",
+        "stats": "Statistics",
+        "totalProducts": "Total products",
+        "productsInWarehouse": "Products in Warehouse",
+        "noProducts": "No products in this warehouse",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "notFound": "Warehouse not found",
+        "backToList": "Back to warehouses"
+      },
+      "search": {
+        "placeholder": "Search warehouses..."
+      },
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} warehouses"
+      },
+      "empty": {
+        "title": "No warehouses yet",
+        "description": "Get started by adding your first warehouse."
+      },
+      "error": {
+        "loading": "Failed to load warehouses"
+      },
+      "form": {
+        "createTitle": "Create Warehouse",
+        "editTitle": "Edit Warehouse",
+        "createDescription": "Fill in the details to create a new warehouse",
+        "editDescription": "Update the warehouse information",
+        "warehouseInfo": "Warehouse Information",
+        "error": "An error occurred while saving the warehouse."
+      },
+      "selector": {
+        "label": "Select warehouse",
+        "all": "All Warehouses",
+        "loading": "Loading..."
+      },
+      "messages": {
+        "created": "Warehouse created successfully",
+        "updated": "Warehouse updated successfully",
+        "deleted": "Warehouse deleted successfully"
+      }
+    },
+    "stock": {
+      "title": "Stock Levels",
+      "description": "View current stock levels across all warehouses",
+      "fields": {
+        "product": "Product",
+        "warehouse": "Warehouse",
+        "quantity": "Total Qty",
+        "reserved": "Reserved",
+        "available": "Available",
+        "lastMovement": "Last Movement"
+      },
+      "search": {
+        "placeholder": "Search by product or SKU..."
+      },
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} items"
+      },
+      "empty": {
+        "title": "No stock data",
+        "description": "Stock levels will appear here once you add products and warehouses."
+      },
+      "error": {
+        "loading": "Failed to load stock data"
+      }
+    },
+    "categories": {
+      "title": "Categories",
+      "description": "Organize your products into categories",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "Enter category name",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter category description",
+        "parent": "Parent Category",
+        "parentPlaceholder": "Select parent category",
+        "noParent": "No parent (root category)",
+        "products": "Products",
+        "status": "Status"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "new": "New Category",
+        "edit": "Edit",
+        "view": "View"
+      },
+      "list": {
+        "title": "Categories"
+      },
+      "search": {
+        "placeholder": "Search categories..."
+      },
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} categories"
+      },
+      "empty": {
+        "title": "No categories yet",
+        "description": "Get started by adding your first category."
+      },
+      "error": {
+        "loading": "Failed to load categories"
+      },
+      "form": {
+        "createTitle": "Create Category",
+        "editTitle": "Edit Category",
+        "createDescription": "Fill in the details to create a new category",
+        "editDescription": "Update the category information",
+        "categoryInfo": "Category Information",
+        "error": "An error occurred while saving the category."
+      },
+      "delete": {
+        "title": "Delete Category",
+        "description": "Are you sure you want to delete this category? This action cannot be undone."
+      },
+      "selector": {
+        "label": "Select category",
+        "all": "All Categories",
+        "loading": "Loading..."
+      },
+      "messages": {
+        "created": "Category created successfully",
+        "updated": "Category updated successfully",
+        "deleted": "Category deleted successfully"
+      }
+    },
+    "movements": {
+      "title": "Stock Movements",
+      "description": "Track inventory entries, exits, and adjustments",
+      "types": {
+        "in": "Entry",
+        "out": "Exit",
+        "adjustment": "Adjustment"
+      },
+      "fields": {
+        "type": "Type",
+        "product": "Product",
+        "productPlaceholder": "Select a product",
+        "warehouse": "Warehouse",
+        "warehousePlaceholder": "Select a warehouse",
+        "quantity": "Quantity",
+        "previousQty": "Previous Qty",
+        "newQty": "New Qty",
+        "reason": "Reason",
+        "reasonPlaceholder": "Enter reason for movement",
+        "reference": "Reference",
+        "referencePlaceholder": "Enter reference number (optional)",
+        "createdBy": "Created By",
+        "createdAt": "Date"
+      },
+      "actions": {
+        "new": "New Movement",
+        "filter": "Filter"
+      },
+      "list": {
+        "title": "Movements"
+      },
+      "search": {
+        "placeholder": "Search movements..."
+      },
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} movements"
+      },
+      "empty": {
+        "title": "No movements yet",
+        "description": "Stock movements will appear here once you start recording inventory changes."
+      },
+      "error": {
+        "loading": "Failed to load movements"
+      },
+      "form": {
+        "createTitle": "Record Stock Movement",
+        "createDescription": "Enter the details to record a new inventory movement",
+        "movementInfo": "Movement Details",
+        "error": "An error occurred while recording the movement."
+      },
+      "filters": {
+        "type": "Movement Type",
+        "allTypes": "All Types",
+        "dateFrom": "From Date",
+        "dateTo": "To Date",
+        "clear": "Clear Filters"
+      },
+      "messages": {
+        "created": "Movement recorded successfully"
+      }
+    },
+    "transfers": {
+      "title": "Transfers",
+      "description": "Transfer stock between warehouses",
+      "status": {
+        "pending": "Pending",
+        "in_transit": "In Transit",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "fields": {
+        "product": "Product",
+        "productPlaceholder": "Select a product",
+        "from": "From Warehouse",
+        "fromPlaceholder": "Select source warehouse",
+        "to": "To Warehouse",
+        "toPlaceholder": "Select destination warehouse",
+        "quantity": "Quantity",
+        "quantityPlaceholder": "Enter quantity to transfer",
+        "notes": "Notes",
+        "notesPlaceholder": "Enter notes (optional)",
+        "status": "Status",
+        "createdBy": "Created By",
+        "createdAt": "Created At",
+        "completedAt": "Completed At"
+      },
+      "actions": {
+        "new": "New Transfer",
+        "complete": "Mark Complete",
+        "cancel": "Cancel Transfer",
+        "startTransit": "Start Transit"
+      },
+      "list": {
+        "title": "Transfers"
+      },
+      "detail": {
+        "title": "Transfer Details",
+        "subtitle": "Transfer #{id}",
+        "information": "Transfer Information",
+        "timeline": "Status Timeline",
+        "backToList": "Back to transfers",
+        "notFound": "Transfer Not Found",
+        "notFoundDescription": "The transfer you are looking for does not exist or has been deleted."
+      },
+      "timeline": {
+        "created": "Created",
+        "createdDescription": "Transfer request was created",
+        "pending": "Pending",
+        "pendingDescription": "Waiting to start transit",
+        "inTransit": "In Transit",
+        "inTransitDescription": "Stock is being transferred",
+        "completed": "Completed",
+        "completedDescription": "Transfer completed successfully",
+        "cancelled": "Cancelled",
+        "cancelledDescription": "Transfer was cancelled"
+      },
+      "search": {
+        "placeholder": "Search transfers..."
+      },
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} transfers"
+      },
+      "empty": {
+        "title": "No transfers yet",
+        "description": "Get started by creating your first stock transfer."
+      },
+      "error": {
+        "loading": "Failed to load transfers"
+      },
+      "form": {
+        "createTitle": "Create Transfer",
+        "createDescription": "Enter the details to transfer stock between warehouses",
+        "transferInfo": "Transfer Details",
+        "error": "An error occurred while creating the transfer."
+      },
+      "messages": {
+        "created": "Transfer created successfully",
+        "updated": "Transfer status updated",
+        "completed": "Transfer completed successfully",
+        "cancelled": "Transfer cancelled"
+      }
+    },
+    "common": {
+      "confirmDelete": "Are you sure?",
+      "confirmDeleteDesc": "This action cannot be undone.",
+      "filters": {
+        "clear": "Clear filters",
+        "status": "Status",
+        "dateRange": "Date Range"
+      }
+    }
+  },
   "errors": {
     "notFound": "Page not found",
     "backHome": "Back to home",
@@ -81,6 +466,7 @@
     "dashboard": "Dashboard",
     "inventory": "Inventory",
     "products": "Products",
+    "categories": "Categories",
     "warehouses": "Warehouses",
     "movements": "Movements",
     "transfers": "Transfers",
@@ -97,6 +483,7 @@
   "pages": {
     "inventory": {
       "products": { "title": "Products", "description": "Manage your product catalog" },
+      "categories": { "title": "Categories", "description": "Organize products into categories" },
       "warehouses": { "title": "Warehouses", "description": "Manage storage locations" },
       "movements": { "title": "Movements", "description": "Track inventory movements" },
       "transfers": { "title": "Transfers", "description": "Transfer stock between warehouses" },

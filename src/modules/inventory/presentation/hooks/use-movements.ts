@@ -1,0 +1,49 @@
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { stockMovementApiAdapter } from "../../infrastructure/adapters/stock-movement-api.adapter";
+import type {
+  StockMovementFilters,
+  CreateStockMovementDto,
+} from "../../application/dto/stock-movement.dto";
+import { stockKeys } from "./use-stock";
+
+const STALE_TIME = 2 * 60 * 1000; // 2 minutes
+
+export const movementKeys = {
+  all: ["movements"] as const,
+  lists: () => [...movementKeys.all, "list"] as const,
+  list: (filters?: StockMovementFilters) => [...movementKeys.lists(), filters] as const,
+  details: () => [...movementKeys.all, "detail"] as const,
+  detail: (id: string) => [...movementKeys.details(), id] as const,
+};
+
+export function useMovements(filters?: StockMovementFilters) {
+  return useQuery({
+    queryKey: movementKeys.list(filters),
+    queryFn: () => stockMovementApiAdapter.findAll(filters),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useMovement(id: string) {
+  return useQuery({
+    queryKey: movementKeys.detail(id),
+    queryFn: () => stockMovementApiAdapter.findById(id),
+    staleTime: STALE_TIME,
+    enabled: Boolean(id),
+  });
+}
+
+export function useCreateMovement() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateStockMovementDto) => stockMovementApiAdapter.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: movementKeys.lists() });
+      // Also invalidate stock queries since movements affect stock levels
+      queryClient.invalidateQueries({ queryKey: stockKeys.lists() });
+    },
+  });
+}

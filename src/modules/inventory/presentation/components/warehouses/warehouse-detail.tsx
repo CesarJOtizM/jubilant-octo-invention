@@ -1,0 +1,299 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import {
+  Warehouse as WarehouseIcon,
+  Edit,
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  Package,
+  Search,
+} from "lucide-react";
+import { Button } from "@/ui/components/button";
+import { Input } from "@/ui/components/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
+import { useWarehouse } from "../../hooks/use-warehouses";
+import { useStock } from "../../hooks/use-stock";
+import { useState } from "react";
+
+interface WarehouseDetailProps {
+  warehouseId: string;
+}
+
+function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+}
+
+function DetailItem({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
+        <Icon className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+      </div>
+      <div>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">{label}</p>
+        <p className="font-medium text-neutral-900 dark:text-neutral-100">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function WarehouseDetailSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="h-12 w-12 animate-pulse rounded-lg bg-neutral-200 dark:bg-neutral-700" />
+        <div className="space-y-2">
+          <div className="h-6 w-48 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700" />
+          <div className="h-4 w-32 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function WarehouseDetail({ warehouseId }: WarehouseDetailProps) {
+  const t = useTranslations("inventory.warehouses");
+  const tStock = useTranslations("inventory.stock");
+  const tCommon = useTranslations("common");
+  const [search, setSearch] = useState("");
+
+  const { data: warehouse, isLoading, isError, error } = useWarehouse(warehouseId);
+  const { data: stockData, isLoading: isLoadingStock } = useStock({
+    warehouseId,
+    search: search || undefined,
+    limit: 20,
+  });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="py-6">
+          <WarehouseDetailSkeleton />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError || !warehouse) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <div className="text-center">
+            <WarehouseIcon className="mx-auto mb-4 h-12 w-12 text-neutral-400" />
+            <p className="text-destructive">
+              {error?.message || t("detail.notFound")}
+            </p>
+            <Button asChild variant="outline" className="mt-4">
+              <Link href="/dashboard/inventory/warehouses">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {t("detail.backToList")}
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/dashboard/inventory/warehouses">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
+            <WarehouseIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+              {warehouse.name}
+            </h1>
+            <p className="text-neutral-500 dark:text-neutral-400">
+              {warehouse.code}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+              warehouse.isActive
+                ? "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
+                : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400"
+            }`}
+          >
+            {warehouse.isActive ? t("status.active") : t("status.inactive")}
+          </span>
+          <Button asChild>
+            <Link href={`/dashboard/inventory/warehouses/${warehouseId}/edit`}>
+              <Edit className="mr-2 h-4 w-4" />
+              {tCommon("edit")}
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Warehouse Info */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{t("detail.info")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <DetailItem
+              icon={MapPin}
+              label={t("fields.address")}
+              value={warehouse.address || "-"}
+            />
+            <DetailItem
+              icon={Calendar}
+              label={t("detail.createdAt")}
+              value={formatDate(warehouse.createdAt)}
+            />
+            <DetailItem
+              icon={Calendar}
+              label={t("detail.updatedAt")}
+              value={formatDate(warehouse.updatedAt)}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{t("detail.stats")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <DetailItem
+              icon={Package}
+              label={t("detail.totalProducts")}
+              value={stockData?.pagination.total.toString() || "0"}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Products in Warehouse */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">{t("detail.productsInWarehouse")}</CardTitle>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Input
+              type="search"
+              placeholder={tStock("search.placeholder")}
+              className="pl-9"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingStock ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 rounded-lg border border-neutral-200 p-4 dark:border-neutral-700"
+                >
+                  <div className="h-10 w-10 animate-pulse rounded-lg bg-neutral-200 dark:bg-neutral-700" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-1/3 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700" />
+                    <div className="h-3 w-1/4 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : !stockData?.data.length ? (
+            <div className="py-8 text-center">
+              <Package className="mx-auto mb-4 h-12 w-12 text-neutral-400" />
+              <p className="text-neutral-500 dark:text-neutral-400">
+                {t("detail.noProducts")}
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-neutral-200 text-left text-sm font-medium text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+                    <th className="px-4 py-3">{tStock("fields.product")}</th>
+                    <th className="px-4 py-3 text-right">{tStock("fields.quantity")}</th>
+                    <th className="px-4 py-3 text-right">{tStock("fields.reserved")}</th>
+                    <th className="px-4 py-3 text-right">{tStock("fields.available")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stockData.data.map((stock) => (
+                    <tr
+                      key={stock.id}
+                      className="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                    >
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/dashboard/inventory/products/${stock.productId}`}
+                          className="hover:underline"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                              <Package className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                                {stock.productName}
+                              </p>
+                              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                {stock.productSku}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-right font-medium">
+                        {stock.quantity}
+                      </td>
+                      <td className="px-4 py-3 text-right text-neutral-500">
+                        {stock.reservedQuantity}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span
+                          className={`font-medium ${
+                            stock.availableQuantity === 0
+                              ? "text-destructive"
+                              : stock.availableQuantity <= 10
+                                ? "text-warning-600 dark:text-warning-400"
+                                : "text-success-600 dark:text-success-400"
+                          }`}
+                        >
+                          {stock.availableQuantity}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

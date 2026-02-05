@@ -1,0 +1,251 @@
+"use client";
+
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { X } from "lucide-react";
+import { Button } from "@/ui/components/button";
+import { Input } from "@/ui/components/input";
+import { Label } from "@/ui/components/label";
+import { FormField } from "@/ui/components/form-field";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
+import {
+  createProductSchema,
+  toCreateProductDto,
+  toUpdateProductDto,
+  type CreateProductFormData,
+} from "../../schemas/product.schema";
+import {
+  useCreateProduct,
+  useUpdateProduct,
+  useProduct,
+} from "../../hooks/use-products";
+import { useProductFormState } from "../../hooks/use-inventory-store";
+
+export function ProductForm() {
+  const t = useTranslations("inventory.products");
+  const tCommon = useTranslations("common");
+  const { isOpen, editingId, close } = useProductFormState();
+  const { data: existingProduct, isLoading: isLoadingProduct } = useProduct(
+    editingId || ""
+  );
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+
+  const isEditing = Boolean(editingId);
+  const isSubmitting = createProduct.isPending || updateProduct.isPending;
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateProductFormData>({
+    resolver: zodResolver(createProductSchema),
+    defaultValues: {
+      sku: "",
+      name: "",
+      description: "",
+      unitOfMeasure: "unit",
+      cost: 0,
+      price: 0,
+      minStock: 0,
+      maxStock: 100,
+    },
+  });
+
+  // Populate form when editing
+  useEffect(() => {
+    if (isEditing && existingProduct) {
+      reset({
+        sku: existingProduct.sku,
+        name: existingProduct.name,
+        description: existingProduct.description || "",
+        categoryId: existingProduct.categoryId || "",
+        unitOfMeasure: existingProduct.unitOfMeasure,
+        cost: existingProduct.cost,
+        price: existingProduct.price,
+        minStock: existingProduct.minStock,
+        maxStock: existingProduct.maxStock,
+        imageUrl: existingProduct.imageUrl || "",
+      });
+    } else if (!isEditing) {
+      reset({
+        sku: "",
+        name: "",
+        description: "",
+        unitOfMeasure: "unit",
+        cost: 0,
+        price: 0,
+        minStock: 0,
+        maxStock: 100,
+      });
+    }
+  }, [isEditing, existingProduct, reset]);
+
+  const onSubmit = async (data: CreateProductFormData) => {
+    try {
+      if (isEditing && editingId) {
+        const dto = toUpdateProductDto(data);
+        await updateProduct.mutateAsync({ id: editingId, data: dto });
+      } else {
+        const dto = toCreateProductDto(data);
+        await createProduct.mutateAsync(dto);
+      }
+      close();
+      reset();
+    } catch {
+      // Error is handled by the mutation
+    }
+  };
+
+  const handleClose = () => {
+    close();
+    reset();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>
+            {isEditing ? t("form.editTitle") : t("form.createTitle")}
+          </CardTitle>
+          <Button variant="ghost" size="icon" onClick={handleClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {isLoadingProduct && isEditing ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {(createProduct.isError || updateProduct.isError) && (
+                <div className="rounded-md bg-error-100 p-3 text-sm text-error-700">
+                  {t("form.error")}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField error={errors.sku?.message}>
+                  <Label htmlFor="sku">{t("fields.sku")}</Label>
+                  <Input
+                    id="sku"
+                    placeholder={t("fields.skuPlaceholder")}
+                    {...register("sku")}
+                  />
+                </FormField>
+
+                <FormField error={errors.name?.message}>
+                  <Label htmlFor="name">{t("fields.name")}</Label>
+                  <Input
+                    id="name"
+                    placeholder={t("fields.namePlaceholder")}
+                    {...register("name")}
+                  />
+                </FormField>
+              </div>
+
+              <FormField error={errors.description?.message}>
+                <Label htmlFor="description">{t("fields.description")}</Label>
+                <Input
+                  id="description"
+                  placeholder={t("fields.descriptionPlaceholder")}
+                  {...register("description")}
+                />
+              </FormField>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField error={errors.unitOfMeasure?.message}>
+                  <Label htmlFor="unitOfMeasure">{t("fields.unitOfMeasure")}</Label>
+                  <Input
+                    id="unitOfMeasure"
+                    placeholder={t("fields.unitOfMeasurePlaceholder")}
+                    {...register("unitOfMeasure")}
+                  />
+                </FormField>
+
+                <FormField error={errors.categoryId?.message}>
+                  <Label htmlFor="categoryId">{t("fields.category")}</Label>
+                  <Input
+                    id="categoryId"
+                    placeholder={t("fields.categoryPlaceholder")}
+                    {...register("categoryId")}
+                  />
+                </FormField>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField error={errors.cost?.message}>
+                  <Label htmlFor="cost">{t("fields.cost")}</Label>
+                  <Input
+                    id="cost"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...register("cost", { valueAsNumber: true })}
+                  />
+                </FormField>
+
+                <FormField error={errors.price?.message}>
+                  <Label htmlFor="price">{t("fields.price")}</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...register("price", { valueAsNumber: true })}
+                  />
+                </FormField>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField error={errors.minStock?.message}>
+                  <Label htmlFor="minStock">{t("fields.minStock")}</Label>
+                  <Input
+                    id="minStock"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    {...register("minStock", { valueAsNumber: true })}
+                  />
+                </FormField>
+
+                <FormField error={errors.maxStock?.message}>
+                  <Label htmlFor="maxStock">{t("fields.maxStock")}</Label>
+                  <Input
+                    id="maxStock"
+                    type="number"
+                    min="0"
+                    placeholder="100"
+                    {...register("maxStock", { valueAsNumber: true })}
+                  />
+                </FormField>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={handleClose}>
+                  {tCommon("cancel")}
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? tCommon("loading")
+                    : isEditing
+                      ? tCommon("save")
+                      : tCommon("create")}
+                </Button>
+              </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
