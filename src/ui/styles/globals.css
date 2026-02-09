@@ -27,6 +27,45 @@
   --color-neutral-900: oklch(18% 0.012 250);
   --color-neutral-950: oklch(12% 0.01 250);
 
+  /* Success - Green */
+  --color-success-50: oklch(97% 0.02 145);
+  --color-success-100: oklch(93% 0.04 145);
+  --color-success-200: oklch(86% 0.08 145);
+  --color-success-300: oklch(76% 0.12 145);
+  --color-success-400: oklch(65% 0.14 145);
+  --color-success-500: oklch(55% 0.14 145);
+  --color-success-600: oklch(47% 0.12 145);
+  --color-success-700: oklch(40% 0.1 145);
+  --color-success-800: oklch(34% 0.08 145);
+  --color-success-900: oklch(28% 0.06 145);
+  --color-success-950: oklch(20% 0.04 145);
+
+  /* Warning - Amber */
+  --color-warning-50: oklch(97% 0.02 85);
+  --color-warning-100: oklch(93% 0.04 85);
+  --color-warning-200: oklch(86% 0.08 85);
+  --color-warning-300: oklch(76% 0.12 85);
+  --color-warning-400: oklch(65% 0.14 85);
+  --color-warning-500: oklch(55% 0.14 85);
+  --color-warning-600: oklch(47% 0.12 85);
+  --color-warning-700: oklch(40% 0.1 85);
+  --color-warning-800: oklch(34% 0.08 85);
+  --color-warning-900: oklch(28% 0.06 85);
+  --color-warning-950: oklch(20% 0.04 85);
+
+  /* Info - Blue */
+  --color-info-50: oklch(97% 0.014 250);
+  --color-info-100: oklch(93% 0.032 250);
+  --color-info-200: oklch(86% 0.065 250);
+  --color-info-300: oklch(76% 0.1 250);
+  --color-info-400: oklch(65% 0.12 250);
+  --color-info-500: oklch(55% 0.12 250);
+  --color-info-600: oklch(47% 0.1 250);
+  --color-info-700: oklch(40% 0.085 250);
+  --color-info-800: oklch(34% 0.07 250);
+  --color-info-900: oklch(28% 0.055 250);
+  --color-info-950: oklch(20% 0.04 250);
+
   /* Semantic Colors */
   --color-background: oklch(99% 0.002 250);
   --color-foreground: var(--color-neutral-900);

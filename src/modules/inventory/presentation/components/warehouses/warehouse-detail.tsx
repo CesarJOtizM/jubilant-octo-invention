@@ -14,6 +14,7 @@ import {
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
+import { Badge } from "@/ui/components/badge";
 import { useWarehouse } from "../../hooks/use-warehouses";
 import { useStock } from "../../hooks/use-stock";
 import { useState } from "react";
@@ -135,15 +136,9 @@ export function WarehouseDetail({ warehouseId }: WarehouseDetailProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span
-            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
-              warehouse.isActive
-                ? "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
-                : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400"
-            }`}
-          >
+          <Badge variant={warehouse.isActive ? "success" : "secondary"}>
             {warehouse.isActive ? t("status.active") : t("status.inactive")}
-          </span>
+          </Badge>
           <Button asChild>
             <Link href={`/dashboard/inventory/warehouses/${warehouseId}/edit`}>
               <Edit className="mr-2 h-4 w-4" />

@@ -1,11 +1,11 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Label } from "@/ui/components/label";
@@ -40,20 +40,33 @@ export function TransferFormPage() {
   } = useForm<CreateTransferFormData>({
     resolver: zodResolver(createTransferSchema),
     defaultValues: {
-      productId: "",
       fromWarehouseId: "",
       toWarehouseId: "",
-      quantity: 1,
+      lines: [{ productId: "", quantity: 1 }],
       notes: "",
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "lines",
+  });
+
   const selectedFromWarehouse = watch("fromWarehouseId");
+  const selectedProducts = watch("lines").map((line) => line.productId);
 
   // Filter out the source warehouse from destination options
   const toWarehouseOptions = warehousesData?.data.filter(
     (w) => w.id !== selectedFromWarehouse
   ) || [];
+
+  // Filter out already selected products for each line
+  const getAvailableProducts = (currentIndex: number) => {
+    const selectedInOtherLines = selectedProducts.filter((_, i) => i !== currentIndex);
+    return productsData?.data.filter(
+      (product) => !selectedInOtherLines.includes(product.id)
+    ) || [];
+  };
 
   const onSubmit = async (data: CreateTransferFormData) => {
     try {
@@ -63,6 +76,10 @@ export function TransferFormPage() {
     } catch {
       // Error is handled by the mutation
     }
+  };
+
+  const handleAddLine = () => {
+    append({ productId: "", quantity: 1 });
   };
 
   return (
@@ -96,29 +113,6 @@ export function TransferFormPage() {
                 {t("form.error")}
               </div>
             )}
-
-            {/* Product Selection */}
-            <FormField error={errors.productId?.message}>
-              <Label>{t("fields.product")} *</Label>
-              <Controller
-                name="productId"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("fields.productPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productsData?.data.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name} ({product.sku})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </FormField>
 
             {/* Warehouse Selection */}
             <div className="flex items-end gap-4">
@@ -173,16 +167,76 @@ export function TransferFormPage() {
               </div>
             </div>
 
-            {/* Quantity */}
-            <FormField error={errors.quantity?.message}>
-              <Label>{t("fields.quantity")} *</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder={t("fields.quantityPlaceholder")}
-                {...register("quantity", { valueAsNumber: true })}
-              />
-            </FormField>
+            {/* Products Lines */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>{t("fields.products")} *</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddLine}
+                  className="gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                  {t("actions.addProduct")}
+                </Button>
+              </div>
+
+              {errors.lines?.message && (
+                <p className="text-sm text-destructive">{errors.lines.message}</p>
+              )}
+
+              <div className="space-y-3 rounded-md border p-4">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-start gap-3">
+                    <div className="flex-1">
+                      <FormField error={errors.lines?.[index]?.productId?.message}>
+                        <Controller
+                          name={`lines.${index}.productId`}
+                          control={control}
+                          render={({ field: selectField }) => (
+                            <Select value={selectField.value} onValueChange={selectField.onChange}>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t("fields.productPlaceholder")} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {getAvailableProducts(index).map((product) => (
+                                  <SelectItem key={product.id} value={product.id}>
+                                    {product.name} ({product.sku})
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </FormField>
+                    </div>
+                    <div className="w-32">
+                      <FormField error={errors.lines?.[index]?.quantity?.message}>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder={t("fields.qty")}
+                          {...register(`lines.${index}.quantity`, { valueAsNumber: true })}
+                        />
+                      </FormField>
+                    </div>
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="mt-1"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Notes */}
             <FormField error={errors.notes?.message}>

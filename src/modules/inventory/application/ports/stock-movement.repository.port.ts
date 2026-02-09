@@ -18,4 +18,6 @@ export interface StockMovementRepositoryPort {
   findAll(filters?: StockMovementFilters): Promise<PaginatedResult<StockMovement>>;
   findById(id: string): Promise<StockMovement | null>;
   create(data: CreateStockMovementDto): Promise<StockMovement>;
+  post(id: string): Promise<StockMovement>;
+  void(id: string): Promise<StockMovement>;
 }

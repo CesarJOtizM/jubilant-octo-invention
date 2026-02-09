@@ -2,51 +2,40 @@
  * API Response DTOs for dashboard metrics
  */
 
+export interface ReportMetadata {
+  reportType: string;
+  reportTitle: string;
+  generatedAt: string;
+  totalRecords: number;
+  parameters?: Record<string, unknown>;
+}
+
 export interface InventoryAvailableResponseDto {
   data: {
+    columns: Array<{ key: string; header: string; type: string }>;
+    rows: Array<Record<string, unknown>>;
+    metadata: ReportMetadata;
     summary: {
       totalItems: number;
       totalValue: number;
       totalQuantity: number;
     };
-    items: Array<{
-      productId: string;
-      productName: string;
-      sku: string;
-      quantity: number;
-      unitPrice: number;
-      totalValue: number;
-    }>;
   };
 }
 
 export interface LowStockResponseDto {
   data: {
-    items: Array<{
-      productId: string;
-      productName: string;
-      sku: string;
-      currentQuantity: number;
-      minQuantity: number;
-      warehouseId: string;
-      warehouseName: string;
-    }>;
-    total: number;
+    columns: Array<{ key: string; header: string; type: string }>;
+    rows: Array<Record<string, unknown>>;
+    metadata: ReportMetadata;
   };
 }
 
 export interface SalesReportResponseDto {
   data: {
-    summary: {
-      totalSales: number;
-      totalRevenue: number;
-      averageOrderValue: number;
-    };
-    items: Array<{
-      date: string;
-      salesCount: number;
-      revenue: number;
-    }>;
+    columns: Array<{ key: string; header: string; type: string }>;
+    rows: Array<Record<string, unknown>>;
+    metadata: ReportMetadata;
   };
 }
 

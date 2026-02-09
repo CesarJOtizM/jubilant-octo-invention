@@ -1,24 +1,31 @@
-import type { MovementType } from "../../domain/entities/stock-movement.entity";
+import type { MovementType, MovementStatus } from "../../domain/entities/stock-movement.entity";
 
 /**
  * API Response DTOs for Stock Movements
  */
 
-export interface StockMovementResponseDto {
+export interface MovementLineResponseDto {
   id: string;
   productId: string;
   productName: string;
   productSku: string;
+  quantity: number;
+  unitCost: number | null;
+}
+
+export interface StockMovementResponseDto {
+  id: string;
   warehouseId: string;
   warehouseName: string;
   type: MovementType;
-  quantity: number;
-  previousQuantity: number;
-  newQuantity: number;
-  reason: string;
+  status: MovementStatus;
   reference: string | null;
+  reason: string | null;
+  note: string | null;
+  lines: MovementLineResponseDto[];
   createdBy: string;
   createdAt: string;
+  postedAt: string | null;
 }
 
 export interface StockMovementListResponseDto {
@@ -31,21 +38,28 @@ export interface StockMovementListResponseDto {
   };
 }
 
-export interface CreateStockMovementDto {
+export interface CreateMovementLineDto {
   productId: string;
+  quantity: number;
+  unitCost?: number;
+}
+
+export interface CreateStockMovementDto {
   warehouseId: string;
   type: MovementType;
-  quantity: number;
-  reason: string;
   reference?: string;
+  reason?: string;
+  note?: string;
+  lines: CreateMovementLineDto[];
 }
 
 export interface StockMovementFilters {
-  productId?: string;
   warehouseId?: string;
   type?: MovementType;
-  dateFrom?: string;
-  dateTo?: string;
+  status?: MovementStatus;
+  productId?: string;
+  startDate?: string;
+  endDate?: string;
   search?: string;
   page?: number;
   limit?: number;

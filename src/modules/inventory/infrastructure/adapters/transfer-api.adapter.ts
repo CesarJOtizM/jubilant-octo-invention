@@ -25,7 +25,7 @@ export class TransferApiAdapter implements TransferRepositoryPort {
     });
 
     return {
-      data: response.data.data.map(TransferMapper.toDomain),
+      data: (response.data.data ?? []).map(TransferMapper.fromApiRaw),
       pagination: response.data.pagination,
     };
   }
@@ -65,9 +65,6 @@ export class TransferApiAdapter implements TransferRepositoryPort {
 
     const params: Record<string, unknown> = {};
 
-    if (filters.productId) {
-      params.productId = filters.productId;
-    }
     if (filters.fromWarehouseId) {
       params.fromWarehouseId = filters.fromWarehouseId;
     }

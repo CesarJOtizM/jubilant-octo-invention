@@ -43,18 +43,25 @@ export class DashboardApiService {
     const lowStockData = lowStockResponse.data;
     const salesData = salesResponse.data;
 
+    // Calculate sales totals from rows
+    const salesRows = salesData.data.rows || [];
+    const monthlyRevenue = salesRows.reduce(
+      (sum: number, row: Record<string, unknown>) => sum + (Number(row.totalAmount) || 0),
+      0
+    );
+
     return {
       inventory: {
-        totalProducts: inventoryData.data.summary.totalItems,
-        totalValue: inventoryData.data.summary.totalValue,
-        totalQuantity: inventoryData.data.summary.totalQuantity,
+        totalProducts: inventoryData.data.summary?.totalItems ?? inventoryData.data.metadata.totalRecords,
+        totalValue: inventoryData.data.summary?.totalValue ?? 0,
+        totalQuantity: inventoryData.data.summary?.totalQuantity ?? 0,
       },
       lowStock: {
-        criticalCount: lowStockData.data.total,
+        criticalCount: lowStockData.data.metadata.totalRecords,
       },
       sales: {
-        monthlyTotal: salesData.data.summary.totalSales,
-        monthlyRevenue: salesData.data.summary.totalRevenue,
+        monthlyTotal: salesData.data.metadata.totalRecords,
+        monthlyRevenue,
       },
     };
   }

@@ -1,19 +1,32 @@
 import { Entity } from "@/shared/domain";
 
-export type TransferStatus = "PENDING" | "IN_TRANSIT" | "COMPLETED" | "CANCELLED";
+export type TransferStatus =
+  | "DRAFT"
+  | "IN_TRANSIT"
+  | "PARTIAL"
+  | "RECEIVED"
+  | "REJECTED"
+  | "CANCELED";
 
-export interface TransferProps {
+export interface TransferLine {
   id: string;
   productId: string;
   productName: string;
   productSku: string;
+  quantity: number;
+  receivedQuantity: number | null;
+}
+
+export interface TransferProps {
+  id: string;
   fromWarehouseId: string;
   fromWarehouseName: string;
   toWarehouseId: string;
   toWarehouseName: string;
-  quantity: number;
   status: TransferStatus;
   notes: string | null;
+  lines: TransferLine[];
+  linesCount: number;
   createdBy: string;
   createdAt: Date;
   completedAt: Date | null;
@@ -29,32 +42,18 @@ export class Transfer extends Entity<string> {
 
   static create(props: TransferProps): Transfer {
     return new Transfer(props.id, {
-      productId: props.productId,
-      productName: props.productName,
-      productSku: props.productSku,
       fromWarehouseId: props.fromWarehouseId,
       fromWarehouseName: props.fromWarehouseName,
       toWarehouseId: props.toWarehouseId,
       toWarehouseName: props.toWarehouseName,
-      quantity: props.quantity,
       status: props.status,
       notes: props.notes,
+      lines: props.lines,
+      linesCount: props.linesCount,
       createdBy: props.createdBy,
       createdAt: props.createdAt,
       completedAt: props.completedAt,
     });
-  }
-
-  get productId(): string {
-    return this.props.productId;
-  }
-
-  get productName(): string {
-    return this.props.productName;
-  }
-
-  get productSku(): string {
-    return this.props.productSku;
   }
 
   get fromWarehouseId(): string {
@@ -73,16 +72,28 @@ export class Transfer extends Entity<string> {
     return this.props.toWarehouseName;
   }
 
-  get quantity(): number {
-    return this.props.quantity;
-  }
-
   get status(): TransferStatus {
     return this.props.status;
   }
 
   get notes(): string | null {
     return this.props.notes;
+  }
+
+  get lines(): TransferLine[] {
+    return this.props.lines;
+  }
+
+  get linesCount(): number {
+    return this.props.linesCount;
+  }
+
+  get totalItems(): number {
+    return this.props.linesCount || this.props.lines.length;
+  }
+
+  get totalQuantity(): number {
+    return this.props.lines.reduce((sum, line) => sum + line.quantity, 0);
   }
 
   get createdBy(): string {
@@ -97,31 +108,43 @@ export class Transfer extends Entity<string> {
     return this.props.completedAt;
   }
 
-  get isPending(): boolean {
-    return this.props.status === "PENDING";
+  get isDraft(): boolean {
+    return this.props.status === "DRAFT";
   }
 
   get isInTransit(): boolean {
     return this.props.status === "IN_TRANSIT";
   }
 
-  get isCompleted(): boolean {
-    return this.props.status === "COMPLETED";
+  get isPartial(): boolean {
+    return this.props.status === "PARTIAL";
   }
 
-  get isCancelled(): boolean {
-    return this.props.status === "CANCELLED";
+  get isReceived(): boolean {
+    return this.props.status === "RECEIVED";
+  }
+
+  get isRejected(): boolean {
+    return this.props.status === "REJECTED";
+  }
+
+  get isCanceled(): boolean {
+    return this.props.status === "CANCELED";
   }
 
   get canStartTransit(): boolean {
-    return this.props.status === "PENDING";
+    return this.props.status === "DRAFT";
   }
 
-  get canComplete(): boolean {
+  get canReceive(): boolean {
+    return this.props.status === "IN_TRANSIT";
+  }
+
+  get canReject(): boolean {
     return this.props.status === "IN_TRANSIT";
   }
 
   get canCancel(): boolean {
-    return this.props.status === "PENDING" || this.props.status === "IN_TRANSIT";
+    return this.props.status === "DRAFT" || this.props.status === "IN_TRANSIT";
   }
 }

@@ -8,7 +8,6 @@ import { Input } from "@/ui/components/input";
 import { Label } from "@/ui/components/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/select";
 import { useDebounce } from "@/shared/presentation/hooks";
-import { useCategories } from "../../hooks/use-categories";
 import type { ProductFilters as ProductFiltersType } from "../../../application/dto/product.dto";
 
 interface ProductFiltersProps {
@@ -22,22 +21,15 @@ export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps
   const [searchValue, setSearchValue] = useState(filters.search || "");
   const [showFilters, setShowFilters] = useState(false);
   const debouncedSearch = useDebounce(searchValue, 300);
-  const { data: categoriesData } = useCategories({ limit: 100, isActive: true });
 
   // Apply debounced search
   useEffect(() => {
-    if (debouncedSearch !== filters.search) {
+    const currentSearch = filters.search || "";
+    if (debouncedSearch !== currentSearch) {
       onFiltersChange({ ...filters, search: debouncedSearch || undefined, page: 1 });
     }
-  }, [debouncedSearch, filters, onFiltersChange]);
-
-  const handleCategoryChange = (categoryId: string) => {
-    onFiltersChange({
-      ...filters,
-      categoryId: categoryId === "all" ? undefined : categoryId,
-      page: 1,
-    });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
   const handleStatusChange = (status: string) => {
     onFiltersChange({
@@ -55,7 +47,7 @@ export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps
     });
   };
 
-  const hasActiveFilters = filters.categoryId || filters.isActive !== undefined || filters.search;
+  const hasActiveFilters = filters.isActive !== undefined || filters.search;
 
   return (
     <div className="space-y-4">
@@ -77,7 +69,7 @@ export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps
           className="gap-2"
         >
           <Filter className="h-4 w-4" />
-          {t("filter") || "Filters"}
+          {t("filter")}
           {hasActiveFilters && (
             <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
               !
@@ -95,26 +87,6 @@ export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps
 
       {showFilters && (
         <div className="flex flex-wrap gap-4 rounded-lg border bg-muted/30 p-4">
-          <div className="min-w-[180px]">
-            <Label className="mb-2 block text-sm">{t("fields.category")}</Label>
-            <Select
-              value={filters.categoryId || "all"}
-              onValueChange={handleCategoryChange}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categoriesData?.data.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="min-w-[150px]">
             <Label className="mb-2 block text-sm">{tCommon("status")}</Label>
             <Select

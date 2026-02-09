@@ -15,6 +15,7 @@ import {
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
+import { Badge } from "@/ui/components/badge";
 import {
   useWarehouses,
   useWarehouseFilters,
@@ -26,7 +27,7 @@ function WarehouseRow({ warehouse }: { warehouse: Warehouse }) {
   const t = useTranslations("inventory.warehouses");
 
   return (
-    <tr className="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
+    <tr className="border-b border-neutral-200 dark:border-neutral-700 transition-colors hover:bg-primary-50/50 dark:hover:bg-primary-950/20">
       <td className="px-4 py-3">
         <Link
           href={`/dashboard/inventory/warehouses/${warehouse.id}`}
@@ -36,10 +37,10 @@ function WarehouseRow({ warehouse }: { warehouse: Warehouse }) {
             <WarehouseIcon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <p className="font-medium text-neutral-900 dark:text-neutral-100">
+            <p className="font-medium text-foreground">
               {warehouse.name}
             </p>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            <p className="text-sm text-muted-foreground">
               {warehouse.code}
             </p>
           </div>
@@ -47,24 +48,18 @@ function WarehouseRow({ warehouse }: { warehouse: Warehouse }) {
       </td>
       <td className="px-4 py-3">
         {warehouse.address ? (
-          <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
-            <MapPin className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-sm text-foreground">
+            <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
             <span className="truncate max-w-xs">{warehouse.address}</span>
           </div>
         ) : (
-          <span className="text-neutral-400">-</span>
+          <span className="text-sm text-muted-foreground">N/A</span>
         )}
       </td>
       <td className="px-4 py-3">
-        <span
-          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-            warehouse.isActive
-              ? "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
-              : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400"
-          }`}
-        >
+        <Badge variant={warehouse.isActive ? "success" : "secondary"}>
           {warehouse.isActive ? t("status.active") : t("status.inactive")}
-        </span>
+        </Badge>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-1">
@@ -188,7 +183,7 @@ export function WarehouseList() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-left text-sm font-medium text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+                  <tr className="border-b border-border text-left text-sm font-medium text-muted-foreground">
                     <th className="px-4 py-3">{t("fields.warehouse")}</th>
                     <th className="px-4 py-3">{t("fields.address")}</th>
                     <th className="px-4 py-3">{t("fields.status")}</th>

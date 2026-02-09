@@ -1,9 +1,9 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { X, ArrowRight } from "lucide-react";
+import { X, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Label } from "@/ui/components/label";
@@ -41,20 +41,33 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
   } = useForm<CreateTransferFormData>({
     resolver: zodResolver(createTransferSchema),
     defaultValues: {
-      productId: "",
       fromWarehouseId: "",
       toWarehouseId: "",
-      quantity: 1,
+      lines: [{ productId: "", quantity: 1 }],
       notes: "",
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "lines",
+  });
+
   const selectedFromWarehouse = watch("fromWarehouseId");
+  const selectedProducts = watch("lines").map((line) => line.productId);
 
   // Filter out the source warehouse from destination options
   const toWarehouseOptions = warehousesData?.data.filter(
     (w) => w.id !== selectedFromWarehouse
   ) || [];
+
+  // Filter out already selected products for each line
+  const getAvailableProducts = (currentIndex: number) => {
+    const selectedInOtherLines = selectedProducts.filter((_, i) => i !== currentIndex);
+    return productsData?.data.filter(
+      (product) => !selectedInOtherLines.includes(product.id)
+    ) || [];
+  };
 
   const onSubmit = async (data: CreateTransferFormData) => {
     try {
@@ -72,11 +85,15 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
     reset();
   };
 
+  const handleAddLine = () => {
+    append({ productId: "", quantity: 1 });
+  };
+
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto mx-4">
+      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t("form.createTitle")}</CardTitle>
           <Button variant="ghost" size="icon" onClick={handleClose}>
@@ -91,28 +108,7 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
               </div>
             )}
 
-            <FormField error={errors.productId?.message}>
-              <Label>{t("fields.product")}</Label>
-              <Controller
-                name="productId"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productsData?.data.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name} ({product.sku})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </FormField>
-
+            {/* Warehouses Selection */}
             <div className="flex items-end gap-4">
               <div className="flex-1">
                 <FormField error={errors.fromWarehouseId?.message}>
@@ -168,15 +164,76 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
               </div>
             </div>
 
-            <FormField error={errors.quantity?.message}>
-              <Label>{t("fields.quantity")}</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder={t("fields.quantityPlaceholder")}
-                {...register("quantity", { valueAsNumber: true })}
-              />
-            </FormField>
+            {/* Products Lines */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>{t("fields.products")}</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddLine}
+                  className="gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                  {t("actions.addProduct")}
+                </Button>
+              </div>
+
+              {errors.lines?.message && (
+                <p className="text-sm text-destructive">{errors.lines.message}</p>
+              )}
+
+              <div className="space-y-3 rounded-md border p-3">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-start gap-3">
+                    <div className="flex-1">
+                      <FormField error={errors.lines?.[index]?.productId?.message}>
+                        <Controller
+                          name={`lines.${index}.productId`}
+                          control={control}
+                          render={({ field: selectField }) => (
+                            <Select value={selectField.value} onValueChange={selectField.onChange}>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t("fields.productPlaceholder")} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {getAvailableProducts(index).map((product) => (
+                                  <SelectItem key={product.id} value={product.id}>
+                                    {product.name} ({product.sku})
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </FormField>
+                    </div>
+                    <div className="w-24">
+                      <FormField error={errors.lines?.[index]?.quantity?.message}>
+                        <Input
+                          type="number"
+                          min="1"
+                          placeholder={t("fields.qty")}
+                          {...register(`lines.${index}.quantity`, { valueAsNumber: true })}
+                        />
+                      </FormField>
+                    </div>
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="mt-1"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <FormField error={errors.notes?.message}>
               <Label>{t("fields.notes")}</Label>

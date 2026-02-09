@@ -10,6 +10,9 @@ export interface StockProps {
   quantity: number;
   reservedQuantity: number;
   availableQuantity: number;
+  averageCost: number;
+  totalValue: number;
+  currency: string;
   lastMovementAt: Date | null;
 }
 
@@ -31,6 +34,9 @@ export class Stock extends Entity<string> {
       quantity: props.quantity,
       reservedQuantity: props.reservedQuantity,
       availableQuantity: props.availableQuantity,
+      averageCost: props.averageCost,
+      totalValue: props.totalValue,
+      currency: props.currency,
       lastMovementAt: props.lastMovementAt,
     });
   }
@@ -65,6 +71,18 @@ export class Stock extends Entity<string> {
 
   get availableQuantity(): number {
     return this.props.availableQuantity;
+  }
+
+  get averageCost(): number {
+    return this.props.averageCost;
+  }
+
+  get totalValue(): number {
+    return this.props.totalValue;
+  }
+
+  get currency(): string {
+    return this.props.currency;
   }
 
   get lastMovementAt(): Date | null {

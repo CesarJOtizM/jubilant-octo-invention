@@ -7,7 +7,7 @@ export class WarehouseMapper {
       id: dto.id,
       code: dto.code,
       name: dto.name,
-      address: dto.address,
+      address: typeof dto.address === "string" ? dto.address : null,
       isActive: dto.isActive,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),

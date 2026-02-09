@@ -42,13 +42,44 @@ export class TokenService {
     }
   }
 
+  /**
+   * Reads access token from cookie (fallback when localStorage is not ready or empty).
+   * Used so requests after client navigation always have the token.
+   */
+  static getAccessTokenFromCookie(): string | null {
+    if (!isClient() || typeof document?.cookie !== 'string') return null;
+    try {
+      const name = `${TOKEN_KEY}=`;
+      const decoded = decodeURIComponent(document.cookie);
+      const parts = decoded.split(';');
+      for (const part of parts) {
+        const trimmed = part.trim();
+        if (trimmed.startsWith(name)) {
+          const value = trimmed.slice(name.length).trim();
+          return value || null;
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
   static getAccessToken(): string | null {
     if (!isClient()) return null;
 
     try {
-      return localStorage.getItem(TOKEN_KEY);
-    } catch {
+      const fromStorage = localStorage.getItem(TOKEN_KEY);
+      if (fromStorage) return fromStorage;
+      // Fallback: use cookie (e.g. after login + route change before rehydration)
+      const fromCookie = this.getAccessTokenFromCookie();
+      if (fromCookie) {
+        localStorage.setItem(TOKEN_KEY, fromCookie);
+        return fromCookie;
+      }
       return null;
+    } catch {
+      return this.getAccessTokenFromCookie();
     }
   }
 

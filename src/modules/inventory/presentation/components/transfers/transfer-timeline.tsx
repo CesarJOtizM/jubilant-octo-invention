@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Check, Clock, Truck, XCircle, Package } from "lucide-react";
+import { Check, FileEdit, Truck, XCircle, Package, Ban } from "lucide-react";
 import { cn } from "@/ui/lib/utils";
 import type { TransferStatus } from "../../../domain/entities/transfer.entity";
 
@@ -12,7 +12,8 @@ interface TimelineStep {
   date?: Date | null;
   isActive: boolean;
   isCompleted: boolean;
-  isCancelled?: boolean;
+  isCanceled?: boolean;
+  isRejected?: boolean;
 }
 
 interface TransferTimelineProps {
@@ -25,7 +26,9 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
   const t = useTranslations("inventory.transfers");
 
   const getSteps = (): TimelineStep[] => {
-    const isCancelled = status === "CANCELLED";
+    const isCanceled = status === "CANCELED";
+    const isRejected = status === "REJECTED";
+    const isReceived = status === "RECEIVED" || status === "PARTIAL";
 
     const steps: TimelineStep[] = [
       {
@@ -37,12 +40,12 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
         isCompleted: true,
       },
       {
-        status: "PENDING",
-        label: t("timeline.pending"),
-        description: t("timeline.pendingDescription"),
+        status: "DRAFT",
+        label: t("timeline.draft"),
+        description: t("timeline.draftDescription"),
         date: createdAt,
-        isActive: status === "PENDING",
-        isCompleted: status !== "PENDING" && !isCancelled,
+        isActive: status === "DRAFT",
+        isCompleted: status !== "DRAFT" && !isCanceled && !isRejected,
       },
       {
         status: "IN_TRANSIT",
@@ -50,29 +53,40 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
         description: t("timeline.inTransitDescription"),
         date: null,
         isActive: status === "IN_TRANSIT",
-        isCompleted: status === "COMPLETED",
+        isCompleted: isReceived,
       },
       {
-        status: "COMPLETED",
-        label: t("timeline.completed"),
-        description: t("timeline.completedDescription"),
+        status: "RECEIVED",
+        label: t("timeline.received"),
+        description: t("timeline.receivedDescription"),
         date: completedAt,
         isActive: false,
-        isCompleted: status === "COMPLETED",
+        isCompleted: isReceived,
       },
     ];
 
-    if (isCancelled) {
-      // Replace the last step with cancelled
+    // Handle terminal states
+    if (isCanceled) {
       steps.pop();
       steps.push({
-        status: "CANCELLED",
-        label: t("timeline.cancelled"),
-        description: t("timeline.cancelledDescription"),
+        status: "CANCELED",
+        label: t("timeline.canceled"),
+        description: t("timeline.canceledDescription"),
         date: null,
         isActive: false,
         isCompleted: false,
-        isCancelled: true,
+        isCanceled: true,
+      });
+    } else if (isRejected) {
+      steps.pop();
+      steps.push({
+        status: "REJECTED",
+        label: t("timeline.rejected"),
+        description: t("timeline.rejectedDescription"),
+        date: null,
+        isActive: false,
+        isCompleted: false,
+        isRejected: true,
       });
     }
 
@@ -82,7 +96,10 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
   const steps = getSteps();
 
   const getIcon = (step: TimelineStep) => {
-    if (step.isCancelled) {
+    if (step.isCanceled) {
+      return <Ban className="h-5 w-5" />;
+    }
+    if (step.isRejected) {
       return <XCircle className="h-5 w-5" />;
     }
     if (step.isCompleted) {
@@ -90,8 +107,8 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
     }
     if (step.isActive) {
       switch (step.status) {
-        case "PENDING":
-          return <Clock className="h-5 w-5" />;
+        case "DRAFT":
+          return <FileEdit className="h-5 w-5" />;
         case "IN_TRANSIT":
           return <Truck className="h-5 w-5" />;
         default:
@@ -121,7 +138,7 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
                   "absolute left-[15px] top-[30px] h-[calc(100%+8px)] w-0.5",
                   step.isCompleted
                     ? "bg-primary"
-                    : step.isCancelled
+                    : step.isCanceled || step.isRejected
                       ? "bg-red-500"
                       : "bg-muted"
                 )}
@@ -136,7 +153,7 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
                   ? "border-primary bg-primary text-primary-foreground"
                   : step.isActive
                     ? "border-primary bg-background text-primary"
-                    : step.isCancelled
+                    : step.isCanceled || step.isRejected
                       ? "border-red-500 bg-red-500 text-white"
                       : "border-muted bg-background text-muted-foreground"
               )}
@@ -152,7 +169,7 @@ export function TransferTimeline({ status, createdAt, completedAt }: TransferTim
                     "font-medium",
                     step.isActive
                       ? "text-primary"
-                      : step.isCancelled
+                      : step.isCanceled || step.isRejected
                         ? "text-red-500"
                         : step.isCompleted
                           ? "text-foreground"

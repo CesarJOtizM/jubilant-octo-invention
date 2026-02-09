@@ -2,6 +2,33 @@
  * API Response DTOs for Products
  */
 
+/** Forma real de la respuesta del backend (puede variar del DTO interno) */
+export interface ProductApiRawDto {
+  id: string;
+  sku: string;
+  name: string;
+  description?: string | null;
+  /** Objeto unidad (backend) o no presente si viene unitOfMeasure */
+  unit?: { code?: string; name?: string; precision?: number };
+  unitOfMeasure?: string;
+  barcode?: string;
+  brand?: string;
+  model?: string;
+  status?: string;
+  isActive?: boolean;
+  costMethod?: string;
+  orgId?: string;
+  cost?: number;
+  price?: number;
+  minStock?: number;
+  maxStock?: number;
+  categoryId?: string | null;
+  categoryName?: string | null;
+  imageUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProductResponseDto {
   id: string;
   sku: string;

@@ -23,9 +23,17 @@ export class StockApiAdapter implements StockRepositoryPort {
       params: this.buildQueryParams(filters),
     });
 
+    const body = response.data;
+    const items = body.data ?? [];
+
     return {
-      data: response.data.data.map(StockMapper.toDomain),
-      pagination: response.data.pagination,
+      data: items.map((item, index) => StockMapper.toDomain(item, index)),
+      pagination: body.pagination ?? {
+        page: filters?.page ?? 1,
+        limit: filters?.limit ?? 20,
+        total: items.length,
+        totalPages: 1,
+      },
     };
   }
 

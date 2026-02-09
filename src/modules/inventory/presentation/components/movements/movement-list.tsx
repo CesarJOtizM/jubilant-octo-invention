@@ -2,26 +2,50 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Search, ArrowRightLeft } from "lucide-react";
+import { Plus, Search, ArrowRightLeft, CheckCircle, XCircle, MoreHorizontal } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
 import { Skeleton } from "@/ui/components/skeleton";
-import { useMovements } from "../../hooks/use-movements";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/ui/components/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/ui/components/alert-dialog";
+import { useMovements, usePostMovement, useVoidMovement } from "../../hooks/use-movements";
 import { MovementTypeBadge } from "./movement-type-badge";
+import { MovementStatusBadge } from "./movement-status-badge";
 import { MovementFilters } from "./movement-filters";
 import { MovementForm } from "./movement-form";
 import type { StockMovementFilters } from "../../../application/dto/stock-movement.dto";
+import type { StockMovement } from "../../../domain/entities/stock-movement.entity";
 
 export function MovementList() {
   const t = useTranslations("inventory.movements");
+  const tCommon = useTranslations("common");
   const [filters, setFilters] = useState<StockMovementFilters>({
     page: 1,
     limit: 10,
   });
   const [searchValue, setSearchValue] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [postConfirm, setPostConfirm] = useState<StockMovement | null>(null);
+  const [voidConfirm, setVoidConfirm] = useState<StockMovement | null>(null);
+
   const { data, isLoading, isError } = useMovements(filters);
+  const postMovement = usePostMovement();
+  const voidMovement = useVoidMovement();
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -33,6 +57,26 @@ export function MovementList() {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(date);
+  };
+
+  const handlePost = async () => {
+    if (!postConfirm) return;
+    try {
+      await postMovement.mutateAsync(postConfirm.id);
+      setPostConfirm(null);
+    } catch {
+      // Error handled by mutation
+    }
+  };
+
+  const handleVoid = async () => {
+    if (!voidConfirm) return;
+    try {
+      await voidMovement.mutateAsync(voidConfirm.id);
+      setVoidConfirm(null);
+    } catch {
+      // Error handled by mutation
+    }
   };
 
   if (isError) {
@@ -95,12 +139,13 @@ export function MovementList() {
                   <thead>
                     <tr className="border-b text-left text-sm font-medium text-muted-foreground">
                       <th className="pb-3 pr-4">{t("fields.type")}</th>
-                      <th className="pb-3 pr-4">{t("fields.product")}</th>
+                      <th className="pb-3 pr-4">{t("fields.status")}</th>
                       <th className="pb-3 pr-4">{t("fields.warehouse")}</th>
-                      <th className="pb-3 pr-4">{t("fields.quantity")}</th>
-                      <th className="pb-3 pr-4">{t("fields.previousQty")} → {t("fields.newQty")}</th>
-                      <th className="pb-3 pr-4">{t("fields.reason")}</th>
+                      <th className="pb-3 pr-4">{t("fields.totalItems")}</th>
+                      <th className="pb-3 pr-4">{t("fields.totalQuantity")}</th>
+                      <th className="pb-3 pr-4">{t("fields.reference")}</th>
                       <th className="pb-3 pr-4">{t("fields.createdAt")}</th>
+                      <th className="pb-3 pr-4 text-right">{tCommon("actions")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -110,39 +155,60 @@ export function MovementList() {
                           <MovementTypeBadge type={movement.type} />
                         </td>
                         <td className="py-4 pr-4">
-                          <div>
-                            <p className="font-medium">{movement.productName}</p>
-                            <p className="text-sm text-muted-foreground">{movement.productSku}</p>
-                          </div>
+                          <MovementStatusBadge status={movement.status} />
                         </td>
                         <td className="py-4 pr-4">{movement.warehouseName}</td>
                         <td className="py-4 pr-4">
-                          <span className={
-                            movement.type === "IN"
-                              ? "text-green-600 dark:text-green-400"
-                              : movement.type === "OUT"
-                                ? "text-red-600 dark:text-red-400"
-                                : "text-yellow-600 dark:text-yellow-400"
-                          }>
-                            {movement.type === "IN" ? "+" : movement.type === "OUT" ? "-" : "±"}
-                            {movement.quantity}
+                          <span className="font-medium">{movement.totalItems}</span>
+                          <span className="text-muted-foreground ml-1">
+                            {movement.totalItems === 1 ? "product" : "products"}
                           </span>
                         </td>
                         <td className="py-4 pr-4">
-                          <span className="text-muted-foreground">{movement.previousQuantity}</span>
-                          <span className="mx-2">→</span>
-                          <span className="font-medium">{movement.newQuantity}</span>
+                          <span className={
+                            movement.isEntry
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-red-600 dark:text-red-400"
+                          }>
+                            {movement.isEntry ? "+" : "-"}
+                            {movement.totalQuantity}
+                          </span>
                         </td>
                         <td className="py-4 pr-4">
-                          <p className="max-w-xs truncate">{movement.reason}</p>
-                          {movement.reference && (
-                            <p className="text-sm text-muted-foreground">
-                              Ref: {movement.reference}
-                            </p>
+                          {movement.reference ? (
+                            <span className="font-mono text-sm">{movement.reference}</span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
                           )}
                         </td>
                         <td className="py-4 pr-4 text-sm text-muted-foreground">
                           {formatDate(movement.createdAt)}
+                        </td>
+                        <td className="py-4 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {movement.canPost && (
+                                <DropdownMenuItem onClick={() => setPostConfirm(movement)}>
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  {t("actions.post")}
+                                </DropdownMenuItem>
+                              )}
+                              {movement.canVoid && (
+                                <DropdownMenuItem
+                                  onClick={() => setVoidConfirm(movement)}
+                                  className="text-destructive"
+                                >
+                                  <XCircle className="mr-2 h-4 w-4" />
+                                  {t("actions.void")}
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
                     ))}
@@ -169,7 +235,7 @@ export function MovementList() {
                       disabled={data.pagination.page <= 1}
                       onClick={() => setFilters((prev) => ({ ...prev, page: data.pagination.page - 1 }))}
                     >
-                      Previous
+                      {tCommon("previous")}
                     </Button>
                     <Button
                       variant="outline"
@@ -177,7 +243,7 @@ export function MovementList() {
                       disabled={data.pagination.page >= data.pagination.totalPages}
                       onClick={() => setFilters((prev) => ({ ...prev, page: data.pagination.page + 1 }))}
                     >
-                      Next
+                      {tCommon("next")}
                     </Button>
                   </div>
                 </div>
@@ -188,6 +254,49 @@ export function MovementList() {
       </Card>
 
       <MovementForm open={isFormOpen} onOpenChange={setIsFormOpen} />
+
+      {/* Post Confirmation Dialog */}
+      <AlertDialog open={!!postConfirm} onOpenChange={(open) => !open && setPostConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("confirmPost.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("confirmPost.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handlePost}
+              disabled={postMovement.isPending}
+            >
+              {postMovement.isPending ? tCommon("loading") : t("actions.post")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Void Confirmation Dialog */}
+      <AlertDialog open={!!voidConfirm} onOpenChange={(open) => !open && setVoidConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("confirmVoid.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("confirmVoid.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleVoid}
+              disabled={voidMovement.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {voidMovement.isPending ? tCommon("loading") : t("actions.void")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

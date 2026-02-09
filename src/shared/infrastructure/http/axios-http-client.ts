@@ -70,17 +70,37 @@ export class AxiosHttpClient implements HttpClientPort {
           _retry?: boolean;
         };
 
-        // Handle 401 - Try to refresh token
+        // Handle 401 - Attempt token refresh before clearing session
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
 
           const refreshToken = TokenService.getRefreshToken();
-          if (refreshToken && !TokenService.isTokenExpired()) {
+          if (refreshToken) {
             try {
-              // Token refresh logic would go here
-              // For now, just clear tokens and let the app redirect to login
-              TokenService.clearTokens();
+              const refreshResponse = await axios.post(
+                `${env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+                { refreshToken }
+              );
+
+              const { accessToken, refreshToken: newRefresh, expiresAt } =
+                refreshResponse.data?.data ?? refreshResponse.data ?? {};
+
+              if (accessToken) {
+                TokenService.setTokens({
+                  accessToken,
+                  refreshToken: newRefresh ?? refreshToken,
+                  expiresAt: expiresAt ?? new Date(Date.now() + 3600000).toISOString(),
+                });
+
+                // Retry the original request with new token
+                if (originalRequest.headers) {
+                  (originalRequest.headers as Record<string, string>).Authorization =
+                    `Bearer ${accessToken}`;
+                }
+                return this.instance(originalRequest);
+              }
             } catch {
+              // Refresh failed — clear session
               TokenService.clearTokens();
             }
           } else {

@@ -13,12 +13,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
+import { Badge } from "@/ui/components/badge";
 import { useProducts, useProductFilters, useSetProductFilters } from "../../hooks";
 import { ProductFilters } from "./product-filters";
 import type { Product } from "../../../domain/entities/product.entity";
 import type { ProductFilters as ProductFiltersType } from "../../../application/dto/product.dto";
 
-function formatCurrency(amount: number): string {
+function formatCurrency(amount: number | null | undefined): string {
+  if (amount == null || amount === 0) return "N/A";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -29,7 +31,7 @@ function ProductRow({ product }: { product: Product }) {
   const t = useTranslations("inventory.products");
 
   return (
-    <tr className="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
+    <tr className="border-b border-neutral-200 dark:border-neutral-700 transition-colors hover:bg-primary-50/50 dark:hover:bg-primary-950/20">
       <td className="px-4 py-3">
         <Link
           href={`/dashboard/inventory/products/${product.id}`}
@@ -39,34 +41,28 @@ function ProductRow({ product }: { product: Product }) {
             <Package className="h-5 w-5 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <p className="font-medium text-neutral-900 dark:text-neutral-100">
+            <p className="font-medium text-foreground">
               {product.name}
             </p>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            <p className="text-sm text-muted-foreground">
               {product.sku}
             </p>
           </div>
         </Link>
       </td>
-      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300">
-        {product.categoryName || "-"}
+      <td className="px-4 py-3 text-sm text-foreground">
+        {product.categoryName || <span className="text-muted-foreground">N/A</span>}
       </td>
-      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300">
+      <td className="px-4 py-3 text-sm font-medium text-foreground">
         {formatCurrency(product.cost)}
       </td>
-      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300">
+      <td className="px-4 py-3 text-sm font-medium text-foreground">
         {formatCurrency(product.price)}
       </td>
       <td className="px-4 py-3">
-        <span
-          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-            product.isActive
-              ? "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
-              : "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400"
-          }`}
-        >
+        <Badge variant={product.isActive ? "success" : "secondary"}>
           {product.isActive ? t("status.active") : t("status.inactive")}
-        </span>
+        </Badge>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-1">
@@ -184,7 +180,7 @@ export function ProductList() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-left text-sm font-medium text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+                  <tr className="border-b border-border text-left text-sm font-medium text-muted-foreground">
                     <th className="px-4 py-3">{t("fields.product")}</th>
                     <th className="px-4 py-3">{t("fields.category")}</th>
                     <th className="px-4 py-3">{t("fields.cost")}</th>

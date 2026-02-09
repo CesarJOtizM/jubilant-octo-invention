@@ -61,18 +61,6 @@ export class WarehouseApiAdapter implements WarehouseRepositoryPort {
     return WarehouseMapper.toDomain(response.data.data);
   }
 
-  async delete(id: string): Promise<void> {
-    await apiClient.delete(`${this.basePath}/${id}`);
-  }
-
-  async toggleStatus(id: string, isActive: boolean): Promise<Warehouse> {
-    const response = await apiClient.patch<ApiResponse<WarehouseResponseDto>>(
-      `${this.basePath}/${id}/status`,
-      { isActive }
-    );
-    return WarehouseMapper.toDomain(response.data.data);
-  }
-
   private buildQueryParams(filters?: WarehouseFilters): Record<string, unknown> {
     if (!filters) return {};
 

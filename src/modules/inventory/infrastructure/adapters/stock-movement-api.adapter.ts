@@ -52,25 +52,42 @@ export class StockMovementApiAdapter implements StockMovementRepositoryPort {
     return StockMovementMapper.toDomain(response.data.data);
   }
 
+  async post(id: string): Promise<StockMovement> {
+    const response = await apiClient.post<ApiResponse<StockMovementResponseDto>>(
+      `${this.basePath}/${id}/post`
+    );
+    return StockMovementMapper.toDomain(response.data.data);
+  }
+
+  async void(id: string): Promise<StockMovement> {
+    const response = await apiClient.post<ApiResponse<StockMovementResponseDto>>(
+      `${this.basePath}/${id}/void`
+    );
+    return StockMovementMapper.toDomain(response.data.data);
+  }
+
   private buildQueryParams(filters?: StockMovementFilters): Record<string, unknown> {
     if (!filters) return {};
 
     const params: Record<string, unknown> = {};
 
-    if (filters.productId) {
-      params.productId = filters.productId;
-    }
     if (filters.warehouseId) {
       params.warehouseId = filters.warehouseId;
     }
     if (filters.type) {
       params.type = filters.type;
     }
-    if (filters.dateFrom) {
-      params.dateFrom = filters.dateFrom;
+    if (filters.status) {
+      params.status = filters.status;
     }
-    if (filters.dateTo) {
-      params.dateTo = filters.dateTo;
+    if (filters.productId) {
+      params.productId = filters.productId;
+    }
+    if (filters.startDate) {
+      params.startDate = filters.startDate;
+    }
+    if (filters.endDate) {
+      params.endDate = filters.endDate;
     }
     if (filters.search) {
       params.search = filters.search;

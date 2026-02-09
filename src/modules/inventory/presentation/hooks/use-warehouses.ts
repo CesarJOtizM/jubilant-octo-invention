@@ -59,26 +59,3 @@ export function useUpdateWarehouse() {
   });
 }
 
-export function useDeleteWarehouse() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => warehouseApiAdapter.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
-    },
-  });
-}
-
-export function useToggleWarehouseStatus() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      warehouseApiAdapter.toggleStatus(id, isActive),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(id) });
-    },
-  });
-}

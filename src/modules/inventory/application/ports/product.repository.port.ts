@@ -20,6 +20,4 @@ export interface ProductRepositoryPort {
   findById(id: string): Promise<Product | null>;
   create(data: CreateProductDto): Promise<Product>;
   update(id: string, data: UpdateProductDto): Promise<Product>;
-  delete(id: string): Promise<void>;
-  toggleStatus(id: string, isActive: boolean): Promise<Product>;
 }

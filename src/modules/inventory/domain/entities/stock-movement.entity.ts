@@ -1,22 +1,37 @@
 import { Entity } from "@/shared/domain";
 
-export type MovementType = "IN" | "OUT" | "ADJUSTMENT";
+export type MovementType =
+  | "IN"
+  | "OUT"
+  | "ADJUST_IN"
+  | "ADJUST_OUT"
+  | "TRANSFER_IN"
+  | "TRANSFER_OUT";
 
-export interface StockMovementProps {
+export type MovementStatus = "DRAFT" | "POSTED" | "VOID";
+
+export interface MovementLine {
   id: string;
   productId: string;
   productName: string;
   productSku: string;
+  quantity: number;
+  unitCost: number | null;
+}
+
+export interface StockMovementProps {
+  id: string;
   warehouseId: string;
   warehouseName: string;
   type: MovementType;
-  quantity: number;
-  previousQuantity: number;
-  newQuantity: number;
-  reason: string;
+  status: MovementStatus;
   reference: string | null;
+  reason: string | null;
+  note: string | null;
+  lines: MovementLine[];
   createdBy: string;
   createdAt: Date;
+  postedAt: Date | null;
 }
 
 export class StockMovement extends Entity<string> {
@@ -29,32 +44,18 @@ export class StockMovement extends Entity<string> {
 
   static create(props: StockMovementProps): StockMovement {
     return new StockMovement(props.id, {
-      productId: props.productId,
-      productName: props.productName,
-      productSku: props.productSku,
       warehouseId: props.warehouseId,
       warehouseName: props.warehouseName,
       type: props.type,
-      quantity: props.quantity,
-      previousQuantity: props.previousQuantity,
-      newQuantity: props.newQuantity,
-      reason: props.reason,
+      status: props.status,
       reference: props.reference,
+      reason: props.reason,
+      note: props.note,
+      lines: props.lines,
       createdBy: props.createdBy,
       createdAt: props.createdAt,
+      postedAt: props.postedAt,
     });
-  }
-
-  get productId(): string {
-    return this.props.productId;
-  }
-
-  get productName(): string {
-    return this.props.productName;
-  }
-
-  get productSku(): string {
-    return this.props.productSku;
   }
 
   get warehouseId(): string {
@@ -69,24 +70,32 @@ export class StockMovement extends Entity<string> {
     return this.props.type;
   }
 
-  get quantity(): number {
-    return this.props.quantity;
-  }
-
-  get previousQuantity(): number {
-    return this.props.previousQuantity;
-  }
-
-  get newQuantity(): number {
-    return this.props.newQuantity;
-  }
-
-  get reason(): string {
-    return this.props.reason;
+  get status(): MovementStatus {
+    return this.props.status;
   }
 
   get reference(): string | null {
     return this.props.reference;
+  }
+
+  get reason(): string | null {
+    return this.props.reason;
+  }
+
+  get note(): string | null {
+    return this.props.note;
+  }
+
+  get lines(): MovementLine[] {
+    return this.props.lines;
+  }
+
+  get totalItems(): number {
+    return this.props.lines.length;
+  }
+
+  get totalQuantity(): number {
+    return this.props.lines.reduce((sum, line) => sum + line.quantity, 0);
   }
 
   get createdBy(): string {
@@ -97,19 +106,45 @@ export class StockMovement extends Entity<string> {
     return this.props.createdAt;
   }
 
+  get postedAt(): Date | null {
+    return this.props.postedAt;
+  }
+
+  // Type helpers
   get isEntry(): boolean {
-    return this.props.type === "IN";
+    return this.props.type === "IN" || this.props.type === "ADJUST_IN" || this.props.type === "TRANSFER_IN";
   }
 
   get isExit(): boolean {
-    return this.props.type === "OUT";
+    return this.props.type === "OUT" || this.props.type === "ADJUST_OUT" || this.props.type === "TRANSFER_OUT";
   }
 
   get isAdjustment(): boolean {
-    return this.props.type === "ADJUSTMENT";
+    return this.props.type === "ADJUST_IN" || this.props.type === "ADJUST_OUT";
   }
 
-  get quantityDifference(): number {
-    return this.props.newQuantity - this.props.previousQuantity;
+  get isTransfer(): boolean {
+    return this.props.type === "TRANSFER_IN" || this.props.type === "TRANSFER_OUT";
+  }
+
+  // Status helpers
+  get isDraft(): boolean {
+    return this.props.status === "DRAFT";
+  }
+
+  get isPosted(): boolean {
+    return this.props.status === "POSTED";
+  }
+
+  get isVoid(): boolean {
+    return this.props.status === "VOID";
+  }
+
+  get canPost(): boolean {
+    return this.props.status === "DRAFT";
+  }
+
+  get canVoid(): boolean {
+    return this.props.status === "POSTED";
   }
 }

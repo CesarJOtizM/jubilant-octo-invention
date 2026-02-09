@@ -42,7 +42,33 @@ export function useCreateMovement() {
     mutationFn: (data: CreateStockMovementDto) => stockMovementApiAdapter.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: movementKeys.lists() });
-      // Also invalidate stock queries since movements affect stock levels
+    },
+  });
+}
+
+export function usePostMovement() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => stockMovementApiAdapter.post(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: movementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: movementKeys.detail(id) });
+      // Also invalidate stock queries since posting affects stock levels
+      queryClient.invalidateQueries({ queryKey: stockKeys.lists() });
+    },
+  });
+}
+
+export function useVoidMovement() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => stockMovementApiAdapter.void(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: movementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: movementKeys.detail(id) });
+      // Also invalidate stock queries since voiding reverses stock changes
       queryClient.invalidateQueries({ queryKey: stockKeys.lists() });
     },
   });

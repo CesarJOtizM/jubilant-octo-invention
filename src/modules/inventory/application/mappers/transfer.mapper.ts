@@ -1,39 +1,75 @@
-import { Transfer } from "../../domain/entities/transfer.entity";
-import type { TransferResponseDto } from "../dto/transfer.dto";
+import { Transfer, type TransferLine } from "../../domain/entities/transfer.entity";
+import type { TransferResponseDto, TransferLineResponseDto, TransferApiRawDto } from "../dto/transfer.dto";
 
 export class TransferMapper {
-  static toDomain(dto: TransferResponseDto): Transfer {
-    return Transfer.create({
+  static lineToDomain(dto: TransferLineResponseDto): TransferLine {
+    return {
       id: dto.id,
       productId: dto.productId,
       productName: dto.productName,
       productSku: dto.productSku,
+      quantity: dto.quantity,
+      receivedQuantity: dto.receivedQuantity,
+    };
+  }
+
+  /** Convert the raw API list item to domain entity */
+  static fromApiRaw(raw: TransferApiRawDto): Transfer {
+    return Transfer.create({
+      id: raw.id,
+      fromWarehouseId: raw.fromWarehouseId,
+      fromWarehouseName: raw.fromWarehouseName ?? "",
+      toWarehouseId: raw.toWarehouseId,
+      toWarehouseName: raw.toWarehouseName ?? "",
+      status: raw.status,
+      notes: typeof raw.note === "string" ? raw.note : null,
+      lines: (raw.lines ?? []).map(TransferMapper.lineToDomain),
+      linesCount: raw.linesCount ?? raw.lines?.length ?? 0,
+      createdBy: raw.createdBy,
+      createdAt: new Date(raw.createdAt),
+      completedAt: typeof raw.completedAt === "string" ? new Date(raw.completedAt) : null,
+    });
+  }
+
+  static toDomain(dto: TransferResponseDto): Transfer {
+    return Transfer.create({
+      id: dto.id,
       fromWarehouseId: dto.fromWarehouseId,
       fromWarehouseName: dto.fromWarehouseName,
       toWarehouseId: dto.toWarehouseId,
       toWarehouseName: dto.toWarehouseName,
-      quantity: dto.quantity,
       status: dto.status,
-      notes: dto.notes,
+      notes: typeof dto.notes === "string" ? dto.notes : null,
+      lines: (dto.lines ?? []).map(TransferMapper.lineToDomain),
+      linesCount: dto.linesCount ?? dto.lines?.length ?? 0,
       createdBy: dto.createdBy,
       createdAt: new Date(dto.createdAt),
-      completedAt: dto.completedAt ? new Date(dto.completedAt) : null,
+      completedAt: typeof dto.completedAt === "string" ? new Date(dto.completedAt) : null,
     });
+  }
+
+  static lineToDto(line: TransferLine): TransferLineResponseDto {
+    return {
+      id: line.id,
+      productId: line.productId,
+      productName: line.productName,
+      productSku: line.productSku,
+      quantity: line.quantity,
+      receivedQuantity: line.receivedQuantity,
+    };
   }
 
   static toDto(entity: Transfer): TransferResponseDto {
     return {
       id: entity.id,
-      productId: entity.productId,
-      productName: entity.productName,
-      productSku: entity.productSku,
       fromWarehouseId: entity.fromWarehouseId,
       fromWarehouseName: entity.fromWarehouseName,
       toWarehouseId: entity.toWarehouseId,
       toWarehouseName: entity.toWarehouseName,
-      quantity: entity.quantity,
       status: entity.status,
       notes: entity.notes,
+      lines: entity.lines.map(TransferMapper.lineToDto),
+      linesCount: entity.linesCount,
       createdBy: entity.createdBy,
       createdAt: entity.createdAt.toISOString(),
       completedAt: entity.completedAt?.toISOString() || null,

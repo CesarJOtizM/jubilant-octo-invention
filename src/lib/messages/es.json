@@ -13,7 +13,10 @@
     "actions": "Acciones",
     "yes": "Sí",
     "no": "No",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "close": "Cerrar"
   },
   "auth": {
     "errors": {
@@ -226,10 +229,15 @@
         "quantity": "Cantidad Total",
         "reserved": "Reservado",
         "available": "Disponible",
+        "avgCost": "Costo Prom.",
+        "totalValue": "Valor Total",
         "lastMovement": "Último Movimiento"
       },
       "search": {
         "placeholder": "Buscar por producto o SKU..."
+      },
+      "filters": {
+        "lowStock": "Stock Bajo"
       },
       "pagination": {
         "showing": "Mostrando {from} a {to} de {total} items"
@@ -310,27 +318,45 @@
       "types": {
         "in": "Entrada",
         "out": "Salida",
-        "adjustment": "Ajuste"
+        "adjust_in": "Ajuste (+)",
+        "adjust_out": "Ajuste (-)",
+        "transfer_in": "Transferencia Entrada",
+        "transfer_out": "Transferencia Salida"
+      },
+      "status": {
+        "draft": "Borrador",
+        "posted": "Confirmado",
+        "void": "Anulado"
       },
       "fields": {
         "type": "Tipo",
+        "status": "Estado",
         "product": "Producto",
         "productPlaceholder": "Selecciona un producto",
         "warehouse": "Almacén",
         "warehousePlaceholder": "Selecciona un almacén",
         "quantity": "Cantidad",
-        "previousQty": "Cant. Anterior",
-        "newQty": "Cant. Nueva",
+        "totalItems": "Artículos",
+        "totalQuantity": "Cant. Total",
+        "unitCost": "Costo Unitario",
         "reason": "Motivo",
         "reasonPlaceholder": "Ingresa el motivo del movimiento",
         "reference": "Referencia",
         "referencePlaceholder": "Ingresa número de referencia (opcional)",
+        "note": "Nota",
+        "notePlaceholder": "Notas adicionales (opcional)",
         "createdBy": "Creado Por",
-        "createdAt": "Fecha"
+        "createdAt": "Fecha",
+        "postedAt": "Confirmado En"
       },
       "actions": {
         "new": "Nuevo Movimiento",
-        "filter": "Filtrar"
+        "filter": "Filtrar",
+        "post": "Confirmar",
+        "void": "Anular",
+        "view": "Ver Detalles",
+        "addLine": "Agregar Producto",
+        "removeLine": "Eliminar"
       },
       "list": {
         "title": "Movimientos"
@@ -352,57 +378,86 @@
         "createTitle": "Registrar Movimiento de Stock",
         "createDescription": "Ingresa los detalles para registrar un nuevo movimiento de inventario",
         "movementInfo": "Detalles del Movimiento",
+        "linesSection": "Productos",
+        "noLines": "No hay productos agregados",
         "error": "Ocurrió un error al registrar el movimiento."
       },
       "filters": {
         "type": "Tipo de Movimiento",
         "allTypes": "Todos los Tipos",
+        "status": "Estado",
+        "allStatuses": "Todos los Estados",
         "dateFrom": "Desde Fecha",
         "dateTo": "Hasta Fecha",
         "clear": "Limpiar Filtros"
       },
       "messages": {
-        "created": "Movimiento registrado exitosamente"
+        "created": "Movimiento registrado exitosamente",
+        "posted": "Movimiento confirmado exitosamente",
+        "voided": "Movimiento anulado exitosamente"
+      },
+      "confirmPost": {
+        "title": "Confirmar Movimiento",
+        "description": "¿Estás seguro de que deseas confirmar este movimiento? Esto actualizará los niveles de stock y no se puede deshacer."
+      },
+      "confirmVoid": {
+        "title": "Anular Movimiento",
+        "description": "¿Estás seguro de que deseas anular este movimiento? Esto revertirá los cambios de stock."
       }
     },
     "transfers": {
       "title": "Transferencias",
       "description": "Transfiere stock entre almacenes",
       "status": {
-        "pending": "Pendiente",
+        "all": "Todos los Estados",
+        "draft": "Borrador",
         "in_transit": "En Tránsito",
-        "completed": "Completado",
-        "cancelled": "Cancelado"
+        "partial": "Parcial",
+        "received": "Recibido",
+        "rejected": "Rechazado",
+        "canceled": "Cancelado"
       },
       "fields": {
         "product": "Producto",
+        "products": "Productos",
         "productPlaceholder": "Selecciona un producto",
         "from": "Almacén Origen",
         "fromPlaceholder": "Selecciona almacén origen",
         "to": "Almacén Destino",
         "toPlaceholder": "Selecciona almacén destino",
         "quantity": "Cantidad",
-        "quantityPlaceholder": "Ingresa cantidad a transferir",
+        "qty": "Cant",
+        "totalQuantity": "Cant Total",
+        "items": "Items",
+        "sku": "SKU",
+        "receivedQuantity": "Cant Recibida",
         "notes": "Notas",
         "notesPlaceholder": "Ingresa notas (opcional)",
         "status": "Estado",
         "createdBy": "Creado Por",
         "createdAt": "Creado El",
-        "completedAt": "Completado El"
+        "completedAt": "Completado El",
+        "actions": "Acciones"
       },
       "actions": {
         "new": "Nueva Transferencia",
-        "complete": "Marcar Completo",
+        "addProduct": "Agregar Producto",
+        "receive": "Marcar Recibido",
+        "reject": "Rechazar",
         "cancel": "Cancelar Transferencia",
         "startTransit": "Iniciar Tránsito"
       },
       "list": {
-        "title": "Transferencias"
+        "title": "Transferencias",
+        "itemsCount": "{count, plural, =1 {1 item} other {# items}}"
       },
       "detail": {
         "title": "Detalles de Transferencia",
         "subtitle": "Transferencia #{id}",
         "information": "Información de Transferencia",
+        "products": "Productos",
+        "summary": "Resumen",
+        "summaryValue": "{items, plural, =1 {1 producto} other {# productos}} ({quantity} unidades)",
         "timeline": "Línea de Tiempo de Estado",
         "backToList": "Volver a transferencias",
         "notFound": "Transferencia No Encontrada",
@@ -411,20 +466,24 @@
       "timeline": {
         "created": "Creada",
         "createdDescription": "Se creó la solicitud de transferencia",
-        "pending": "Pendiente",
-        "pendingDescription": "Esperando iniciar tránsito",
+        "draft": "Borrador",
+        "draftDescription": "La transferencia está siendo preparada",
         "inTransit": "En Tránsito",
         "inTransitDescription": "El stock está siendo transferido",
-        "completed": "Completada",
-        "completedDescription": "Transferencia completada exitosamente",
-        "cancelled": "Cancelada",
-        "cancelledDescription": "La transferencia fue cancelada"
+        "received": "Recibido",
+        "receivedDescription": "Transferencia recibida en destino",
+        "rejected": "Rechazado",
+        "rejectedDescription": "La transferencia fue rechazada en destino",
+        "canceled": "Cancelada",
+        "canceledDescription": "La transferencia fue cancelada"
       },
       "search": {
         "placeholder": "Buscar transferencias..."
       },
       "pagination": {
-        "showing": "Mostrando {from} a {to} de {total} transferencias"
+        "showing": "Mostrando {from} a {to} de {total} transferencias",
+        "previous": "Anterior",
+        "next": "Siguiente"
       },
       "empty": {
         "title": "Sin transferencias aún",
@@ -442,8 +501,9 @@
       "messages": {
         "created": "Transferencia creada exitosamente",
         "updated": "Estado de transferencia actualizado",
-        "completed": "Transferencia completada exitosamente",
-        "cancelled": "Transferencia cancelada"
+        "received": "Transferencia recibida exitosamente",
+        "rejected": "Transferencia rechazada",
+        "canceled": "Transferencia cancelada"
       }
     },
     "common": {
@@ -454,6 +514,331 @@
         "status": "Estado",
         "dateRange": "Rango de Fechas"
       }
+    }
+  },
+  "sales": {
+    "title": "Ventas",
+    "description": "Gestiona órdenes de venta y facturas",
+    "status": {
+      "draft": "Borrador",
+      "confirmed": "Confirmada",
+      "cancelled": "Cancelada"
+    },
+    "fields": {
+      "saleNumber": "Venta #",
+      "status": "Estado",
+      "warehouse": "Almacén",
+      "warehousePlaceholder": "Selecciona un almacén",
+      "customer": "Cliente",
+      "customerPlaceholder": "Nombre o referencia del cliente",
+      "externalReference": "Ref. Externa",
+      "externalReferencePlaceholder": "Número de factura u orden (opcional)",
+      "product": "Producto",
+      "productPlaceholder": "Selecciona un producto",
+      "quantity": "Cantidad",
+      "salePrice": "Precio Unitario",
+      "lineTotal": "Total",
+      "items": "Artículos",
+      "total": "Total",
+      "note": "Nota",
+      "notePlaceholder": "Notas adicionales (opcional)",
+      "createdAt": "Creado",
+      "confirmedAt": "Confirmado En",
+      "cancelledAt": "Cancelado En"
+    },
+    "actions": {
+      "new": "Nueva Venta",
+      "view": "Ver Detalles",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "cancelSale": "Cancelar Venta",
+      "addLine": "Agregar Producto",
+      "removeLine": "Eliminar"
+    },
+    "list": {
+      "title": "Ventas"
+    },
+    "search": {
+      "placeholder": "Buscar ventas..."
+    },
+    "pagination": {
+      "showing": "Mostrando {from} a {to} de {total} ventas"
+    },
+    "empty": {
+      "title": "Sin ventas aún",
+      "description": "Comienza creando tu primera venta."
+    },
+    "error": {
+      "loading": "Error al cargar ventas"
+    },
+    "form": {
+      "createTitle": "Crear Venta",
+      "createDescription": "Ingresa los detalles para crear una nueva orden de venta",
+      "saleInfo": "Detalles de la Venta",
+      "linesSection": "Productos",
+      "noLines": "No hay productos agregados",
+      "error": "Ocurrió un error al crear la venta."
+    },
+    "detail": {
+      "info": "Información de la Venta",
+      "lines": "Productos",
+      "createdAt": "Creado el {date}"
+    },
+    "filters": {
+      "status": "Estado",
+      "allStatuses": "Todos los Estados",
+      "dateFrom": "Desde Fecha",
+      "dateTo": "Hasta Fecha",
+      "clear": "Limpiar Filtros"
+    },
+    "confirmSale": {
+      "title": "Confirmar Venta",
+      "description": "¿Estás seguro de que deseas confirmar esta venta? Esto descontará el stock del almacén y no se puede deshacer."
+    },
+    "cancelSale": {
+      "title": "Cancelar Venta",
+      "description": "¿Estás seguro de que deseas cancelar esta venta? Si fue confirmada, el stock se devolverá al almacén."
+    },
+    "messages": {
+      "created": "Venta creada exitosamente",
+      "confirmed": "Venta confirmada exitosamente",
+      "cancelled": "Venta cancelada exitosamente"
+    }
+  },
+  "returns": {
+    "title": "Devoluciones",
+    "description": "Procesa devoluciones de productos de clientes y a proveedores",
+    "types": {
+      "customer": "Devolución Cliente",
+      "supplier": "Devolución Proveedor"
+    },
+    "status": {
+      "draft": "Borrador",
+      "confirmed": "Confirmada",
+      "cancelled": "Cancelada"
+    },
+    "fields": {
+      "returnNumber": "Devolución #",
+      "type": "Tipo",
+      "status": "Estado",
+      "warehouse": "Almacén",
+      "warehousePlaceholder": "Selecciona un almacén",
+      "product": "Producto",
+      "productPlaceholder": "Selecciona un producto",
+      "quantity": "Cantidad",
+      "originalPrice": "Precio Original",
+      "originalCost": "Costo Original",
+      "lineTotal": "Total",
+      "items": "Artículos",
+      "total": "Total",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Motivo de la devolución",
+      "saleReference": "Referencia de Venta",
+      "saleReferencePlaceholder": "ID o número de venta",
+      "note": "Nota",
+      "notePlaceholder": "Notas adicionales (opcional)",
+      "createdAt": "Creado",
+      "confirmedAt": "Confirmado En",
+      "cancelledAt": "Cancelado En"
+    },
+    "actions": {
+      "new": "Nueva Devolución",
+      "view": "Ver Detalles",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "cancelReturn": "Cancelar Devolución",
+      "addLine": "Agregar Producto",
+      "removeLine": "Eliminar"
+    },
+    "list": {
+      "title": "Devoluciones"
+    },
+    "search": {
+      "placeholder": "Buscar devoluciones..."
+    },
+    "pagination": {
+      "showing": "Mostrando {from} a {to} de {total} devoluciones"
+    },
+    "empty": {
+      "title": "Sin devoluciones aún",
+      "description": "Comienza creando tu primera devolución."
+    },
+    "error": {
+      "loading": "Error al cargar devoluciones"
+    },
+    "form": {
+      "createTitle": "Crear Devolución",
+      "createDescription": "Ingresa los detalles para procesar una devolución de producto",
+      "returnInfo": "Detalles de la Devolución",
+      "linesSection": "Productos",
+      "noLines": "No hay productos agregados",
+      "error": "Ocurrió un error al crear la devolución."
+    },
+    "detail": {
+      "info": "Información de la Devolución",
+      "lines": "Productos",
+      "createdAt": "Creado el {date}"
+    },
+    "filters": {
+      "type": "Tipo de Devolución",
+      "allTypes": "Todos los Tipos",
+      "status": "Estado",
+      "allStatuses": "Todos los Estados",
+      "dateFrom": "Desde Fecha",
+      "dateTo": "Hasta Fecha",
+      "clear": "Limpiar Filtros"
+    },
+    "confirmReturn": {
+      "title": "Confirmar Devolución",
+      "description": "¿Estás seguro de que deseas confirmar esta devolución? Esto actualizará los niveles de inventario."
+    },
+    "cancelReturn": {
+      "title": "Cancelar Devolución",
+      "description": "¿Estás seguro de que deseas cancelar esta devolución? Si fue confirmada, los cambios de inventario se revertirán."
+    },
+    "messages": {
+      "created": "Devolución creada exitosamente",
+      "confirmed": "Devolución confirmada exitosamente",
+      "cancelled": "Devolución cancelada exitosamente"
+    }
+  },
+  "users": {
+    "title": "Usuarios",
+    "description": "Gestiona usuarios del sistema y acceso",
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "locked": "Bloqueado"
+    },
+    "fields": {
+      "name": "Nombre",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "username": "Usuario",
+      "password": "Contraseña",
+      "status": "Estado",
+      "roles": "Roles",
+      "lastLogin": "Último acceso",
+      "createdAt": "Creado"
+    },
+    "actions": {
+      "new": "Nuevo Usuario",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "lock": "Bloquear Cuenta"
+    },
+    "list": {
+      "title": "Usuarios"
+    },
+    "search": {
+      "placeholder": "Buscar usuarios..."
+    },
+    "filters": {
+      "status": "Estado",
+      "allStatuses": "Todos los Estados"
+    },
+    "pagination": {
+      "showing": "Mostrando {from} a {to} de {total} usuarios"
+    },
+    "empty": {
+      "title": "Sin usuarios aún",
+      "description": "Comienza agregando tu primer usuario."
+    },
+    "error": {
+      "loading": "Error al cargar usuarios"
+    },
+    "form": {
+      "createTitle": "Crear Usuario",
+      "error": "Ocurrió un error al crear el usuario."
+    },
+    "messages": {
+      "created": "Usuario creado exitosamente",
+      "updated": "Usuario actualizado exitosamente",
+      "statusChanged": "Estado del usuario actualizado exitosamente"
+    }
+  },
+  "roles": {
+    "title": "Roles",
+    "description": "Gestiona roles y permisos",
+    "fields": {
+      "name": "Nombre",
+      "namePlaceholder": "Ingresa nombre del rol (ej: GERENTE)",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ingresa descripción del rol (opcional)",
+      "status": "Estado",
+      "system": "Sistema",
+      "permissions": "Permisos",
+      "permissionCount": "Permisos",
+      "createdAt": "Creado"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "type": {
+      "system": "Sistema",
+      "custom": "Personalizado"
+    },
+    "actions": {
+      "new": "Nuevo Rol",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "managePermissions": "Gestionar Permisos",
+      "viewPermissions": "Ver Permisos"
+    },
+    "list": {
+      "title": "Roles"
+    },
+    "search": {
+      "placeholder": "Buscar roles..."
+    },
+    "empty": {
+      "title": "Sin roles personalizados aún",
+      "description": "Los roles del sistema están disponibles. Crea roles personalizados para necesidades específicas."
+    },
+    "error": {
+      "loading": "Error al cargar roles"
+    },
+    "form": {
+      "createTitle": "Crear Rol",
+      "editTitle": "Editar Rol",
+      "roleInfo": "Información del Rol",
+      "error": "Ocurrió un error al guardar el rol."
+    },
+    "permissions": {
+      "title": "Gestionar Permisos",
+      "description": "Selecciona los permisos para este rol",
+      "module": "Módulo",
+      "selectAll": "Seleccionar Todo",
+      "deselectAll": "Deseleccionar Todo",
+      "noPermissions": "No hay permisos disponibles",
+      "modules": {
+        "users": "Usuarios",
+        "roles": "Roles",
+        "products": "Productos",
+        "warehouses": "Almacenes",
+        "inventory": "Inventario",
+        "sales": "Ventas",
+        "returns": "Devoluciones",
+        "reports": "Reportes",
+        "audit": "Auditoría",
+        "organizations": "Organizaciones",
+        "organization": "Organización",
+        "imports": "Importaciones",
+        "movements": "Movimientos",
+        "stock": "Stock"
+      }
+    },
+    "delete": {
+      "title": "Eliminar Rol",
+      "description": "¿Estás seguro de que deseas eliminar este rol? Los usuarios asignados a este rol perderán sus permisos."
+    },
+    "messages": {
+      "created": "Rol creado exitosamente",
+      "updated": "Rol actualizado exitosamente",
+      "deleted": "Rol eliminado exitosamente",
+      "permissionsUpdated": "Permisos actualizados exitosamente"
     }
   },
   "errors": {

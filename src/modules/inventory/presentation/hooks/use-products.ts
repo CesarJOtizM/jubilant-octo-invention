@@ -59,26 +59,3 @@ export function useUpdateProduct() {
   });
 }
 
-export function useDeleteProduct() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => productApiAdapter.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-    },
-  });
-}
-
-export function useToggleProductStatus() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      productApiAdapter.toggleStatus(id, isActive),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
-    },
-  });
-}

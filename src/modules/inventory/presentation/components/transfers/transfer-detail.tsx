@@ -16,7 +16,6 @@ interface TransferDetailProps {
 
 export function TransferDetail({ transferId }: TransferDetailProps) {
   const t = useTranslations("inventory.transfers");
-  const tCommon = useTranslations("common");
   const { data: transfer, isLoading, isError } = useTransfer(transferId);
   const updateStatus = useUpdateTransferStatus();
 
@@ -24,12 +23,16 @@ export function TransferDetail({ transferId }: TransferDetailProps) {
     await updateStatus.mutateAsync({ id: transferId, status: "IN_TRANSIT" });
   };
 
-  const handleComplete = async () => {
-    await updateStatus.mutateAsync({ id: transferId, status: "COMPLETED" });
+  const handleReceive = async () => {
+    await updateStatus.mutateAsync({ id: transferId, status: "RECEIVED" });
+  };
+
+  const handleReject = async () => {
+    await updateStatus.mutateAsync({ id: transferId, status: "REJECTED" });
   };
 
   const handleCancel = async () => {
-    await updateStatus.mutateAsync({ id: transferId, status: "CANCELLED" });
+    await updateStatus.mutateAsync({ id: transferId, status: "CANCELED" });
   };
 
   if (isLoading) {
@@ -116,17 +119,26 @@ export function TransferDetail({ transferId }: TransferDetailProps) {
               {t("actions.startTransit")}
             </Button>
           )}
-          {transfer.canComplete && (
+          {transfer.canReceive && (
             <Button
-              onClick={handleComplete}
+              onClick={handleReceive}
               disabled={updateStatus.isPending}
             >
-              {t("actions.complete")}
+              {t("actions.receive")}
+            </Button>
+          )}
+          {transfer.canReject && (
+            <Button
+              variant="outline"
+              onClick={handleReject}
+              disabled={updateStatus.isPending}
+            >
+              {t("actions.reject")}
             </Button>
           )}
           {transfer.canCancel && (
             <Button
-              variant="outline"
+              variant="destructive"
               onClick={handleCancel}
               disabled={updateStatus.isPending}
             >
@@ -143,18 +155,6 @@ export function TransferDetail({ transferId }: TransferDetailProps) {
             <CardTitle>{t("detail.information")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Product */}
-            <div className="flex items-start gap-3">
-              <Package className="mt-0.5 h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {t("fields.product")}
-                </p>
-                <p className="font-medium">{transfer.productName}</p>
-                <p className="text-sm text-muted-foreground">{transfer.productSku}</p>
-              </div>
-            </div>
-
             {/* Warehouses */}
             <div className="flex items-center gap-3">
               <Warehouse className="h-5 w-5 text-muted-foreground" />
@@ -175,14 +175,19 @@ export function TransferDetail({ transferId }: TransferDetailProps) {
               </div>
             </div>
 
-            {/* Quantity */}
+            {/* Summary */}
             <div className="flex items-start gap-3">
               <Package className="mt-0.5 h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  {t("fields.quantity")}
+                  {t("detail.summary")}
                 </p>
-                <p className="text-2xl font-bold">{transfer.quantity}</p>
+                <p className="text-2xl font-bold">
+                  {t("detail.summaryValue", {
+                    items: transfer.totalItems,
+                    quantity: transfer.totalQuantity,
+                  })}
+                </p>
               </div>
             </div>
 
@@ -237,6 +242,51 @@ export function TransferDetail({ transferId }: TransferDetailProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Products Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("detail.products")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b text-left text-sm font-medium text-muted-foreground">
+                  <th className="pb-3 pr-4">{t("fields.product")}</th>
+                  <th className="pb-3 pr-4">{t("fields.sku")}</th>
+                  <th className="pb-3 pr-4 text-right">{t("fields.quantity")}</th>
+                  {transfer.isReceived || transfer.isPartial ? (
+                    <th className="pb-3 text-right">{t("fields.receivedQuantity")}</th>
+                  ) : null}
+                </tr>
+              </thead>
+              <tbody>
+                {transfer.lines.map((line) => (
+                  <tr key={line.id} className="border-b">
+                    <td className="py-4 pr-4 font-medium">{line.productName}</td>
+                    <td className="py-4 pr-4 text-muted-foreground">{line.productSku}</td>
+                    <td className="py-4 pr-4 text-right">{line.quantity}</td>
+                    {transfer.isReceived || transfer.isPartial ? (
+                      <td className="py-4 text-right">
+                        <span
+                          className={
+                            line.receivedQuantity !== null && line.receivedQuantity < line.quantity
+                              ? "text-orange-600"
+                              : "text-green-600"
+                          }
+                        >
+                          {line.receivedQuantity ?? "-"}
+                        </span>
+                      </td>
+                    ) : null}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

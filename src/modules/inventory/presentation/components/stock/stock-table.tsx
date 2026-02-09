@@ -16,9 +16,16 @@ import { useStock, useStockFilters, useSetStockFilters } from "../../hooks";
 import { WarehouseSelector } from "../warehouses/warehouse-selector";
 import type { Stock } from "../../../domain/entities/stock.entity";
 
+function formatCurrency(value: number, currency: string): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency || "USD",
+    minimumFractionDigits: 2,
+  }).format(value);
+}
+
 function StockRow({ stock }: { stock: Stock }) {
-  const t = useTranslations("inventory.stock");
-  const isLowStock = stock.availableQuantity <= 10; // TODO: Compare with product minStock
+  const isLowStock = stock.availableQuantity <= 10;
 
   return (
     <tr className="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800/50">
@@ -29,29 +36,21 @@ function StockRow({ stock }: { stock: Stock }) {
           </div>
           <div>
             <p className="font-medium text-neutral-900 dark:text-neutral-100">
-              {stock.productName}
+              {stock.productName || stock.productId}
             </p>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              {stock.productSku}
-            </p>
+            {stock.productSku && (
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                {stock.productSku}
+              </p>
+            )}
           </div>
         </div>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
           <Warehouse className="h-4 w-4" />
-          {stock.warehouseName}
+          {stock.warehouseName || stock.warehouseId}
         </div>
-      </td>
-      <td className="px-4 py-3 text-right">
-        <span className="font-medium text-neutral-900 dark:text-neutral-100">
-          {stock.quantity}
-        </span>
-      </td>
-      <td className="px-4 py-3 text-right">
-        <span className="text-neutral-600 dark:text-neutral-300">
-          {stock.reservedQuantity}
-        </span>
       </td>
       <td className="px-4 py-3 text-right">
         <div className="flex items-center justify-end gap-2">
@@ -64,12 +63,22 @@ function StockRow({ stock }: { stock: Stock }) {
                 ? "text-warning-600 dark:text-warning-400"
                 : stock.isOutOfStock
                   ? "text-destructive"
-                  : "text-success-600 dark:text-success-400"
+                  : "text-neutral-900 dark:text-neutral-100"
             }`}
           >
-            {stock.availableQuantity}
+            {stock.quantity}
           </span>
         </div>
+      </td>
+      <td className="px-4 py-3 text-right">
+        <span className="text-neutral-600 dark:text-neutral-300">
+          {formatCurrency(stock.averageCost, stock.currency)}
+        </span>
+      </td>
+      <td className="px-4 py-3 text-right">
+        <span className="font-medium text-neutral-900 dark:text-neutral-100">
+          {formatCurrency(stock.totalValue, stock.currency)}
+        </span>
       </td>
       <td className="px-4 py-3 text-neutral-500 dark:text-neutral-400 text-sm">
         {stock.lastMovementAt
@@ -160,7 +169,18 @@ export function StockTable() {
               onChange={handleSearch}
             />
           </div>
-          <WarehouseSelector />
+          <div className="flex items-center gap-3">
+            <Button
+              variant={filters.lowStock ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilters({ lowStock: !filters.lowStock, page: 1 })}
+              className="gap-2"
+            >
+              <AlertTriangle className="h-4 w-4" />
+              {t("filters.lowStock")}
+            </Button>
+            <WarehouseSelector />
+          </div>
         </div>
 
         {/* Table */}
@@ -177,8 +197,8 @@ export function StockTable() {
                     <th className="px-4 py-3">{t("fields.product")}</th>
                     <th className="px-4 py-3">{t("fields.warehouse")}</th>
                     <th className="px-4 py-3 text-right">{t("fields.quantity")}</th>
-                    <th className="px-4 py-3 text-right">{t("fields.reserved")}</th>
-                    <th className="px-4 py-3 text-right">{t("fields.available")}</th>
+                    <th className="px-4 py-3 text-right">{t("fields.avgCost")}</th>
+                    <th className="px-4 py-3 text-right">{t("fields.totalValue")}</th>
                     <th className="px-4 py-3">{t("fields.lastMovement")}</th>
                   </tr>
                 </thead>
@@ -191,7 +211,7 @@ export function StockTable() {
             </div>
 
             {/* Pagination */}
-            {data.pagination.totalPages > 1 && (
+            {data.pagination?.totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between border-t border-neutral-200 pt-4 dark:border-neutral-700">
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
                   {t("pagination.showing", {

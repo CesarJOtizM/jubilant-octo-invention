@@ -1,19 +1,28 @@
 import { Stock } from "../../domain/entities/stock.entity";
-import type { StockResponseDto } from "../dto/stock.dto";
+import type { StockResponseDto, StockApiRawDto } from "../dto/stock.dto";
 
 export class StockMapper {
-  static toDomain(dto: StockResponseDto): Stock {
+  static toDomain(dto: StockApiRawDto | StockResponseDto, index?: number): Stock {
+    const quantity = dto.quantity ?? 0;
+    const reservedQuantity = dto.reservedQuantity ?? 0;
+
     return Stock.create({
-      id: dto.id,
+      id: dto.id ?? `${dto.productId}:${dto.warehouseId}:${index ?? 0}`,
       productId: dto.productId,
-      productName: dto.productName,
-      productSku: dto.productSku,
+      productName: dto.productName ?? "",
+      productSku: dto.productSku ?? "",
       warehouseId: dto.warehouseId,
-      warehouseName: dto.warehouseName,
-      quantity: dto.quantity,
-      reservedQuantity: dto.reservedQuantity,
-      availableQuantity: dto.availableQuantity,
-      lastMovementAt: dto.lastMovementAt ? new Date(dto.lastMovementAt) : null,
+      warehouseName: dto.warehouseName ?? "",
+      quantity,
+      reservedQuantity,
+      availableQuantity: dto.availableQuantity ?? quantity - reservedQuantity,
+      averageCost: ("averageCost" in dto ? dto.averageCost : undefined) ?? 0,
+      totalValue: ("totalValue" in dto ? dto.totalValue : undefined) ?? 0,
+      currency: ("currency" in dto ? dto.currency : undefined) ?? "USD",
+      lastMovementAt:
+        typeof dto.lastMovementAt === "string"
+          ? new Date(dto.lastMovementAt)
+          : null,
     });
   }
 

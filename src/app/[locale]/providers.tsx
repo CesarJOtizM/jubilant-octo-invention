@@ -19,25 +19,24 @@ function AuthHydration({ children }: { children: ReactNode }) {
     hydrate();
   }, [hydrate]);
 
-  // Sync token to cookie for proxy/middleware access
+  // Sync token to cookie so it's available after route changes and for middleware
   useEffect(() => {
     const syncTokenToCookie = () => {
       const token = TokenService.getAccessToken();
+      const name = process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME ?? "nevada_auth_token";
       if (token) {
-        document.cookie = `nevada_auth_token=${token}; path=/; SameSite=Lax`;
+        document.cookie = `${name}=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
       } else {
-        document.cookie =
-          "nevada_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       }
     };
 
     syncTokenToCookie();
 
     // Listen for storage changes (in case another tab logs in/out)
+    const tokenKey = process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME ?? "nevada_auth_token";
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "nevada_auth_token") {
-        syncTokenToCookie();
-      }
+      if (e.key === tokenKey) syncTokenToCookie();
     };
 
     window.addEventListener("storage", handleStorageChange);

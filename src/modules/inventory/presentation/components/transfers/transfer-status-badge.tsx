@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Clock, Truck, CheckCircle2, XCircle } from "lucide-react";
+import { FileEdit, Truck, PackageCheck, CheckCircle2, XCircle, Ban } from "lucide-react";
 import { Badge } from "@/ui/components/badge";
 import type { TransferStatus } from "../../../domain/entities/transfer.entity";
 
@@ -12,26 +12,36 @@ interface TransferStatusBadgeProps {
 export function TransferStatusBadge({ status }: TransferStatusBadgeProps) {
   const t = useTranslations("inventory.transfers.status");
 
-  const config = {
-    PENDING: {
-      label: t("pending"),
-      variant: "warning" as const,
-      icon: Clock,
+  const config: Record<TransferStatus, { label: string; variant: "warning" | "info" | "success" | "error" | "secondary"; icon: typeof FileEdit }> = {
+    DRAFT: {
+      label: t("draft"),
+      variant: "secondary",
+      icon: FileEdit,
     },
     IN_TRANSIT: {
       label: t("in_transit"),
-      variant: "info" as const,
+      variant: "info",
       icon: Truck,
     },
-    COMPLETED: {
-      label: t("completed"),
-      variant: "success" as const,
+    PARTIAL: {
+      label: t("partial"),
+      variant: "warning",
+      icon: PackageCheck,
+    },
+    RECEIVED: {
+      label: t("received"),
+      variant: "success",
       icon: CheckCircle2,
     },
-    CANCELLED: {
-      label: t("cancelled"),
-      variant: "error" as const,
+    REJECTED: {
+      label: t("rejected"),
+      variant: "error",
       icon: XCircle,
+    },
+    CANCELED: {
+      label: t("canceled"),
+      variant: "error",
+      icon: Ban,
     },
   };
 

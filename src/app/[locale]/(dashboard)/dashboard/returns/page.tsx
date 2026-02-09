@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PagePlaceholder } from "@/ui/components/page-placeholder";
+import { ReturnList } from "@/modules/returns/presentation/components";
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -8,7 +8,19 @@ interface Props {
 export default async function ReturnsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("pages.returns");
+  const t = await getTranslations("returns");
 
-  return <PagePlaceholder title={t("title")} description={t("description")} />;
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+          {t("title")}
+        </h1>
+        <p className="text-neutral-500 dark:text-neutral-400">
+          {t("description")}
+        </p>
+      </div>
+      <ReturnList />
+    </div>
+  );
 }

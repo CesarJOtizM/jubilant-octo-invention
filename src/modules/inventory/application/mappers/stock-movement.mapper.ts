@@ -1,42 +1,60 @@
-import { StockMovement } from "../../domain/entities/stock-movement.entity";
-import type { StockMovementResponseDto } from "../dto/stock-movement.dto";
+import { StockMovement, type MovementLine } from "../../domain/entities/stock-movement.entity";
+import type { StockMovementResponseDto, MovementLineResponseDto } from "../dto/stock-movement.dto";
 
 export class StockMovementMapper {
-  static toDomain(dto: StockMovementResponseDto): StockMovement {
-    return StockMovement.create({
+  static lineToDomain(dto: MovementLineResponseDto): MovementLine {
+    return {
       id: dto.id,
       productId: dto.productId,
       productName: dto.productName,
       productSku: dto.productSku,
+      quantity: dto.quantity,
+      unitCost: dto.unitCost,
+    };
+  }
+
+  static toDomain(dto: StockMovementResponseDto): StockMovement {
+    return StockMovement.create({
+      id: dto.id,
       warehouseId: dto.warehouseId,
       warehouseName: dto.warehouseName,
       type: dto.type,
-      quantity: dto.quantity,
-      previousQuantity: dto.previousQuantity,
-      newQuantity: dto.newQuantity,
-      reason: dto.reason,
-      reference: dto.reference,
+      status: dto.status,
+      reference: typeof dto.reference === "string" ? dto.reference : null,
+      reason: typeof dto.reason === "string" ? dto.reason : null,
+      note: typeof dto.note === "string" ? dto.note : null,
+      lines: dto.lines.map(StockMovementMapper.lineToDomain),
       createdBy: dto.createdBy,
       createdAt: new Date(dto.createdAt),
+      postedAt: typeof dto.postedAt === "string" ? new Date(dto.postedAt) : null,
     });
+  }
+
+  static lineToDto(line: MovementLine): MovementLineResponseDto {
+    return {
+      id: line.id,
+      productId: line.productId,
+      productName: line.productName,
+      productSku: line.productSku,
+      quantity: line.quantity,
+      unitCost: line.unitCost,
+    };
   }
 
   static toDto(entity: StockMovement): StockMovementResponseDto {
     return {
       id: entity.id,
-      productId: entity.productId,
-      productName: entity.productName,
-      productSku: entity.productSku,
       warehouseId: entity.warehouseId,
       warehouseName: entity.warehouseName,
       type: entity.type,
-      quantity: entity.quantity,
-      previousQuantity: entity.previousQuantity,
-      newQuantity: entity.newQuantity,
-      reason: entity.reason,
+      status: entity.status,
       reference: entity.reference,
+      reason: entity.reason,
+      note: entity.note,
+      lines: entity.lines.map(StockMovementMapper.lineToDto),
       createdBy: entity.createdBy,
       createdAt: entity.createdAt.toISOString(),
+      postedAt: entity.postedAt?.toISOString() || null,
     };
   }
 }

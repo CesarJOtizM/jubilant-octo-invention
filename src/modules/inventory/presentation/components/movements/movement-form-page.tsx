@@ -1,17 +1,18 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Label } from "@/ui/components/label";
 import { FormField } from "@/ui/components/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/components/select";
+import { Textarea } from "@/ui/components/textarea";
 import {
   createMovementSchema,
   toCreateMovementDto,
@@ -39,13 +40,18 @@ export function MovementFormPage() {
   } = useForm<CreateMovementFormData>({
     resolver: zodResolver(createMovementSchema),
     defaultValues: {
-      productId: "",
       warehouseId: "",
       type: "IN",
-      quantity: 1,
-      reason: "",
       reference: "",
+      reason: "",
+      note: "",
+      lines: [{ productId: "", quantity: 1, unitCost: undefined }],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "lines",
   });
 
   const onSubmit = async (data: CreateMovementFormData) => {
@@ -56,6 +62,10 @@ export function MovementFormPage() {
     } catch {
       // Error is handled by the mutation
     }
+  };
+
+  const addLine = () => {
+    append({ productId: "", quantity: 1, unitCost: undefined });
   };
 
   return (
@@ -77,58 +87,38 @@ export function MovementFormPage() {
         </div>
       </div>
 
-      {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("form.movementInfo")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {createMovement.isError && (
-              <div className="rounded-md bg-red-100 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
-                {t("form.error")}
-              </div>
-            )}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {createMovement.isError && (
+          <div className="rounded-md bg-red-100 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
+            {t("form.error")}
+          </div>
+        )}
 
-            {/* Movement Type */}
-            <FormField error={errors.type?.message}>
-              <Label>{t("fields.type")} *</Label>
-              <Controller
-                name="type"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="IN">{t("types.in")}</SelectItem>
-                      <SelectItem value="OUT">{t("types.out")}</SelectItem>
-                      <SelectItem value="ADJUSTMENT">{t("types.adjustment")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </FormField>
-
+        {/* Movement Details Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("form.movementInfo")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {/* Product Selection */}
-              <FormField error={errors.productId?.message}>
-                <Label>{t("fields.product")} *</Label>
+              {/* Movement Type */}
+              <FormField error={errors.type?.message}>
+                <Label>{t("fields.type")} *</Label>
                 <Controller
-                  name="productId"
+                  name="type"
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder={t("fields.productPlaceholder")} />
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {productsData?.data.map((product) => (
-                          <SelectItem key={product.id} value={product.id}>
-                            {product.name} ({product.sku})
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="IN">{t("types.in")}</SelectItem>
+                        <SelectItem value="OUT">{t("types.out")}</SelectItem>
+                        <SelectItem value="ADJUST_IN">{t("types.adjust_in")}</SelectItem>
+                        <SelectItem value="ADJUST_OUT">{t("types.adjust_out")}</SelectItem>
+                        <SelectItem value="TRANSFER_IN">{t("types.transfer_in")}</SelectItem>
+                        <SelectItem value="TRANSFER_OUT">{t("types.transfer_out")}</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -159,49 +149,138 @@ export function MovementFormPage() {
               </FormField>
             </div>
 
-            {/* Quantity */}
-            <FormField error={errors.quantity?.message}>
-              <Label>{t("fields.quantity")} *</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder="1"
-                {...register("quantity", { valueAsNumber: true })}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* Reference */}
+              <FormField error={errors.reference?.message}>
+                <Label>{t("fields.reference")}</Label>
+                <Input
+                  placeholder={t("fields.referencePlaceholder")}
+                  {...register("reference")}
+                />
+              </FormField>
+
+              {/* Reason */}
+              <FormField error={errors.reason?.message}>
+                <Label>{t("fields.reason")}</Label>
+                <Input
+                  placeholder={t("fields.reasonPlaceholder")}
+                  {...register("reason")}
+                />
+              </FormField>
+            </div>
+
+            {/* Note */}
+            <FormField error={errors.note?.message}>
+              <Label>{t("fields.note")}</Label>
+              <Textarea
+                placeholder={t("fields.notePlaceholder")}
+                rows={2}
+                {...register("note")}
               />
             </FormField>
+          </CardContent>
+        </Card>
 
-            {/* Reason */}
-            <FormField error={errors.reason?.message}>
-              <Label>{t("fields.reason")} *</Label>
-              <Input
-                placeholder={t("fields.reasonPlaceholder")}
-                {...register("reason")}
-              />
-            </FormField>
-
-            {/* Reference */}
-            <FormField error={errors.reference?.message}>
-              <Label>{t("fields.reference")}</Label>
-              <Input
-                placeholder={t("fields.referencePlaceholder")}
-                {...register("reference")}
-              />
-            </FormField>
-
-            {/* Actions */}
-            <div className="flex justify-end gap-3 border-t pt-6">
-              <Button asChild type="button" variant="outline">
-                <Link href="/dashboard/inventory/movements">
-                  {tCommon("cancel")}
-                </Link>
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? tCommon("loading") : tCommon("create")}
+        {/* Products Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>{t("form.linesSection")}</CardTitle>
+              <Button type="button" variant="outline" size="sm" onClick={addLine}>
+                <Plus className="mr-2 h-4 w-4" />
+                {t("actions.addLine")}
               </Button>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            {errors.lines?.message && (
+              <p className="mb-4 text-sm text-destructive">{errors.lines.message}</p>
+            )}
+
+            {fields.length === 0 ? (
+              <div className="rounded-md border border-dashed p-8 text-center text-muted-foreground">
+                {t("form.noLines")}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-start gap-4 rounded-lg border p-4">
+                    <div className="flex-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <FormField error={errors.lines?.[index]?.productId?.message}>
+                        <Label>{t("fields.product")} *</Label>
+                        <Controller
+                          name={`lines.${index}.productId`}
+                          control={control}
+                          render={({ field: selectField }) => (
+                            <Select value={selectField.value} onValueChange={selectField.onChange}>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t("fields.productPlaceholder")} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {productsData?.data.map((product) => (
+                                  <SelectItem key={product.id} value={product.id}>
+                                    {product.name} ({product.sku})
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </FormField>
+
+                      <FormField error={errors.lines?.[index]?.quantity?.message}>
+                        <Label>{t("fields.quantity")} *</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          {...register(`lines.${index}.quantity`, { valueAsNumber: true })}
+                        />
+                      </FormField>
+
+                      <FormField error={errors.lines?.[index]?.unitCost?.message}>
+                        <Label>{t("fields.unitCost")}</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...register(`lines.${index}.unitCost`, {
+                            valueAsNumber: true,
+                            setValueAs: (v) => v === "" ? undefined : parseFloat(v),
+                          })}
+                        />
+                      </FormField>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="mt-6"
+                      onClick={() => remove(index)}
+                      disabled={fields.length === 1}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3">
+          <Button asChild type="button" variant="outline">
+            <Link href="/dashboard/inventory/movements">
+              {tCommon("cancel")}
+            </Link>
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? tCommon("loading") : tCommon("create")}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

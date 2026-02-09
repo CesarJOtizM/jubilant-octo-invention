@@ -45,6 +45,7 @@ export const useAuthStore = create<AuthStore>()(
           set({
             user,
             isAuthenticated: true,
+            isHydrated: true,
             isLoading: false,
             error: null,
           });

@@ -6,9 +6,9 @@ export class CategoryMapper {
     return Category.create({
       id: dto.id,
       name: dto.name,
-      description: dto.description,
-      parentId: dto.parentId,
-      parentName: dto.parentName,
+      description: typeof dto.description === "string" ? dto.description : null,
+      parentId: typeof dto.parentId === "string" ? dto.parentId : null,
+      parentName: typeof dto.parentName === "string" ? dto.parentName : null,
       isActive: dto.isActive,
       productCount: dto.productCount,
       createdAt: new Date(dto.createdAt),

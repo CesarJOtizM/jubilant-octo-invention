@@ -20,6 +20,4 @@ export interface WarehouseRepositoryPort {
   findById(id: string): Promise<Warehouse | null>;
   create(data: CreateWarehouseDto): Promise<Warehouse>;
   update(id: string, data: UpdateWarehouseDto): Promise<Warehouse>;
-  delete(id: string): Promise<void>;
-  toggleStatus(id: string, isActive: boolean): Promise<Warehouse>;
 }
