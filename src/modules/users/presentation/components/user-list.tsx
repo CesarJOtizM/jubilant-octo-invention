@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Search, Users, MoreHorizontal, CheckCircle, XCircle, Lock } from "lucide-react";
+import { Plus, Search, Users, MoreHorizontal, CheckCircle, XCircle, Lock, Shield } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { Label } from "@/ui/components/label";
@@ -19,8 +19,9 @@ import {
 import { useUsers, useChangeUserStatus } from "../hooks/use-users";
 import { UserStatusBadge } from "./user-status-badge";
 import { UserForm } from "./user-form";
+import { UserRolesDialog } from "./user-roles-dialog";
 import type { UserFilters } from "../../application/dto/user.dto";
-import type { UserStatus } from "../../domain/entities/user.entity";
+import type { User, UserStatus } from "../../domain/entities/user.entity";
 
 export function UserList() {
   const t = useTranslations("users");
@@ -28,6 +29,7 @@ export function UserList() {
   const [filters, setFilters] = useState<UserFilters>({ page: 1, limit: 10 });
   const [searchValue, setSearchValue] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [rolesDialogUser, setRolesDialogUser] = useState<User | null>(null);
 
   const { data, isLoading, isError } = useUsers(filters);
   const changeStatus = useChangeUserStatus();
@@ -157,6 +159,11 @@ export function UserList() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => setRolesDialogUser(user)}>
+                                <Shield className="mr-2 h-4 w-4" />
+                                {t("actions.manageRoles")}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               {!user.isActive && (
                                 <DropdownMenuItem onClick={() => handleChangeStatus(user.id, "ACTIVE")}>
                                   <CheckCircle className="mr-2 h-4 w-4" />
@@ -215,6 +222,11 @@ export function UserList() {
       </Card>
 
       <UserForm open={isFormOpen} onOpenChange={setIsFormOpen} />
+      <UserRolesDialog
+        user={rolesDialogUser ? (data?.data.find((u) => u.id === rolesDialogUser.id) ?? rolesDialogUser) : null}
+        open={!!rolesDialogUser}
+        onOpenChange={(open) => { if (!open) setRolesDialogUser(null); }}
+      />
     </>
   );
 }

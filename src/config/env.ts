@@ -2,11 +2,11 @@ import { z } from "zod";
 
 const envSchema = z.object({
   // App
-  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
   NEXT_PUBLIC_APP_NAME: z.string().default("Nevada Inventory System"),
 
   // API
-  NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:8080"),
+  NEXT_PUBLIC_API_URL: z.url().default("http://localhost:8080"),
   NEXT_PUBLIC_API_TIMEOUT: z.coerce.number().default(30000),
 
   // Auth

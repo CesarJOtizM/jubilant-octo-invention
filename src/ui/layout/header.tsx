@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { LogOut } from "lucide-react";
+import { LogOut, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useAuth } from "@/modules/authentication/presentation/hooks/use-auth";
 import { useLogout } from "@/modules/authentication/presentation/hooks/use-logout";
 import { LocaleSwitcher } from "./locale-switcher";
@@ -16,6 +18,9 @@ export function DashboardHeader({ className }: DashboardHeaderProps) {
   const t = useTranslations();
   const { user } = useAuth();
   const { logout, isLoading } = useLogout();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <header
@@ -29,6 +34,16 @@ export function DashboardHeader({ className }: DashboardHeaderProps) {
       </div>
 
       <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          title={mounted ? (theme === "dark" ? t("theme.light") : t("theme.dark")) : undefined}
+        >
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-transform dark:rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+        </Button>
+
         <LocaleSwitcher />
 
         {user && (

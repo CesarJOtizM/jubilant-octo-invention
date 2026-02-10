@@ -134,7 +134,7 @@ export function ProductFormPage({ productId }: ProductFormPageProps) {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {(createProduct.isError || updateProduct.isError) && (
-              <div className="rounded-md bg-error-100 p-3 text-sm text-error-700">
+              <div className="rounded-md bg-error-100 p-3 text-sm text-error-700 dark:bg-error-900/20 dark:text-error-400">
                 {t("form.error")}
               </div>
             )}

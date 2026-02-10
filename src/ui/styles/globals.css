@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Primary - Teal */
   --color-primary-50: oklch(97% 0.014 185);
@@ -131,4 +133,27 @@
     outline-color: var(--color-error-500);
     box-shadow: 0 0 0 2px var(--color-error-100);
   }
+}
+
+/* Dark mode semantic overrides */
+.dark {
+  --color-background: oklch(16% 0.012 250);
+  --color-foreground: oklch(93% 0.006 250);
+  --color-card: oklch(21% 0.014 250);
+  --color-card-foreground: oklch(93% 0.006 250);
+  --color-popover: oklch(21% 0.014 250);
+  --color-popover-foreground: oklch(93% 0.006 250);
+  --color-primary: var(--color-primary-400);
+  --color-primary-foreground: oklch(16% 0.012 185);
+  --color-secondary: oklch(26% 0.015 250);
+  --color-secondary-foreground: oklch(91% 0.008 250);
+  --color-muted: oklch(26% 0.015 250);
+  --color-muted-foreground: oklch(65% 0.018 250);
+  --color-accent: oklch(26% 0.04 185);
+  --color-accent-foreground: oklch(86% 0.065 185);
+  --color-destructive: oklch(60% 0.2 25);
+  --color-destructive-foreground: oklch(93% 0.006 250);
+  --color-border: oklch(30% 0.015 250);
+  --color-input: oklch(30% 0.015 250);
+  --color-ring: var(--color-primary-400);
 }

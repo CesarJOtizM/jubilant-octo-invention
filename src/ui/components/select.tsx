@@ -7,6 +7,7 @@ import {
   useState,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   type HTMLAttributes,
   type ReactNode,
@@ -152,12 +153,25 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
     const { open, onOpenChange, triggerRef } = useSelectContext();
     const [mounted, setMounted] = useState(false);
     const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    const combinedRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        (contentRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        if (typeof ref === "function") {
+          ref(node);
+        } else if (ref) {
+          (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }
+      },
+      [ref]
+    );
 
     useEffect(() => {
       setMounted(true);
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (open && triggerRef.current) {
         const rect = triggerRef.current.getBoundingClientRect();
         setCoords({
@@ -173,6 +187,7 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
 
       const handleClickOutside = (e: MouseEvent) => {
         if (triggerRef.current?.contains(e.target as Node)) return;
+        if (contentRef.current?.contains(e.target as Node)) return;
         onOpenChange(false);
       };
 
@@ -193,7 +208,7 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
 
     return createPortal(
       <div
-        ref={ref}
+        ref={combinedRef}
         className={cn(
           "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           position === "popper" && "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2",
@@ -207,9 +222,7 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
         }}
         {...props}
       >
-        <SelectScrollUpButton />
-        <div className="p-1">{children}</div>
-        <SelectScrollDownButton />
+        <div className="p-1 overflow-y-auto max-h-[var(--select-content-available-height,theme(maxHeight.96))]">{children}</div>
       </div>,
       document.body
     );

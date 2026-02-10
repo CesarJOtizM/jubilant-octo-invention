@@ -726,7 +726,8 @@
       "new": "Nuevo Usuario",
       "activate": "Activar",
       "deactivate": "Desactivar",
-      "lock": "Bloquear Cuenta"
+      "lock": "Bloquear Cuenta",
+      "manageRoles": "Gestionar Roles"
     },
     "list": {
       "title": "Usuarios"
@@ -756,6 +757,21 @@
       "created": "Usuario creado exitosamente",
       "updated": "Usuario actualizado exitosamente",
       "statusChanged": "Estado del usuario actualizado exitosamente"
+    },
+    "roles": {
+      "title": "Gestionar Roles",
+      "description": "Ver y gestionar los roles asignados a este usuario.",
+      "assigned": "Roles Asignados",
+      "add": "Agregar Rol",
+      "selectRole": "Seleccionar un rol...",
+      "noRolesAvailable": "No hay roles adicionales disponibles.",
+      "cannotRemoveLast": "Un usuario debe tener al menos un rol.",
+      "remove": "Eliminar rol",
+      "assignSuccess": "Rol asignado exitosamente",
+      "assignError": "Error al asignar el rol",
+      "removeSuccess": "Rol eliminado exitosamente",
+      "removeError": "Error al eliminar el rol",
+      "assigning": "Asignando rol..."
     }
   },
   "roles": {
@@ -882,5 +898,10 @@
     "roles": { "title": "Roles", "description": "Configura roles y permisos de usuarios" },
     "audit": { "title": "Auditoría", "description": "Revisa actividad del sistema" },
     "settings": { "title": "Configuración", "description": "Configura ajustes del sistema" }
+  },
+  "theme": {
+    "light": "Modo claro",
+    "dark": "Modo oscuro",
+    "system": "Sistema"
   }
 }

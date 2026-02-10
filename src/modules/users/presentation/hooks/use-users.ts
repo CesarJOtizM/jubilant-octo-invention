@@ -66,9 +66,11 @@ export function useAssignRole() {
   return useMutation({
     mutationFn: ({ userId, data }: { userId: string; data: AssignRoleDto }) =>
       userApiAdapter.assignRole(userId, data),
-    onSuccess: (_, { userId }) => {
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    onSuccess: async (_, { userId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) }),
+        queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
+      ]);
     },
   });
 }
@@ -78,9 +80,11 @@ export function useRemoveRole() {
   return useMutation({
     mutationFn: ({ userId, roleId }: { userId: string; roleId: string }) =>
       userApiAdapter.removeRole(userId, roleId),
-    onSuccess: (_, { userId }) => {
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    onSuccess: async (_, { userId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) }),
+        queryClient.invalidateQueries({ queryKey: userKeys.lists() }),
+      ]);
     },
   });
 }

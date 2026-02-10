@@ -15,9 +15,9 @@ interface FormFieldProps {
 
 const stateStyles: Record<FormFieldState, string> = {
   default: "",
-  error: "text-error-600",
-  success: "text-success-600",
-  warning: "text-warning-600",
+  error: "text-error-600 dark:text-error-400",
+  success: "text-success-600 dark:text-success-400",
+  warning: "text-warning-600 dark:text-warning-400",
 };
 
 export function FormField({

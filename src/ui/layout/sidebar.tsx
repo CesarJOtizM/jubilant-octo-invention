@@ -8,9 +8,6 @@ import { cn } from "@/ui/lib/utils";
 import {
   LayoutDashboard,
   Package,
-  Warehouse,
-  ArrowLeftRight,
-  TrendingUp,
   ShoppingCart,
   RotateCcw,
   FileBarChart,
@@ -20,7 +17,6 @@ import {
   ClipboardList,
   Settings,
   ChevronDown,
-  ChevronRight,
   Menu,
   X,
 } from "lucide-react";
@@ -135,7 +131,7 @@ export function Sidebar({ className }: SidebarProps) {
     return children.some((child) => isActive(child.href));
   };
 
-  const renderNavItem = (item: NavItem, index: number) => {
+  const renderNavItem = (item: NavItem, _index: number) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.includes(item.label);
     const active = item.href

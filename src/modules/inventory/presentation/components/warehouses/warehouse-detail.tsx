@@ -265,7 +265,7 @@ export function WarehouseDetail({ warehouseId }: WarehouseDetailProps) {
                       <td className="px-4 py-3 text-right font-medium">
                         {stock.quantity}
                       </td>
-                      <td className="px-4 py-3 text-right text-neutral-500">
+                      <td className="px-4 py-3 text-right text-neutral-500 dark:text-neutral-400">
                         {stock.reservedQuantity}
                       </td>
                       <td className="px-4 py-3 text-right">

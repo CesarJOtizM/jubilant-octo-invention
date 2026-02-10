@@ -726,7 +726,8 @@
       "new": "New User",
       "activate": "Activate",
       "deactivate": "Deactivate",
-      "lock": "Lock Account"
+      "lock": "Lock Account",
+      "manageRoles": "Manage Roles"
     },
     "list": {
       "title": "Users"
@@ -756,6 +757,21 @@
       "created": "User created successfully",
       "updated": "User updated successfully",
       "statusChanged": "User status updated successfully"
+    },
+    "roles": {
+      "title": "Manage Roles",
+      "description": "View and manage the roles assigned to this user.",
+      "assigned": "Assigned Roles",
+      "add": "Add Role",
+      "selectRole": "Select a role...",
+      "noRolesAvailable": "No additional roles available.",
+      "cannotRemoveLast": "A user must have at least one role.",
+      "remove": "Remove role",
+      "assignSuccess": "Role assigned successfully",
+      "assignError": "Failed to assign role",
+      "removeSuccess": "Role removed successfully",
+      "removeError": "Failed to remove role",
+      "assigning": "Assigning role..."
     }
   },
   "roles": {
@@ -882,5 +898,10 @@
     "roles": { "title": "Roles", "description": "Configure user roles and permissions" },
     "audit": { "title": "Audit Log", "description": "Review system activity" },
     "settings": { "title": "Settings", "description": "Configure system settings" }
+  },
+  "theme": {
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "system": "System"
   }
 }

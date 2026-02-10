@@ -28,7 +28,6 @@ export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps
     if (debouncedSearch !== currentSearch) {
       onFiltersChange({ ...filters, search: debouncedSearch || undefined, page: 1 });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch]);
 
   const handleStatusChange = (status: string) => {
