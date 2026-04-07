@@ -28,6 +28,7 @@ export interface ProductProps {
   daysOfStock: number | null;
   turnoverRate: number;
   lastMovementDate: string | null;
+  barcode?: string | null;
   statusChangedBy?: string | null;
   statusChangedAt?: string | null;
   companyId?: string | null;
@@ -70,6 +71,7 @@ export class Product extends Entity<string> {
       daysOfStock: props.daysOfStock,
       turnoverRate: props.turnoverRate,
       lastMovementDate: props.lastMovementDate,
+      barcode: props.barcode,
       statusChangedBy: props.statusChangedBy,
       statusChangedAt: props.statusChangedAt,
       companyId: props.companyId,
@@ -197,6 +199,10 @@ export class Product extends Entity<string> {
 
   get brandName(): string | null | undefined {
     return this.props.brandName;
+  }
+
+  get barcode(): string | null | undefined {
+    return this.props.barcode;
   }
 
   toJSON() {
