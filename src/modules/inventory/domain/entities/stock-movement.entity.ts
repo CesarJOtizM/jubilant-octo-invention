@@ -210,6 +210,19 @@ export class StockMovement extends AggregateRoot<string> {
       id: this._id,
       ...this.props,
       lines: this.props.lines.map((l) => l.toJSON()),
+      // Include computed properties so they survive SSR serialization
+      isEntry: this.isEntry,
+      isExit: this.isExit,
+      isAdjustment: this.isAdjustment,
+      isTransfer: this.isTransfer,
+      isDraft: this.isDraft,
+      isPosted: this.isPosted,
+      isVoid: this.isVoid,
+      isReturned: this.isReturned,
+      canPost: this.canPost,
+      canVoid: this.canVoid,
+      totalItems: this.totalItems,
+      totalQuantity: this.totalQuantity,
     };
   }
 
