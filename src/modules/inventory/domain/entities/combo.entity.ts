@@ -3,6 +3,8 @@ import { Entity } from "@/shared/domain";
 export interface ComboItemProps {
   id: string;
   productId: string;
+  productName: string;
+  productSku: string;
   quantity: number;
 }
 

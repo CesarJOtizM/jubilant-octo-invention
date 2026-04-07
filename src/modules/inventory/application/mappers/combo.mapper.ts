@@ -19,6 +19,8 @@ export class ComboMapper {
       items: (dto.items ?? []).map((item) => ({
         id: item.id,
         productId: item.productId,
+        productName: item.productName ?? "",
+        productSku: item.productSku ?? "",
         quantity: item.quantity,
       })),
       createdAt: dto.createdAt,
@@ -39,6 +41,8 @@ export class ComboMapper {
       items: entity.items.map((item) => ({
         id: item.id,
         productId: item.productId,
+        productName: item.productName,
+        productSku: item.productSku,
         quantity: item.quantity,
       })),
       createdAt: entity.createdAt,

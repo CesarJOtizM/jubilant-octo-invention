@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
@@ -25,7 +25,6 @@ import {
   useDeactivateCombo,
   useComboAvailability,
 } from "@/modules/inventory/presentation/hooks/use-combos";
-import { useProducts } from "@/modules/inventory/presentation/hooks/use-products";
 import { formatDate } from "@/lib/date";
 
 interface ComboDetailProps {
@@ -100,18 +99,6 @@ export function ComboDetail({ comboId }: ComboDetailProps) {
   const { data: combo, isLoading, isError, error } = useCombo(comboId);
   const deactivateCombo = useDeactivateCombo();
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  // Load products to resolve names
-  const { data: productsData } = useProducts({ limit: 200 });
-  const productMap = useMemo(() => {
-    const map = new Map<string, { name: string; sku: string }>();
-    if (productsData?.data) {
-      for (const p of productsData.data) {
-        map.set(p.id, { name: p.name, sku: p.sku });
-      }
-    }
-    return map;
-  }, [productsData]);
 
   // Load availability for this combo's SKU
   const { data: availabilityData, isLoading: isLoadingAvailability } =
@@ -274,25 +261,22 @@ export function ComboDetail({ comboId }: ComboDetailProps) {
                 </tr>
               </thead>
               <tbody>
-                {combo.items.map((item) => {
-                  const product = productMap.get(item.productId);
-                  return (
-                    <tr
-                      key={item.id}
-                      className="border-b border-neutral-200 dark:border-neutral-700"
-                    >
-                      <td className="px-4 py-3 text-sm font-medium text-foreground">
-                        {product?.name || item.productId}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {product?.sku || "—"}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-foreground">
-                        {item.quantity}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {combo.items.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-b border-neutral-200 dark:border-neutral-700"
+                  >
+                    <td className="px-4 py-3 text-sm font-medium text-foreground">
+                      {item.productName || item.productId}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                      {item.productSku || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {item.quantity}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
