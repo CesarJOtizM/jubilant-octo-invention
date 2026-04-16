@@ -11,7 +11,7 @@ function cookieOptions(maxAge: number) {
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: "strict" as const,
+    sameSite: "lax" as const,
     path: "/",
     maxAge,
   };
