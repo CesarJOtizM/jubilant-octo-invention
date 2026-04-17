@@ -82,6 +82,7 @@ function toCreateApiDto(data: CreateProductDto): CreateProductApiDto {
     price: data.price || undefined,
     companyId: data.companyId || undefined,
     brandId: data.brandId || undefined,
+    barcode: data.barcode || undefined,
   };
 }
 
@@ -106,6 +107,7 @@ function toUpdateApiDto(data: UpdateProductDto): UpdateProductApiDto {
   }
   if (data.companyId !== undefined) dto.companyId = data.companyId || undefined;
   if (data.brandId !== undefined) dto.brandId = data.brandId || undefined;
+  if (data.barcode !== undefined) dto.barcode = data.barcode || undefined;
 
   return dto;
 }

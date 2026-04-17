@@ -26,6 +26,11 @@ export const createProductSchema = z.object({
   price: z.number().min(0, "Price cannot be negative"),
   companyId: z.string().optional(),
   brandId: z.string().optional(),
+  // Barcode: length-only validation. Backend validates format (EAN-8, UPC-A, EAN-13, Code 128).
+  barcode: z
+    .string()
+    .max(100, "Barcode cannot exceed 100 characters")
+    .optional(),
 });
 
 export const updateProductSchema = createProductSchema.partial().extend({
@@ -42,6 +47,7 @@ export interface CreateProductFormData {
   price: number;
   companyId?: string;
   brandId?: string;
+  barcode?: string;
 }
 
 export interface UpdateProductFormData extends Partial<CreateProductFormData> {
@@ -64,6 +70,7 @@ export function toCreateProductDto(
     maxStock: 0,
     companyId: data.companyId || undefined,
     brandId: data.brandId || undefined,
+    barcode: data.barcode?.trim() || undefined,
   };
 }
 
@@ -81,6 +88,8 @@ export function toUpdateProductDto(
   if (data.isActive !== undefined) dto.isActive = data.isActive;
   if (data.companyId !== undefined) dto.companyId = data.companyId || undefined;
   if (data.brandId !== undefined) dto.brandId = data.brandId || undefined;
+  if (data.barcode !== undefined)
+    dto.barcode = data.barcode?.trim() || undefined;
 
   return dto;
 }

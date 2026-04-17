@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useRouter } from "@/i18n/navigation";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, ScanBarcode } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Input } from "@/ui/components/input";
 import { CurrencyInput } from "@/ui/components/currency-input";
@@ -65,6 +65,7 @@ export function ProductFormPage({ productId }: ProductFormPageProps) {
       price: 0,
       categoryIds: [],
       companyId: undefined,
+      barcode: "",
     },
   });
 
@@ -81,6 +82,7 @@ export function ProductFormPage({ productId }: ProductFormPageProps) {
         price: existingProduct.price,
         categoryIds: existingProduct.categories.map((c) => c.id),
         companyId: existingProduct.companyId || undefined,
+        barcode: existingProduct.barcode || "",
       });
     }
   }, [isEditing, existingProduct, reset]);
@@ -172,6 +174,34 @@ export function ProductFormPage({ productId }: ProductFormPageProps) {
                 />
               </FormField>
             </div>
+
+            <FormField error={errors.barcode?.message}>
+              <Label htmlFor="barcode">{t("fields.barcode")}</Label>
+              <div className="relative">
+                <ScanBarcode
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <Input
+                  id="barcode"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder={t("fields.barcodePlaceholder")}
+                  aria-describedby="barcode-helper"
+                  className="pl-9 font-mono tracking-wider"
+                  {...register("barcode")}
+                />
+              </div>
+              {!errors.barcode?.message && (
+                <p
+                  id="barcode-helper"
+                  className="text-xs text-muted-foreground"
+                >
+                  {t("fields.barcodeHelper")}
+                </p>
+              )}
+            </FormField>
 
             <FormField error={errors.description?.message}>
               <Label htmlFor="description">{t("fields.description")}</Label>

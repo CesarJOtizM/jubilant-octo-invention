@@ -152,6 +152,7 @@ export interface CreateProductDto {
   imageUrl?: string;
   companyId?: string;
   brandId?: string;
+  barcode?: string;
 }
 
 export interface UpdateProductDto {
@@ -168,6 +169,7 @@ export interface UpdateProductDto {
   imageUrl?: string;
   companyId?: string;
   brandId?: string;
+  barcode?: string;
 }
 
 export interface ProductFilters {

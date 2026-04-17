@@ -25,6 +25,7 @@ import {
   ToggleRight,
   User,
   Loader2,
+  ScanBarcode,
 } from "lucide-react";
 import { Button } from "@/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
@@ -407,6 +408,19 @@ export function ProductDetail({ productId }: ProductDetailProps) {
               icon={Tag}
               label={t("fields.brand")}
               value={product.brandName || "—"}
+            />
+            <DetailItem
+              icon={ScanBarcode}
+              label={t("fields.barcode")}
+              value={
+                product.barcode ? (
+                  <span className="font-mono tracking-wider tabular-nums">
+                    {product.barcode}
+                  </span>
+                ) : (
+                  "—"
+                )
+              }
             />
             <DetailItem
               icon={Calendar}
