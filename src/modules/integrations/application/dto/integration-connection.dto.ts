@@ -24,6 +24,7 @@ export interface IntegrationConnectionResponseDto {
   lastSyncError?: string | null;
   syncedOrdersCount: number;
   webhookSecret?: string | null;
+  webhookUrl?: string | null;
   tokenStatus?: string | null;
   meliUserId?: string | null;
   createdAt: string;

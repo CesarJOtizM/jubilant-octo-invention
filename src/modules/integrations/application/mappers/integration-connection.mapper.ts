@@ -31,6 +31,7 @@ export class IntegrationConnectionMapper {
       lastSyncError: dto.lastSyncError ?? null,
       syncedOrdersCount: dto.syncedOrdersCount ?? 0,
       webhookSecret: dto.webhookSecret ?? null,
+      webhookUrl: dto.webhookUrl ?? null,
       tokenStatus: (dto.tokenStatus as TokenStatus) ?? null,
       meliUserId: dto.meliUserId ?? null,
       createdAt: new Date(dto.createdAt),

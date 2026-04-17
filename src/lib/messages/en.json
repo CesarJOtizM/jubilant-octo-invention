@@ -2490,8 +2490,7 @@
     "description": "Connect external platforms to synchronize orders and inventory",
     "list": {
       "empty": "No integrations connected",
-      "emptyDescription": "Connect your first platform to start synchronizing orders automatically.",
-      "addVtex": "Connect VTEX"
+      "emptyDescription": "Connect your first platform to start synchronizing orders automatically."
     },
     "fields": {
       "status": "Status",
@@ -2499,22 +2498,17 @@
       "syncedOrders": "Synced Orders",
       "connectedAt": "Connected Since",
       "lastError": "Last Error",
+      "webhookUrl": "Webhook URL",
       "webhookSecret": "Webhook Secret"
     },
     "form": {
-      "createTitle": "Connect VTEX Store",
-      "createDescription": "Enter your VTEX credentials to connect your store",
       "editTitle": "Edit Connection",
       "editDescription": "Update connection settings",
-      "accountName": "Account Name",
-      "accountNamePlaceholder": "your-vtex-account",
       "storeName": "Store Name",
-      "storeNamePlaceholder": "My VTEX Store",
+      "storeNamePlaceholder": "My Store",
       "appKey": "App Key",
-      "appKeyPlaceholder": "Enter VTEX App Key",
       "appKeyUpdatePlaceholder": "Leave empty to keep current",
       "appToken": "App Token",
-      "appTokenPlaceholder": "Enter VTEX App Token",
       "appTokenUpdatePlaceholder": "Leave empty to keep current",
       "syncStrategy": "Sync Strategy",
       "syncStrategyBoth": "Webhook + Polling",
@@ -2534,11 +2528,11 @@
       "BOTH": "Webhook + Polling"
     },
     "syncDirection": {
-      "inbound": "Inbound (VTEX → Nevada)",
-      "outbound": "Outbound (Nevada → VTEX)",
+      "inbound": "Inbound ({provider} → Nevada)",
+      "outbound": "Outbound (Nevada → {provider})",
       "bidirectional": "Bidirectional",
-      "inboundDescription": "Only receive orders from VTEX",
-      "outboundDescription": "Only reflect status changes to VTEX",
+      "inboundDescription": "Only receive orders from {provider}",
+      "outboundDescription": "Only push status changes to {provider}",
       "bidirectionalDescription": "Sync orders both ways"
     },
     "status": {
@@ -2572,6 +2566,7 @@
       "info": "Connection Details",
       "notFound": "Connection Not Found",
       "notFoundDescription": "The integration you are looking for does not exist or has been removed.",
+      "webhookUrlCopied": "Webhook URL copied to clipboard",
       "webhookSecretCopied": "Webhook secret copied to clipboard"
     },
     "syncLogs": {
@@ -2646,7 +2641,7 @@
       "added": "SKU mapping added",
       "deleted": "SKU mapping removed",
       "empty": "No SKU mappings configured",
-      "externalSkuPlaceholder": "VTEX SKU or RefId",
+      "externalSkuPlaceholder": "External SKU",
       "productIdPlaceholder": "Internal Product ID",
       "selectProduct": "Select product...",
       "searchProduct": "Search by name or SKU...",
@@ -2663,7 +2658,7 @@
       "typeProduct": "Product",
       "typeCombo": "Combo",
       "unmatchedAlert": "Unmatched SKUs",
-      "unmatchedDescription": "These SKUs from VTEX could not be matched to internal products. Map them to enable order synchronization.",
+      "unmatchedDescription": "These external SKUs could not be matched to internal products. Map them to enable order synchronization.",
       "mapThis": "Map"
     },
     "failedSyncs": {
@@ -2686,7 +2681,17 @@
       "vtex": {
         "name": "VTEX",
         "description": "Connect your VTEX e-commerce stores to synchronize orders and manage inventory across platforms.",
-        "addConnection": "Add VTEX Connection"
+        "addConnection": "Add VTEX Connection",
+        "form": {
+          "createTitle": "Connect VTEX Store",
+          "createDescription": "Enter your VTEX credentials to connect your store",
+          "accountName": "Account Name",
+          "accountNamePlaceholder": "your-vtex-account",
+          "appKeyPlaceholder": "Enter VTEX App Key",
+          "appKeyUpdatePlaceholder": "Leave empty to keep current",
+          "appTokenPlaceholder": "Enter VTEX App Token",
+          "appTokenUpdatePlaceholder": "Leave empty to keep current"
+        }
       },
       "mercadolibre": {
         "name": "MercadoLibre",

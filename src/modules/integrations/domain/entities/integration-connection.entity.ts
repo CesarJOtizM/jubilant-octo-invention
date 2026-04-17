@@ -32,6 +32,7 @@ export interface IntegrationConnectionProps {
   lastSyncError: string | null;
   syncedOrdersCount: number;
   webhookSecret: string | null;
+  webhookUrl: string | null;
   tokenStatus: TokenStatus | null;
   meliUserId: string | null;
   createdAt: Date;
@@ -68,6 +69,7 @@ export class IntegrationConnection extends Entity<string> {
       lastSyncError: props.lastSyncError,
       syncedOrdersCount: props.syncedOrdersCount,
       webhookSecret: props.webhookSecret,
+      webhookUrl: props.webhookUrl,
       tokenStatus: props.tokenStatus,
       meliUserId: props.meliUserId,
       createdAt: props.createdAt,
@@ -132,6 +134,9 @@ export class IntegrationConnection extends Entity<string> {
 
   get webhookSecret(): string | null {
     return this.props.webhookSecret;
+  }
+  get webhookUrl(): string | null {
+    return this.props.webhookUrl;
   }
   get tokenStatus(): TokenStatus | null {
     return this.props.tokenStatus;

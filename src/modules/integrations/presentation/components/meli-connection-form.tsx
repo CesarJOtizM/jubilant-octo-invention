@@ -45,6 +45,7 @@ export function MeliConnectionForm({
 }: MeliConnectionFormProps) {
   const t = useTranslations("integrations");
   const tCommon = useTranslations("common");
+  const meliProvider = t("providers.mercadolibre.name");
   const { multiCompanyEnabled } = useOrgSettings();
 
   const { data: warehousesResult } = useWarehouses();
@@ -172,7 +173,7 @@ export function MeliConnectionForm({
             <FormField>
               <Label>{t("form.syncDirection")}</Label>
               <Input
-                value={t("syncDirection.inbound")}
+                value={t("syncDirection.inbound", { provider: meliProvider })}
                 disabled
                 className="bg-muted"
               />

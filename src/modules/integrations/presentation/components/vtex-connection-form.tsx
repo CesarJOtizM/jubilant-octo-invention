@@ -151,6 +151,8 @@ function SharedFormFields({
   contacts,
   companies,
 }: SharedFormFieldsProps) {
+  const vtexProvider = t("providers.vtex.name");
+
   const strategyLabels: Record<string, string> = {
     WEBHOOK: "Webhook",
     POLLING: "Polling",
@@ -158,8 +160,8 @@ function SharedFormFields({
   };
 
   const directionLabels: Record<string, string> = {
-    INBOUND: t("syncDirection.inbound"),
-    OUTBOUND: t("syncDirection.outbound"),
+    INBOUND: t("syncDirection.inbound", { provider: vtexProvider }),
+    OUTBOUND: t("syncDirection.outbound", { provider: vtexProvider }),
     BIDIRECTIONAL: t("syncDirection.bidirectional"),
   };
 
@@ -184,8 +186,8 @@ function SharedFormFields({
           {...register("appKey")}
           placeholder={
             isEditing
-              ? t("form.appKeyUpdatePlaceholder")
-              : t("form.appKeyPlaceholder")
+              ? t("providers.vtex.form.appKeyUpdatePlaceholder")
+              : t("providers.vtex.form.appKeyPlaceholder")
           }
         />
       </FormField>
@@ -200,8 +202,8 @@ function SharedFormFields({
           {...register("appToken")}
           placeholder={
             isEditing
-              ? t("form.appTokenUpdatePlaceholder")
-              : t("form.appTokenPlaceholder")
+              ? t("providers.vtex.form.appTokenUpdatePlaceholder")
+              : t("providers.vtex.form.appTokenPlaceholder")
           }
         />
       </FormField>
@@ -248,10 +250,10 @@ function SharedFormFields({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="INBOUND">
-                  {t("syncDirection.inbound")}
+                  {t("syncDirection.inbound", { provider: vtexProvider })}
                 </SelectItem>
                 <SelectItem value="OUTBOUND">
-                  {t("syncDirection.outbound")}
+                  {t("syncDirection.outbound", { provider: vtexProvider })}
                 </SelectItem>
                 <SelectItem value="BIDIRECTIONAL">
                   {t("syncDirection.bidirectional")}
@@ -394,6 +396,7 @@ function VtexCreateForm({
   isPending,
   onSubmit,
 }: VtexCreateFormProps) {
+  const vtexProvider = t("providers.vtex.name");
   const today = useMemo(() => new Date(), []);
   const [syncFromDate, setSyncFromDate] = useState<Date | undefined>(
     () => new Date(),
@@ -453,8 +456,10 @@ function VtexCreateForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] flex-col gap-0 p-0 sm:max-w-lg">
         <DialogHeader className="px-4 pt-4 sm:px-6 sm:pt-6">
-          <DialogTitle>{t("form.createTitle")}</DialogTitle>
-          <DialogDescription>{t("form.createDescription")}</DialogDescription>
+          <DialogTitle>{t("providers.vtex.form.createTitle")}</DialogTitle>
+          <DialogDescription>
+            {t("providers.vtex.form.createDescription")}
+          </DialogDescription>
         </DialogHeader>
 
         <form
@@ -467,11 +472,13 @@ function VtexCreateForm({
               <SectionHeading>{t("form.sectionCredentials")}</SectionHeading>
 
               <FormField error={errors.accountName?.message}>
-                <Label htmlFor="accountName">{t("form.accountName")} *</Label>
+                <Label htmlFor="accountName">
+                  {t("providers.vtex.form.accountName")} *
+                </Label>
                 <Input
                   id="accountName"
                   {...register("accountName")}
-                  placeholder={t("form.accountNamePlaceholder")}
+                  placeholder={t("providers.vtex.form.accountNamePlaceholder")}
                 />
               </FormField>
 
@@ -491,7 +498,7 @@ function VtexCreateForm({
                     id="appKey"
                     type="password"
                     {...register("appKey")}
-                    placeholder={t("form.appKeyPlaceholder")}
+                    placeholder={t("providers.vtex.form.appKeyPlaceholder")}
                   />
                 </FormField>
 
@@ -501,7 +508,7 @@ function VtexCreateForm({
                     id="appToken"
                     type="password"
                     {...register("appToken")}
-                    placeholder={t("form.appTokenPlaceholder")}
+                    placeholder={t("providers.vtex.form.appTokenPlaceholder")}
                   />
                 </FormField>
               </div>
@@ -563,8 +570,12 @@ function VtexCreateForm({
                       };
                     }) => {
                       const labels: Record<string, string> = {
-                        INBOUND: t("syncDirection.inbound"),
-                        OUTBOUND: t("syncDirection.outbound"),
+                        INBOUND: t("syncDirection.inbound", {
+                          provider: vtexProvider,
+                        }),
+                        OUTBOUND: t("syncDirection.outbound", {
+                          provider: vtexProvider,
+                        }),
                         BIDIRECTIONAL: t("syncDirection.bidirectional"),
                       };
                       return (
@@ -577,10 +588,14 @@ function VtexCreateForm({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="INBOUND">
-                              {t("syncDirection.inbound")}
+                              {t("syncDirection.inbound", {
+                                provider: vtexProvider,
+                              })}
                             </SelectItem>
                             <SelectItem value="OUTBOUND">
-                              {t("syncDirection.outbound")}
+                              {t("syncDirection.outbound", {
+                                provider: vtexProvider,
+                              })}
                             </SelectItem>
                             <SelectItem value="BIDIRECTIONAL">
                               {t("syncDirection.bidirectional")}

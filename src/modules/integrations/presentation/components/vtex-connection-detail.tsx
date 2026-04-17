@@ -10,13 +10,8 @@ import {
   TestTube,
   RefreshCw,
   Loader2,
-  Eye,
-  EyeOff,
-  Copy,
-  Check,
   MoreVertical,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
 import { Badge } from "@/ui/components/badge";
@@ -46,6 +41,7 @@ import { SkuMappingForm } from "./sku-mapping-form";
 import { UnmatchedSkusAlert } from "./unmatched-skus-alert";
 import { VtexConnectionForm } from "./vtex-connection-form";
 import { SyncConfigurationDialog } from "./sync-configuration-dialog";
+import { WebhookCredentialsDisplay } from "./webhook-credentials-display";
 import {
   useIntegration,
   useDeleteIntegration,
@@ -64,6 +60,7 @@ export function VtexConnectionDetail({
   const locale = useLocale();
   const t = useTranslations("integrations");
   const tCommon = useTranslations("common");
+  const vtexProvider = t("providers.vtex.name");
   const router = useRouter();
   const { data: connection, isLoading, isError } = useIntegration(connectionId);
   const deleteIntegration = useDeleteIntegration();
@@ -74,8 +71,6 @@ export function VtexConnectionDetail({
   const [activeTab, setActiveTab] = useState("logs");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editFormOpen, setEditFormOpen] = useState(false);
-  const [showSecret, setShowSecret] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [syncDialogOpen, setSyncDialogOpen] = useState(false);
 
   const formatDate = (date: Date | string | null) => {
@@ -132,8 +127,8 @@ export function VtexConnectionDetail({
   };
 
   const syncDirectionLabels: Record<string, string> = {
-    INBOUND: t("syncDirection.inbound"),
-    OUTBOUND: t("syncDirection.outbound"),
+    INBOUND: t("syncDirection.inbound", { provider: vtexProvider }),
+    OUTBOUND: t("syncDirection.outbound", { provider: vtexProvider }),
     BIDIRECTIONAL: t("syncDirection.bidirectional"),
   };
 
@@ -141,15 +136,6 @@ export function VtexConnectionDetail({
     warehouses.find((w) => w.id === connection.defaultWarehouseId)?.name ??
     connection.warehouseName ??
     connection.defaultWarehouseId;
-
-  const handleCopySecret = async () => {
-    if (connection.webhookSecret) {
-      await navigator.clipboard.writeText(connection.webhookSecret);
-      setCopied(true);
-      toast.success(t("detail.webhookSecretCopied"));
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -319,44 +305,10 @@ export function VtexConnectionDetail({
                 </dd>
               </div>
             )}
-            {connection.webhookSecret && (
-              <div className="sm:col-span-2 lg:col-span-3">
-                <dt className="text-sm font-medium text-muted-foreground">
-                  {t("fields.webhookSecret")}
-                </dt>
-                <dd className="mt-1 flex items-center gap-2">
-                  <code className="rounded bg-muted px-2 py-1 text-sm font-mono">
-                    {showSecret
-                      ? connection.webhookSecret
-                      : "\u2022".repeat(32)}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setShowSecret(!showSecret)}
-                  >
-                    {showSecret ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={handleCopySecret}
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </dd>
-              </div>
-            )}
+            <WebhookCredentialsDisplay
+              webhookUrl={connection.webhookUrl}
+              webhookSecret={connection.webhookSecret}
+            />
           </dl>
         </CardContent>
       </Card>

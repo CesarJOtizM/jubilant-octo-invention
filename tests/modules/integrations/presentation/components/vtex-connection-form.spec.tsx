@@ -86,7 +86,9 @@ describe("VtexConnectionForm", () => {
   it("Given: create mode When: rendering Then: should show create title", () => {
     render(<VtexConnectionForm {...defaultProps} />);
 
-    expect(screen.getByText("form.createTitle")).toBeInTheDocument();
+    expect(
+      screen.getByText("providers.vtex.form.createTitle"),
+    ).toBeInTheDocument();
   });
 
   it("Given: edit mode When: rendering Then: should show edit title", () => {
@@ -104,7 +106,9 @@ describe("VtexConnectionForm", () => {
   it("Given: create mode When: rendering Then: should show accountName field", () => {
     render(<VtexConnectionForm {...defaultProps} />);
 
-    expect(screen.getByText("form.accountName *")).toBeInTheDocument();
+    expect(
+      screen.getByText("providers.vtex.form.accountName *"),
+    ).toBeInTheDocument();
   });
 
   it("Given: edit mode When: rendering Then: should hide accountName field", () => {
@@ -116,7 +120,9 @@ describe("VtexConnectionForm", () => {
       />,
     );
 
-    expect(screen.queryByText("form.accountName *")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("providers.vtex.form.accountName *"),
+    ).not.toBeInTheDocument();
   });
 
   it("Given: create mode When: rendering Then: should show storeName field", () => {
@@ -168,6 +174,8 @@ describe("VtexConnectionForm", () => {
   it("Given: closed dialog When: rendering Then: should not be visible", () => {
     render(<VtexConnectionForm {...defaultProps} open={false} />);
 
-    expect(screen.queryByText("form.createTitle")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("providers.vtex.form.createTitle"),
+    ).not.toBeInTheDocument();
   });
 });
