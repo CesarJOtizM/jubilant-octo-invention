@@ -21,7 +21,9 @@ import {
 } from "@/ui/components/select";
 import { SearchableSelect } from "@/ui/components/searchable-select";
 import { ProductSearchSelect } from "@/modules/inventory/presentation/components/shared/product-search-select";
+import { ProductScanButton } from "@/modules/inventory/presentation/components/shared/product-scan-button";
 import { ContactsSearchSelect } from "@/modules/contacts/presentation/components/shared/contacts-search-select";
+import type { Product } from "@/modules/inventory/domain/entities/product.entity";
 import { Textarea } from "@/ui/components/textarea";
 import {
   createSaleSchema,
@@ -66,6 +68,7 @@ export function SaleFormPage() {
     handleSubmit,
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<CreateSaleFormData>({
     resolver: zodResolver(createSaleSchema),
@@ -103,6 +106,60 @@ export function SaleFormPage() {
       }
     },
     [setValue, comboMap],
+  );
+
+  /**
+   * When a product is scanned, either bump the quantity of its existing
+   * product line, fill the first empty product line, or append a new one.
+   * Combo lines are ignored when matching — scanning only touches products.
+   */
+  const handleProductScanned = useCallback(
+    (product: Product) => {
+      const currentLines = getValues("lines");
+
+      // 1) Same product already in a product-type line → bump quantity
+      const existingIndex = currentLines.findIndex(
+        (l) => l.lineType === "product" && l.productId === product.id,
+      );
+      if (existingIndex >= 0) {
+        const current = currentLines[existingIndex].quantity ?? 0;
+        setValue(`lines.${existingIndex}.quantity`, current + 1, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        return;
+      }
+
+      // 2) Empty product-type line → fill it in place
+      const emptyIndex = currentLines.findIndex(
+        (l) => l.lineType === "product" && !l.productId,
+      );
+      if (emptyIndex >= 0) {
+        setValue(`lines.${emptyIndex}.productId`, product.id, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setValue(`lines.${emptyIndex}.quantity`, 1, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setValue(`lines.${emptyIndex}.salePrice`, product.price, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        return;
+      }
+
+      // 3) Otherwise → append a new product line with the product's price
+      append({
+        lineType: "product",
+        productId: product.id,
+        comboId: "",
+        quantity: 1,
+        salePrice: product.price,
+      });
+    },
+    [getValues, setValue, append],
   );
 
   const onSubmit = async (data: CreateSaleFormData) => {
@@ -231,17 +288,23 @@ export function SaleFormPage() {
         {/* Products Card */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <CardTitle>{t("form.linesSection")}</CardTitle>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addLine}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {t("actions.addLine")}
-              </Button>
+              <div className="flex items-center gap-2">
+                <ProductScanButton
+                  onProductScanned={handleProductScanned}
+                  disabled={isSubmitting}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addLine}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t("actions.addLine")}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

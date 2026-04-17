@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -19,6 +20,7 @@ import {
 import { Textarea } from "@/ui/components/textarea";
 import { CurrencyInput } from "@/ui/components/currency-input";
 import { ProductSearchSelect } from "@/modules/inventory/presentation/components/shared/product-search-select";
+import { ProductScanButton } from "@/modules/inventory/presentation/components/shared/product-scan-button";
 import {
   createMovementSchema,
   toCreateMovementDto,
@@ -28,6 +30,7 @@ import { useCreateMovement } from "@/modules/inventory/presentation/hooks/use-mo
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
 import { useContacts } from "@/modules/contacts/presentation/hooks/use-contacts";
+import type { Product } from "@/modules/inventory/domain/entities/product.entity";
 
 interface MovementFormProps {
   open: boolean;
@@ -50,6 +53,8 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
     reset,
     control,
     watch,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<CreateMovementFormData>({
     resolver: zodResolver(createMovementSchema),
@@ -68,6 +73,46 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
     control,
     name: "lines",
   });
+
+  /**
+   * When a product is scanned, either bump the quantity of its existing line
+   * or append a new one. If the only line is empty (productId === ""), fill
+   * that one instead of appending — this handles the initial-open case.
+   */
+  const handleProductScanned = useCallback(
+    (product: Product) => {
+      const currentLines = getValues("lines");
+      const existingIndex = currentLines.findIndex(
+        (l) => l.productId === product.id,
+      );
+
+      if (existingIndex >= 0) {
+        const current = currentLines[existingIndex].quantity ?? 0;
+        setValue(`lines.${existingIndex}.quantity`, current + 1, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        return;
+      }
+
+      // Empty-line case: fill the first empty line instead of appending
+      const emptyIndex = currentLines.findIndex((l) => !l.productId);
+      if (emptyIndex >= 0) {
+        setValue(`lines.${emptyIndex}.productId`, product.id, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setValue(`lines.${emptyIndex}.quantity`, 1, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        return;
+      }
+
+      append({ productId: product.id, quantity: 1, unitCost: undefined });
+    },
+    [getValues, setValue, append],
+  );
 
   const watchType = watch("type");
 
@@ -244,17 +289,23 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
 
               {/* Products Section */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <h3 className="font-medium">{t("form.linesSection")}</h3>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addLine}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    {t("actions.addLine")}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <ProductScanButton
+                      onProductScanned={handleProductScanned}
+                      disabled={createMovement.isPending}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addLine}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      {t("actions.addLine")}
+                    </Button>
+                  </div>
                 </div>
 
                 {errors.lines?.message && (

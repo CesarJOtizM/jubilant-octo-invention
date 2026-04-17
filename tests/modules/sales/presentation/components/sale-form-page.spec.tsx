@@ -35,6 +35,11 @@ vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
       ],
     },
   }),
+  // ProductScanButton pulls this in — mock it to a no-op mutation
+  useProductLookupMutation: () => ({
+    mutateAsync: vi.fn().mockResolvedValue(null),
+    isPending: false,
+  }),
 }));
 
 vi.mock("@/modules/inventory/presentation/hooks/use-warehouses", () => ({

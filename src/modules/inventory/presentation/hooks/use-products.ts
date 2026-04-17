@@ -98,3 +98,18 @@ export function useToggleProductStatus() {
     },
   });
 }
+
+/**
+ * Imperative barcode/SKU lookup. Unlike `useLookupProduct` (which is reactive
+ * and tied to a query key), this returns a mutation you can trigger from a
+ * scanner event handler to get `Product | null` on demand.
+ *
+ * Use `mutateAsync(code)` from inside `onScan` callbacks and handle the
+ * null case to show a "not found" toast.
+ */
+export function useProductLookupMutation() {
+  return useMutation({
+    mutationFn: (code: string) =>
+      getContainer().productRepository.lookupByCode(code),
+  });
+}

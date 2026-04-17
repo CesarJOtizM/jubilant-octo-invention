@@ -6,6 +6,7 @@ const mockFindAll = vi.fn();
 const mockFindById = vi.fn();
 const mockCreate = vi.fn();
 const mockUpdate = vi.fn();
+const mockLookupByCode = vi.fn();
 
 vi.mock("@/config/di/container", () => ({
   getContainer: vi.fn(() => ({
@@ -14,6 +15,7 @@ vi.mock("@/config/di/container", () => ({
       findById: mockFindById,
       create: mockCreate,
       update: mockUpdate,
+      lookupByCode: mockLookupByCode,
     },
   })),
 }));
@@ -32,6 +34,7 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useToggleProductStatus,
+  useProductLookupMutation,
   productKeys,
 } from "@/modules/inventory/presentation/hooks/use-products";
 import { toast } from "sonner";
@@ -261,6 +264,59 @@ describe("use-products hooks", () => {
       });
 
       expect(toast.error).toHaveBeenCalled();
+    });
+  });
+
+  // ── useProductLookupMutation ───────────────────────────────────────
+
+  describe("useProductLookupMutation", () => {
+    it("Given a barcode, When mutating, Then it calls lookupByCode with the code", async () => {
+      const product = { id: "p-1", name: "Widget" };
+      mockLookupByCode.mockResolvedValueOnce(product);
+      const { Wrapper } = createQueryWrapper();
+
+      const { result } = renderHook(() => useProductLookupMutation(), {
+        wrapper: Wrapper,
+      });
+
+      let returned: unknown;
+      await act(async () => {
+        returned = await result.current.mutateAsync("7701234567890");
+      });
+
+      expect(mockLookupByCode).toHaveBeenCalledWith("7701234567890");
+      expect(returned).toEqual(product);
+    });
+
+    it("Given the barcode does not exist, When mutating, Then it resolves to null", async () => {
+      mockLookupByCode.mockResolvedValueOnce(null);
+      const { Wrapper } = createQueryWrapper();
+
+      const { result } = renderHook(() => useProductLookupMutation(), {
+        wrapper: Wrapper,
+      });
+
+      let returned: unknown;
+      await act(async () => {
+        returned = await result.current.mutateAsync("NOT-A-CODE");
+      });
+
+      expect(returned).toBeNull();
+    });
+
+    it("Given the backend throws, When mutating, Then the promise rejects", async () => {
+      mockLookupByCode.mockRejectedValueOnce(new Error("network"));
+      const { Wrapper } = createQueryWrapper();
+
+      const { result } = renderHook(() => useProductLookupMutation(), {
+        wrapper: Wrapper,
+      });
+
+      await expect(
+        act(async () => {
+          await result.current.mutateAsync("x");
+        }),
+      ).rejects.toThrow();
     });
   });
 });
