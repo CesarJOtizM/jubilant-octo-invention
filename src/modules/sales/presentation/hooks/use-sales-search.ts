@@ -4,7 +4,10 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getContainer } from "@/config/di/container";
 import type { SaleFilters } from "@/modules/sales/application/dto/sale.dto";
-import type { Sale } from "@/modules/sales/domain/entities/sale.entity";
+import type {
+  Sale,
+  SaleStatus,
+} from "@/modules/sales/domain/entities/sale.entity";
 
 const PAGE_SIZE = 20;
 const DEBOUNCE_MS = 300;
@@ -12,7 +15,7 @@ const DEBOUNCE_MS = 300;
 export interface UseSalesSearchOptions {
   search?: string;
   companyId?: string;
-  statuses?: string[];
+  statuses?: SaleStatus[];
   enabled?: boolean;
 }
 
@@ -50,7 +53,7 @@ export function useSalesSearch(options: UseSalesSearchOptions = {}) {
   }, [search]);
 
   const filters: SaleFilters = {
-    ...(statuses && { status: statuses as any }),
+    ...(statuses && { status: statuses }),
     ...(companyId && { companyId }),
     ...(debouncedSearch && { search: debouncedSearch }),
     limit: PAGE_SIZE,

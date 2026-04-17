@@ -96,14 +96,14 @@ describe("useSalesSearch", () => {
   it("Given: statuses provided When: fetching Then: should include status in filters", async () => {
     mockFindAll.mockResolvedValue(mockPage([], 1));
 
-    renderHook(() => useSalesSearch({ statuses: ["COMPLETED", "PENDING"] }), {
+    renderHook(() => useSalesSearch({ statuses: ["COMPLETED", "CONFIRMED"] }), {
       wrapper,
     });
 
     await waitFor(() => expect(mockFindAll).toHaveBeenCalled());
 
     const callArgs = mockFindAll.mock.calls[0][0];
-    expect(callArgs.status).toEqual(["COMPLETED", "PENDING"]);
+    expect(callArgs.status).toEqual(["COMPLETED", "CONFIRMED"]);
   });
 
   it("Given: search term When: debounce expires Then: should pass search to query", async () => {
