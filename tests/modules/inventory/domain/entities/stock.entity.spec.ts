@@ -266,4 +266,28 @@ describe("Stock Entity", () => {
       expect(entity.lastMovementAt).toBeNull();
     });
   });
+
+  describe("productBarcode", () => {
+    it("Given: productBarcode provided When: creating Then: should expose it via getter", () => {
+      // Arrange
+      const props = { ...validProps, productBarcode: "7501234567890" };
+
+      // Act
+      const entity = Stock.create(props);
+
+      // Assert
+      expect(entity.productBarcode).toBe("7501234567890");
+    });
+
+    it("Given: productBarcode omitted When: creating Then: getter should return undefined", () => {
+      // Arrange
+      const props = { ...validProps };
+
+      // Act
+      const entity = Stock.create(props);
+
+      // Assert
+      expect(entity.productBarcode).toBeUndefined();
+    });
+  });
 });

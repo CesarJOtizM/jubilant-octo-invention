@@ -5,6 +5,7 @@ export interface StockProps {
   productId: string;
   productName: string;
   productSku: string;
+  productBarcode?: string;
   warehouseId: string;
   warehouseName: string;
   quantity: number;
@@ -29,6 +30,7 @@ export class Stock extends Entity<string> {
       productId: props.productId,
       productName: props.productName,
       productSku: props.productSku,
+      productBarcode: props.productBarcode,
       warehouseId: props.warehouseId,
       warehouseName: props.warehouseName,
       quantity: props.quantity,
@@ -51,6 +53,10 @@ export class Stock extends Entity<string> {
 
   get productSku(): string {
     return this.props.productSku;
+  }
+
+  get productBarcode(): string | undefined {
+    return this.props.productBarcode;
   }
 
   get warehouseId(): string {

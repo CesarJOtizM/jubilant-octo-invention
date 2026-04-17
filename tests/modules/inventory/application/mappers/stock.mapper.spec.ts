@@ -110,6 +110,28 @@ describe("StockMapper", () => {
       // Assert
       expect(entity.lastMovementAt).toBeNull();
     });
+
+    it("Given a DTO with productBarcode, When toDomain is called, Then the entity should expose productBarcode", () => {
+      // Arrange
+      const dto = { ...mockRawDto, productBarcode: "7501234567890" };
+
+      // Act
+      const entity = StockMapper.toDomain(dto);
+
+      // Assert
+      expect(entity.productBarcode).toBe("7501234567890");
+    });
+
+    it("Given a DTO without productBarcode, When toDomain is called, Then the entity should have undefined productBarcode", () => {
+      // Arrange
+      const dto = { ...mockRawDto };
+
+      // Act
+      const entity = StockMapper.toDomain(dto);
+
+      // Assert
+      expect(entity.productBarcode).toBeUndefined();
+    });
   });
 
   describe("toDto", () => {
@@ -133,6 +155,20 @@ describe("StockMapper", () => {
       expect(dto).not.toHaveProperty("averageCost");
       expect(dto).not.toHaveProperty("totalValue");
       expect(dto).not.toHaveProperty("currency");
+    });
+
+    it("Given a Stock entity with productBarcode, When toDto is called, Then the DTO should include productBarcode", () => {
+      // Arrange
+      const entity = StockMapper.toDomain({
+        ...mockRawDto,
+        productBarcode: "7501234567890",
+      });
+
+      // Act
+      const dto = StockMapper.toDto(entity);
+
+      // Assert
+      expect(dto.productBarcode).toBe("7501234567890");
     });
   });
 });

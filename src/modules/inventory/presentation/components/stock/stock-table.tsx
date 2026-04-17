@@ -55,13 +55,26 @@ function StockRow({
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
             <Package className="h-5 w-5 text-primary-600 dark:text-primary-400" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="font-medium text-neutral-900 dark:text-neutral-100">
               {stock.productName || stock.productId}
             </p>
-            {stock.productSku && (
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                {stock.productSku}
+            {(stock.productSku || stock.productBarcode) && (
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-neutral-500 dark:text-neutral-400">
+                {stock.productSku && <span>{stock.productSku}</span>}
+                {stock.productSku && stock.productBarcode && (
+                  <span aria-hidden="true" className="text-neutral-300 dark:text-neutral-600">
+                    &middot;
+                  </span>
+                )}
+                {stock.productBarcode && (
+                  <span
+                    className="font-mono tracking-wider tabular-nums text-xs"
+                    aria-label={t("fields.barcode")}
+                  >
+                    {stock.productBarcode}
+                  </span>
+                )}
               </p>
             )}
           </div>

@@ -14,6 +14,7 @@ export interface StockApiRawDto {
   id?: string;
   productName?: string;
   productSku?: string;
+  productBarcode?: string;
   warehouseName?: string;
   reservedQuantity?: number;
   availableQuantity?: number;
@@ -25,6 +26,7 @@ export interface StockResponseDto {
   productId: string;
   productName?: string;
   productSku?: string;
+  productBarcode?: string;
   warehouseId: string;
   warehouseName?: string;
   quantity: number;

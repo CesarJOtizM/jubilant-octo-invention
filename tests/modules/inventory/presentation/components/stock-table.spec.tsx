@@ -391,4 +391,95 @@ describe("StockTable", () => {
     render(<StockTable />);
     expect(screen.getByText(/error\.loading/)).toBeDefined();
   });
+
+  // --- Branch: barcode rendered next to SKU ---
+  it("Given: stock with productBarcode When: rendering Then: should show barcode next to SKU", () => {
+    const stock = Stock.create({
+      id: "s-bc",
+      productId: "p1",
+      productName: "Widget With Barcode",
+      productSku: "WB-001",
+      productBarcode: "7501234567890",
+      warehouseId: "wh-1",
+      warehouseName: "Main",
+      quantity: 10,
+      reservedQuantity: 0,
+      availableQuantity: 10,
+      averageCost: 5,
+      totalValue: 50,
+      currency: "USD",
+      lastMovementAt: null,
+    });
+    mockQueryState = {
+      data: { data: [stock] },
+      isLoading: false,
+      isError: false,
+      error: null,
+    };
+
+    render(<StockTable />);
+
+    expect(screen.getByText("WB-001")).toBeDefined();
+    expect(screen.getByText("7501234567890")).toBeDefined();
+  });
+
+  it("Given: stock without productBarcode When: rendering Then: should not render barcode element", () => {
+    const stock = Stock.create({
+      id: "s-nobc",
+      productId: "p1",
+      productName: "Widget No Barcode",
+      productSku: "WNB-001",
+      warehouseId: "wh-1",
+      warehouseName: "Main",
+      quantity: 10,
+      reservedQuantity: 0,
+      availableQuantity: 10,
+      averageCost: 5,
+      totalValue: 50,
+      currency: "USD",
+      lastMovementAt: null,
+    });
+    mockQueryState = {
+      data: { data: [stock] },
+      isLoading: false,
+      isError: false,
+      error: null,
+    };
+
+    const { container } = render(<StockTable />);
+
+    expect(screen.getByText("WNB-001")).toBeDefined();
+    // No element labeled as barcode should be present
+    expect(container.querySelector('[aria-label="fields.barcode"]')).toBeNull();
+  });
+
+  it("Given: stock with barcode but no SKU When: rendering Then: should still render barcode without separator", () => {
+    const stock = Stock.create({
+      id: "s-bc-only",
+      productId: "p1",
+      productName: "Only Barcode",
+      productSku: "",
+      productBarcode: "7501234567890",
+      warehouseId: "wh-1",
+      warehouseName: "Main",
+      quantity: 10,
+      reservedQuantity: 0,
+      availableQuantity: 10,
+      averageCost: 5,
+      totalValue: 50,
+      currency: "USD",
+      lastMovementAt: null,
+    });
+    mockQueryState = {
+      data: { data: [stock] },
+      isLoading: false,
+      isError: false,
+      error: null,
+    };
+
+    render(<StockTable />);
+
+    expect(screen.getByText("Only Barcode")).toBeDefined();
+    expect(screen.getByText("7501234567890")).toBeDefined();
+  });
 });
