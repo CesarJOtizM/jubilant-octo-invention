@@ -1,0 +1,292 @@
+import { vi, describe, it, expect, beforeEach } from "vitest";
+
+vi.mock("@/shared/infrastructure/http", () => ({
+  apiClient: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
+
+vi.mock("@/modules/brands/application/mappers/brand.mapper", () => ({
+  BrandMapper: {
+    toDomain: vi.fn((dto: unknown) => dto),
+  },
+}));
+
+import { apiClient } from "@/shared/infrastructure/http";
+import { BrandApiAdapter } from "@/modules/brands/infrastructure/adapters/brand-api.adapter";
+import type { BrandResponseDto } from "@/modules/brands/application/dto/brand.dto";
+
+describe("BrandApiAdapter", () => {
+  let adapter: BrandApiAdapter;
+
+  const mockBrandDto: BrandResponseDto = {
+    id: "brand-001",
+    name: "Samsung",
+    description: "Electronics manufacturer",
+    isActive: true,
+    createdAt: "2026-03-07T10:00:00.000Z",
+    updatedAt: "2026-03-07T12:00:00.000Z",
+  };
+
+  const mockPagination = {
+    page: 1,
+    limit: 10,
+    total: 1,
+    totalPages: 1,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    adapter = new BrandApiAdapter();
+  });
+
+  describe("findAll", () => {
+    it("Given: no filters When: findAll is called Then: should GET /inventory/brands with empty params", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: {
+          data: [mockBrandDto],
+          pagination: mockPagination,
+        },
+      });
+
+      const result = await adapter.findAll();
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands", {
+        params: {},
+      });
+      expect(result.data).toHaveLength(1);
+      expect(result.pagination).toEqual(mockPagination);
+    });
+
+    it("Given: search filter When: findAll is called Then: should pass search param", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: [], pagination: mockPagination },
+      });
+
+      await adapter.findAll({ search: "samsung" });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands", {
+        params: { search: "samsung" },
+      });
+    });
+
+    it("Given: isActive true When: findAll is called Then: should pass isActive param", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: [], pagination: mockPagination },
+      });
+
+      await adapter.findAll({ isActive: true });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands", {
+        params: { isActive: true },
+      });
+    });
+
+    it("Given: isActive false When: findAll is called Then: should pass isActive=false", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: [], pagination: mockPagination },
+      });
+
+      await adapter.findAll({ isActive: false });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands", {
+        params: { isActive: false },
+      });
+    });
+
+    it("Given: pagination and sorting When: findAll is called Then: should pass all params", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: [], pagination: mockPagination },
+      });
+
+      await adapter.findAll({
+        page: 2,
+        limit: 25,
+        sortBy: "name",
+        sortOrder: "desc",
+      });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands", {
+        params: {
+          page: 2,
+          limit: 25,
+          sortBy: "name",
+          sortOrder: "desc",
+        },
+      });
+    });
+
+    it("Given: all filters combined When: findAll is called Then: should pass all params", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: [], pagination: mockPagination },
+      });
+
+      await adapter.findAll({
+        search: "test",
+        isActive: true,
+        page: 3,
+        limit: 50,
+        sortBy: "createdAt",
+        sortOrder: "asc",
+      });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands", {
+        params: {
+          search: "test",
+          isActive: true,
+          page: 3,
+          limit: 50,
+          sortBy: "createdAt",
+          sortOrder: "asc",
+        },
+      });
+    });
+
+    it("Given: undefined filter values When: findAll is called Then: should exclude them from params", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: [], pagination: mockPagination },
+      });
+
+      await adapter.findAll({
+        search: undefined,
+        page: undefined,
+        sortBy: undefined,
+      });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands", {
+        params: {},
+      });
+    });
+  });
+
+  describe("findById", () => {
+    it("Given: a valid ID When: findById is called Then: should GET and return the mapped brand", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: mockBrandDto },
+      });
+
+      const result = await adapter.findById("brand-001");
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/brands/brand-001");
+      expect(result).toBeTruthy();
+    });
+
+    it("Given: a non-existent ID When: findById is called Then: should return null on 404", async () => {
+      vi.mocked(apiClient.get).mockRejectedValue({
+        response: { status: 404 },
+      });
+
+      const result = await adapter.findById("non-existent");
+
+      expect(result).toBeNull();
+    });
+
+    it("Given: a server error (500) When: findById is called Then: should rethrow the error", async () => {
+      const serverError = { response: { status: 500 } };
+      vi.mocked(apiClient.get).mockRejectedValue(serverError);
+
+      await expect(adapter.findById("brand-001")).rejects.toEqual(serverError);
+    });
+
+    it("Given: generic Error without response When: findById Then: should rethrow", async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(new Error("Network error"));
+
+      await expect(adapter.findById("brand-001")).rejects.toThrow(
+        "Network error",
+      );
+    });
+
+    it("Given: error with non-object response When: findById Then: should rethrow", async () => {
+      vi.mocked(apiClient.get).mockRejectedValue({ response: "weird" });
+
+      await expect(adapter.findById("brand-001")).rejects.toEqual({
+        response: "weird",
+      });
+    });
+
+    it("Given: null error When: findById Then: should rethrow", async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(null);
+
+      await expect(adapter.findById("brand-001")).rejects.toBeNull();
+    });
+  });
+
+  describe("create", () => {
+    it("Given: valid create data When: create is called Then: should POST and return mapped brand", async () => {
+      vi.mocked(apiClient.post).mockResolvedValue({
+        data: { data: mockBrandDto },
+      });
+
+      const createDto = {
+        name: "Samsung",
+        description: "Electronics manufacturer",
+      };
+      const result = await adapter.create(createDto);
+
+      expect(apiClient.post).toHaveBeenCalledWith(
+        "/inventory/brands",
+        createDto,
+      );
+      expect(result).toBeTruthy();
+    });
+
+    it("Given: minimal create data (only name) When: create is called Then: should POST", async () => {
+      vi.mocked(apiClient.post).mockResolvedValue({
+        data: { data: mockBrandDto },
+      });
+
+      await adapter.create({ name: "Brand only" });
+
+      expect(apiClient.post).toHaveBeenCalledWith("/inventory/brands", {
+        name: "Brand only",
+      });
+    });
+  });
+
+  describe("update", () => {
+    it("Given: valid update data When: update is called Then: should PATCH and return mapped brand", async () => {
+      vi.mocked(apiClient.patch).mockResolvedValue({
+        data: { data: { ...mockBrandDto, name: "Updated Samsung" } },
+      });
+
+      const result = await adapter.update("brand-001", {
+        name: "Updated Samsung",
+      });
+
+      expect(apiClient.patch).toHaveBeenCalledWith(
+        "/inventory/brands/brand-001",
+        { name: "Updated Samsung" },
+      );
+      expect(result).toBeTruthy();
+    });
+
+    it("Given: isActive update When: update is called Then: should PATCH with isActive", async () => {
+      vi.mocked(apiClient.patch).mockResolvedValue({
+        data: { data: mockBrandDto },
+      });
+
+      await adapter.update("brand-001", { isActive: false });
+
+      expect(apiClient.patch).toHaveBeenCalledWith(
+        "/inventory/brands/brand-001",
+        { isActive: false },
+      );
+    });
+  });
+
+  describe("delete", () => {
+    it("Given: a valid ID When: delete is called Then: should PATCH /deactivate (soft delete)", async () => {
+      vi.mocked(apiClient.patch).mockResolvedValue({ data: undefined });
+
+      await adapter.delete("brand-001");
+
+      expect(apiClient.patch).toHaveBeenCalledWith(
+        "/inventory/brands/brand-001/deactivate",
+      );
+    });
+  });
+});
