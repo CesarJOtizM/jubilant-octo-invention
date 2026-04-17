@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/ui/components/dialog";
-import { useCameraScanner } from "@/modules/sales/presentation/hooks/use-camera-scanner";
+import { useCameraScanner } from "@/shared/presentation/hooks/use-camera-scanner";
 
 interface CameraScannerDialogProps {
   open: boolean;
@@ -19,12 +19,19 @@ interface CameraScannerDialogProps {
   onScan: (barcode: string) => void;
 }
 
+/**
+ * Generic camera-based barcode scanner dialog.
+ *
+ * Use this anywhere a product/item needs to be identified by barcode:
+ * sales, inventory movements, returns, etc. Reads i18n from the
+ * top-level `scanner` namespace so it's domain-agnostic.
+ */
 export function CameraScannerDialog({
   open,
   onOpenChange,
   onScan,
 }: CameraScannerDialogProps) {
-  const t = useTranslations("sales.picking");
+  const t = useTranslations("scanner");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [lastScanned, setLastScanned] = useState<string | null>(null);
 

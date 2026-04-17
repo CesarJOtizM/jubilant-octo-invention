@@ -13,11 +13,11 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock("@/modules/sales/presentation/hooks/use-camera-scanner", () => ({
+vi.mock("@/shared/presentation/hooks/use-camera-scanner", () => ({
   useCameraScanner: () => mockCameraScannerState,
 }));
 
-import { CameraScannerDialog } from "@/modules/sales/presentation/components/camera-scanner-dialog";
+import { CameraScannerDialog } from "@/shared/presentation/components/camera-scanner-dialog";
 
 describe("CameraScannerDialog", () => {
   const defaultProps = {

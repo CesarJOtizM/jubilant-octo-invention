@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useBarcodeScanner } from "@/modules/sales/presentation/hooks/use-barcode-scanner";
+import { useBarcodeScanner } from "@/shared/presentation/hooks/use-barcode-scanner";
 
 describe("useBarcodeScanner", () => {
   let onScan: ReturnType<typeof vi.fn>;

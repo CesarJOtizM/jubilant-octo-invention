@@ -111,6 +111,15 @@ async function startZxingScanner(
   return controls;
 }
 
+/**
+ * Camera-based barcode scanner for mobile devices.
+ *
+ * Uses the native BarcodeDetector API when available (Chrome/Edge/Android)
+ * and falls back to @zxing/browser on other platforms.
+ *
+ * Consumer must render a `<video>` element and pass its ref. The hook
+ * manages the MediaStream lifecycle (start/stop/cleanup on unmount).
+ */
 export function useCameraScanner({
   enabled,
   videoRef,

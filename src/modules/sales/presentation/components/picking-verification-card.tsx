@@ -16,8 +16,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/card";
 import type { SaleLine } from "@/modules/sales/domain/entities/sale.entity";
 import { usePickingConfig } from "@/modules/sales/presentation/hooks/use-picking-config";
 import { usePickingVerification } from "@/modules/sales/presentation/hooks/use-picking-verification";
-import { useBarcodeScanner } from "@/modules/sales/presentation/hooks/use-barcode-scanner";
-import { CameraScannerDialog } from "./camera-scanner-dialog";
+import { useBarcodeScanner } from "@/shared/presentation/hooks/use-barcode-scanner";
+import { CameraScannerDialog } from "@/shared/presentation/components/camera-scanner-dialog";
 
 interface PickingVerificationCardProps {
   lines: SaleLine[];

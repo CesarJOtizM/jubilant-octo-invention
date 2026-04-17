@@ -10,6 +10,17 @@ interface UseBarcodeScannerProps {
 const MAX_KEY_INTERVAL_MS = 80;
 const MIN_BARCODE_LENGTH = 3;
 
+/**
+ * Detects keystrokes coming from HID barcode scanners (USB/Bluetooth).
+ *
+ * A hardware scanner "types" characters very quickly (sub-80ms between keys)
+ * and ends with Enter. This hook buffers those keystrokes and fires `onScan`
+ * with the assembled barcode. Human typing is ignored because it's too slow.
+ *
+ * Works on any platform (mobile or desktop) and is independent of the
+ * camera-based scanner (`useCameraScanner`). Both can be active at the same
+ * time.
+ */
 export function useBarcodeScanner({ enabled, onScan }: UseBarcodeScannerProps) {
   const bufferRef = useRef("");
   const lastKeyTimeRef = useRef(0);

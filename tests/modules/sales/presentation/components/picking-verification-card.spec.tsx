@@ -40,12 +40,12 @@ vi.mock("@/modules/sales/presentation/hooks/use-picking-verification", () => ({
   }),
 }));
 
-vi.mock("@/modules/sales/presentation/hooks/use-barcode-scanner", () => ({
+vi.mock("@/shared/presentation/hooks/use-barcode-scanner", () => ({
   useBarcodeScanner: vi.fn(),
 }));
 
 vi.mock(
-  "@/modules/sales/presentation/components/camera-scanner-dialog",
+  "@/shared/presentation/components/camera-scanner-dialog",
   () => ({
     CameraScannerDialog: () => <div data-testid="camera-scanner-dialog" />,
   }),

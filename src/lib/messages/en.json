@@ -197,7 +197,10 @@
         "maxStock": "Maximum Stock",
         "status": "Status",
         "company": "Company",
-        "brand": "Brand"
+        "brand": "Brand",
+        "barcode": "Barcode",
+        "barcodePlaceholder": "Scan or enter the code",
+        "barcodeHelper": "Supported formats: EAN-8, UPC-A, EAN-13 or Code 128"
       },
       "status": {
         "active": "Active",
@@ -1026,6 +1029,11 @@
         "status": "Status",
         "dateRange": "Date Range"
       }
+    },
+    "scanner": {
+      "added": "{name} added",
+      "notFound": "No product found with code {code}",
+      "lookupError": "Couldn't look up the product. Please try again."
     }
   },
   "sales": {
@@ -1243,13 +1251,8 @@
       "need": "Need",
       "scanned": "Scanned",
       "status": "Status",
-      "cameraTitle": "Camera Scanner",
-      "cameraDescription": "Point your camera at a barcode to scan it",
-      "startCamera": "Start Camera",
       "shipBlocked": "Complete picking verification before shipping",
-      "shipBlockedMessage": "All products must be verified before this sale can be shipped",
-      "backendNative": "Using native barcode detection",
-      "backendZxing": "Using software barcode detection"
+      "shipBlockedMessage": "All products must be verified before this sale can be shipped"
     }
   },
   "returns": {
@@ -2792,5 +2795,13 @@
         }
       }
     }
+  },
+  "scanner": {
+    "cameraTitle": "Camera Scanner",
+    "cameraDescription": "Point your camera at a barcode to scan it",
+    "startCamera": "Start Camera",
+    "scanWithCamera": "Scan with camera",
+    "backendNative": "Using native barcode detection",
+    "backendZxing": "Using software barcode detection"
   }
 }

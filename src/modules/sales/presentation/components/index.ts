@@ -7,4 +7,3 @@ export { SaleTimeline } from "./sale-timeline";
 export { SaleSwapDialog } from "./sale-swap-dialog";
 export { SaleSwapHistory } from "./sale-swap-history";
 export { PickingVerificationCard } from "./picking-verification-card";
-export { CameraScannerDialog } from "./camera-scanner-dialog";
