@@ -4,10 +4,13 @@ export type IntegrationProvider = "VTEX" | "MERCADOLIBRE";
 export type ConnectionStatus = "CONNECTED" | "DISCONNECTED" | "ERROR";
 export type SyncStrategy = "WEBHOOK" | "POLLING" | "BOTH";
 export type SyncDirection = "INBOUND" | "OUTBOUND" | "BIDIRECTIONAL";
+// Mirrors backend IntegrationConnection.TokenStatus.
+// Transitions: PENDING_AUTH -> VALID -> REFRESHING -> VALID | REAUTH_REQUIRED.
+// VTEX connections stay null (no OAuth).
 export type TokenStatus =
+  | "PENDING_AUTH"
   | "VALID"
   | "REFRESHING"
-  | "EXPIRED"
   | "REAUTH_REQUIRED";
 
 export interface IntegrationConnectionProps {

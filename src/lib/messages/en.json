@@ -2625,7 +2625,10 @@
         "paid": "Paid",
         "confirmed": "Confirmed",
         "payment_required": "Payment Required",
+        "payment_in_process": "Payment in Process",
         "partially_paid": "Partially Paid",
+        "partially_refunded": "Partially Refunded",
+        "pending_cancel": "Pending Cancellation",
         "cancelled": "Cancelled"
       }
     },
@@ -2693,9 +2696,9 @@
         "inboundOnly": "MercadoLibre only supports inbound sync (MeLi → Nevada)",
         "tokenStatusLabel": "Token Status",
         "tokenStatus": {
+          "PENDING_AUTH": "Pending Authentication",
           "VALID": "Valid",
           "REFRESHING": "Refreshing",
-          "EXPIRED": "Expired",
           "REAUTH_REQUIRED": "Re-auth Required"
         },
         "form": {
@@ -2756,19 +2759,31 @@
         "meli": {
           "paid": {
             "label": "Paid",
-            "desc": "Payment received, safe to import"
+            "desc": "Payment credited, real sale — safe to import"
           },
           "confirmed": {
             "label": "Confirmed",
-            "desc": "Order confirmed, safe to import"
+            "desc": "Initial unpaid state, or seller-cancelled order — not a real sale"
           },
           "payment_required": {
             "label": "Payment Required",
             "desc": "Payment not confirmed, order may not be completed"
           },
+          "payment_in_process": {
+            "label": "Payment in Process",
+            "desc": "Payment in transit, not yet credited"
+          },
           "partially_paid": {
             "label": "Partially Paid",
             "desc": "Partial payment, order may not be completed"
+          },
+          "partially_refunded": {
+            "label": "Partially Refunded",
+            "desc": "The order had a partial refund of payment"
+          },
+          "pending_cancel": {
+            "label": "Pending Cancellation",
+            "desc": "Cancellation requested but not yet effective"
           },
           "cancelled": {
             "label": "Cancelled",

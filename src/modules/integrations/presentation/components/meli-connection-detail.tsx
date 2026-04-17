@@ -53,28 +53,29 @@ import {
   useGetMeliAuthUrl,
 } from "@/modules/integrations/presentation/hooks/use-integrations";
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
+import type { TokenStatus } from "@/modules/integrations/domain/entities/integration-connection.entity";
 
 interface MeliConnectionDetailProps {
   connectionId: string;
 }
 
-function TokenStatusBadge({ status }: { status: string | null }) {
+const TOKEN_STATUS_VARIANTS: Record<
+  TokenStatus,
+  "success" | "warning" | "destructive" | "secondary"
+> = {
+  VALID: "success",
+  REFRESHING: "secondary",
+  PENDING_AUTH: "warning",
+  REAUTH_REQUIRED: "destructive",
+};
+
+function TokenStatusBadge({ status }: { status: TokenStatus | null }) {
   const t = useTranslations("integrations");
 
   if (!status) return null;
 
-  const variants: Record<
-    string,
-    "success" | "warning" | "destructive" | "secondary"
-  > = {
-    VALID: "success",
-    REFRESHING: "secondary",
-    EXPIRED: "warning",
-    REAUTH_REQUIRED: "destructive",
-  };
-
   return (
-    <Badge variant={variants[status] ?? "secondary"}>
+    <Badge variant={TOKEN_STATUS_VARIANTS[status] ?? "secondary"}>
       {t(`providers.mercadolibre.tokenStatus.${status}` as never)}
     </Badge>
   );

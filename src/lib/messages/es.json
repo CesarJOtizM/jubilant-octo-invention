@@ -2625,7 +2625,10 @@
         "paid": "Pagado",
         "confirmed": "Confirmado",
         "payment_required": "Pago requerido",
+        "payment_in_process": "Pago en proceso",
         "partially_paid": "Parcialmente pagado",
+        "partially_refunded": "Reembolso parcial",
+        "pending_cancel": "Cancelación en proceso",
         "cancelled": "Cancelado"
       }
     },
@@ -2693,9 +2696,9 @@
         "inboundOnly": "MercadoLibre solo soporta sincronización de entrada (MeLi → Nevada)",
         "tokenStatusLabel": "Estado del token",
         "tokenStatus": {
+          "PENDING_AUTH": "Pendiente de autenticar",
           "VALID": "Válido",
           "REFRESHING": "Actualizando",
-          "EXPIRED": "Expirado",
           "REAUTH_REQUIRED": "Requiere re-auth"
         },
         "form": {
@@ -2756,19 +2759,31 @@
         "meli": {
           "paid": {
             "label": "Pagado",
-            "desc": "Pago recibido, seguro para importar"
+            "desc": "Pago acreditado, venta real — seguro para importar"
           },
           "confirmed": {
             "label": "Confirmado",
-            "desc": "Orden confirmada, seguro para importar"
+            "desc": "Estado inicial sin pagar, o cancelación por el vendedor — no es una venta real"
           },
           "payment_required": {
             "label": "Pago requerido",
             "desc": "Pago no confirmado, la orden podría no concretarse"
           },
+          "payment_in_process": {
+            "label": "Pago en proceso",
+            "desc": "Pago en tránsito, aún no acreditado"
+          },
           "partially_paid": {
             "label": "Parcialmente pagado",
             "desc": "Pago parcial, la orden podría no completarse"
+          },
+          "partially_refunded": {
+            "label": "Reembolso parcial",
+            "desc": "La orden tuvo una devolución parcial del pago"
+          },
+          "pending_cancel": {
+            "label": "Cancelación en proceso",
+            "desc": "Cancelación solicitada pero aún no efectiva"
           },
           "cancelled": {
             "label": "Cancelado",
