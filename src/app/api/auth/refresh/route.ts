@@ -42,11 +42,18 @@ export async function POST(request: NextRequest) {
 
     const data = result.data || result;
 
-    // Update HttpOnly cookies (refresh token stays server-side only)
-    await setAuthCookies(data.accessToken, data.refreshToken);
+    // Update HttpOnly cookies (refresh token stays server-side only).
+    // Cookie maxAge is derived from backend-issued expiry timestamps.
+    await setAuthCookies(
+      data.accessToken,
+      data.refreshToken,
+      data.accessTokenExpiresAt,
+      data.refreshTokenExpiresAt,
+    );
 
-    // Return data WITHOUT refreshToken but WITH accessToken
-    // (browser needs accessToken for direct backend API calls)
+    // Return data WITHOUT refreshToken but WITH accessToken + accessTokenExpiresAt
+    // (browser needs accessToken for direct backend API calls and the
+    // expiry timestamp to schedule proactive refresh).
     const { refreshToken: _rt, ...rest } = data;
     return NextResponse.json({
       success: true,

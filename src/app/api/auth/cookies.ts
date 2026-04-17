@@ -2,8 +2,6 @@ import { cookies } from "next/headers";
 
 const ACCESS_TOKEN_COOKIE = "nevada_access_token";
 const REFRESH_TOKEN_COOKIE = "nevada_refresh_token";
-const ACCESS_TOKEN_MAX_AGE = 30 * 60; // 30 min (matches access token lifetime)
-const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -17,20 +15,48 @@ function cookieOptions(maxAge: number) {
   };
 }
 
+/**
+ * Converts an ISO date string (or Date) into a cookie `maxAge` value (in seconds)
+ * relative to `now`. Guarantees a minimum of 1 second so the browser never
+ * interprets the cookie as a "session cookie" due to a negative maxAge.
+ */
+function computeMaxAgeSeconds(
+  expiresAt: string | Date | undefined | null,
+): number | null {
+  if (!expiresAt) return null;
+  const expiryDate =
+    expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
+  const expiryMs = expiryDate.getTime();
+  if (Number.isNaN(expiryMs)) return null;
+  const deltaSeconds = Math.floor((expiryMs - Date.now()) / 1000);
+  return deltaSeconds > 0 ? deltaSeconds : 1;
+}
+
 export async function setAuthCookies(
   accessToken: string,
   refreshToken: string,
+  accessTokenExpiresAt: string | Date,
+  refreshTokenExpiresAt: string | Date,
 ) {
+  const accessMaxAge = computeMaxAgeSeconds(accessTokenExpiresAt);
+  const refreshMaxAge = computeMaxAgeSeconds(refreshTokenExpiresAt);
+
+  if (accessMaxAge === null || refreshMaxAge === null) {
+    throw new Error(
+      "setAuthCookies: invalid or missing token expiry dates from backend",
+    );
+  }
+
   const cookieStore = await cookies();
   cookieStore.set(
     ACCESS_TOKEN_COOKIE,
     accessToken,
-    cookieOptions(ACCESS_TOKEN_MAX_AGE),
+    cookieOptions(accessMaxAge),
   );
   cookieStore.set(
     REFRESH_TOKEN_COOKIE,
     refreshToken,
-    cookieOptions(REFRESH_TOKEN_MAX_AGE),
+    cookieOptions(refreshMaxAge),
   );
 }
 
