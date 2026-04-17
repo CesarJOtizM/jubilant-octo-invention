@@ -8,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   isValidElement,
   type HTMLAttributes,
@@ -23,8 +24,12 @@ interface SelectContextValue {
   value: string;
   onValueChange: (value: string) => void;
   triggerRef: React.RefObject<HTMLButtonElement | null>;
+  /**
+   * Label text derived from the currently selected <SelectItem>. Resolved
+   * synchronously by walking the children tree at render time so the trigger
+   * can show the correct text on first paint (no mount or open needed).
+   */
   displayText: string;
-  setDisplayText: (text: string) => void;
   disabled: boolean;
 }
 
@@ -36,6 +41,69 @@ function useSelectContext() {
     throw new Error("Select components must be used within a Select");
   }
   return context;
+}
+
+/**
+ * Recursively walks a React children tree and extracts the plain text content.
+ * Used to resolve a <SelectItem>'s label without mounting it.
+ */
+function extractText(node: ReactNode): string {
+  if (node === null || node === undefined || typeof node === "boolean") {
+    return "";
+  }
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (isValidElement(node)) {
+    return extractText((node.props as { children?: ReactNode }).children);
+  }
+  return "";
+}
+
+/**
+ * Walks the children tree looking for a <SelectItem> whose `value` prop
+ * matches the target. Returns its text label, or empty string if not found.
+ *
+ * We match by `displayName === "SelectItem"` instead of referential equality
+ * so custom wrappers that re-export <SelectItem> keep working.
+ */
+function findSelectedItemLabel(
+  children: ReactNode,
+  targetValue: string,
+): string {
+  let result = "";
+
+  const visit = (node: ReactNode): void => {
+    if (result) return; // Short-circuit once we've found it.
+    if (node === null || node === undefined || typeof node === "boolean") {
+      return;
+    }
+    if (Array.isArray(node)) {
+      for (const child of node) visit(child);
+      return;
+    }
+    if (!isValidElement(node)) return;
+
+    const element = node as React.ReactElement<{
+      value?: string;
+      children?: ReactNode;
+    }>;
+    const type = element.type as { displayName?: string } | string;
+    const displayName =
+      typeof type === "string" ? type : (type?.displayName ?? "");
+
+    if (displayName === "SelectItem" && element.props.value === targetValue) {
+      result = extractText(element.props.children);
+      return;
+    }
+
+    if (element.props.children) {
+      visit(element.props.children);
+    }
+  };
+
+  visit(children);
+  return result;
 }
 
 interface SelectProps {
@@ -61,7 +129,6 @@ function Select({
 }: SelectProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
-  const [displayText, setDisplayText] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const isOpenControlled = controlledOpen !== undefined;
@@ -91,19 +158,30 @@ function Select({
     [isValueControlled, onValueChange, handleOpenChange],
   );
 
+  // Resolve the selected item's label by walking the children tree at render
+  // time. No need to mount <SelectItem>s or open the dropdown — the trigger
+  // shows the correct text on first paint. Empty string when there's no
+  // match so the trigger falls back to the placeholder.
+  const displayText = useMemo(
+    () => (value ? findSelectedItemLabel(children, value) : ""),
+    [children, value],
+  );
+
+  const contextValue = useMemo<SelectContextValue>(
+    () => ({
+      open,
+      onOpenChange: handleOpenChange,
+      value,
+      onValueChange: handleValueChange,
+      triggerRef,
+      displayText,
+      disabled,
+    }),
+    [open, handleOpenChange, value, handleValueChange, displayText, disabled],
+  );
+
   return (
-    <SelectContext.Provider
-      value={{
-        open,
-        onOpenChange: handleOpenChange,
-        value,
-        onValueChange: handleValueChange,
-        triggerRef,
-        displayText,
-        setDisplayText,
-        disabled,
-      }}
-    >
+    <SelectContext.Provider value={contextValue}>
       {children}
     </SelectContext.Provider>
   );
@@ -167,13 +245,13 @@ interface SelectValueProps {
 }
 
 function SelectValue({ placeholder, children }: SelectValueProps) {
-  const { value: _value, displayText } = useSelectContext();
+  const { displayText } = useSelectContext();
   if (children) {
     return <span>{children}</span>;
   }
-  // Show displayText when available, otherwise fall back to placeholder.
-  // Never show the raw value string (e.g. "all") — SelectItems only mount
-  // when the dropdown opens, so displayText may not be set yet.
+  // displayText is resolved synchronously from the selected <SelectItem>'s
+  // children. Falls back to placeholder when no value is selected or when
+  // no matching item is found.
   return <span>{displayText || placeholder}</span>;
 }
 
@@ -275,6 +353,9 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
       };
     }, [open, onOpenChange, triggerRef]);
 
+    // Items only render when the dropdown is open — the trigger's label is
+    // resolved by the parent <Select> via children traversal, so there's no
+    // need to keep hidden items in the DOM.
     if (!mounted || !open) return null;
 
     return createPortal(
@@ -315,15 +396,6 @@ const SelectLabel = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 );
 SelectLabel.displayName = "SelectLabel";
 
-function extractText(node: ReactNode): string {
-  if (typeof node === "string") return node;
-  if (typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(extractText).join("");
-  if (isValidElement(node))
-    return extractText((node.props as { children?: ReactNode }).children);
-  return "";
-}
-
 interface SelectItemProps extends HTMLAttributes<HTMLDivElement> {
   value: string;
   disabled?: boolean;
@@ -331,22 +403,8 @@ interface SelectItemProps extends HTMLAttributes<HTMLDivElement> {
 
 const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
   ({ className, children, value, disabled, ...props }, ref) => {
-    const {
-      value: selectedValue,
-      onValueChange,
-      setDisplayText,
-    } = useSelectContext();
+    const { value: selectedValue, onValueChange } = useSelectContext();
     const isSelected = selectedValue === value;
-
-    // Extract text content from children for display
-    useEffect(() => {
-      if (isSelected) {
-        const text = extractText(children);
-        if (text) {
-          setDisplayText(text);
-        }
-      }
-    }, [isSelected, children, setDisplayText]);
 
     return (
       <div
@@ -363,8 +421,6 @@ const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
         )}
         onClick={() => {
           if (!disabled) {
-            const text = extractText(children);
-            if (text) setDisplayText(text);
             onValueChange(value);
           }
         }}
