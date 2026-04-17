@@ -407,10 +407,11 @@
         "avgCost": "Avg Cost",
         "totalValue": "Total Value",
         "lastMovement": "Last Movement",
-        "actions": "Actions"
+        "actions": "Actions",
+        "barcode": "Barcode"
       },
       "search": {
-        "placeholder": "Search by product or SKU..."
+        "placeholder": "Search by product, SKU or barcode..."
       },
       "filters": {
         "lowStock": "Low Stock",

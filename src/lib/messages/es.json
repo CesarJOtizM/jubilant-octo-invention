@@ -407,10 +407,11 @@
         "avgCost": "Costo Prom.",
         "totalValue": "Valor Total",
         "lastMovement": "Último Movimiento",
-        "actions": "Acciones"
+        "actions": "Acciones",
+        "barcode": "Código de barras"
       },
       "search": {
-        "placeholder": "Buscar por producto o SKU..."
+        "placeholder": "Buscar por producto, SKU o código..."
       },
       "filters": {
         "lowStock": "Stock Bajo",

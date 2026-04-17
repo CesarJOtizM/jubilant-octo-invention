@@ -40,9 +40,26 @@ function ProductRow({ product }: { product: Product }) {
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
             <Package className="h-5 w-5 text-primary-600 dark:text-primary-400" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="font-medium text-foreground">{product.name}</p>
-            <p className="text-sm text-muted-foreground">{product.sku}</p>
+            {(product.sku || product.barcode) && (
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+                {product.sku && <span>{product.sku}</span>}
+                {product.sku && product.barcode && (
+                  <span aria-hidden="true" className="text-neutral-300 dark:text-neutral-600">
+                    &middot;
+                  </span>
+                )}
+                {product.barcode && (
+                  <span
+                    className="font-mono tracking-wider tabular-nums text-xs"
+                    aria-label={t("fields.barcode")}
+                  >
+                    {product.barcode}
+                  </span>
+                )}
+              </p>
+            )}
           </div>
         </Link>
       </td>

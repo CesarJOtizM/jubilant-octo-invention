@@ -173,4 +173,57 @@ describe("ProductList", () => {
     expect(screen.queryByText("list.title")).not.toBeInTheDocument();
     expect(screen.queryByText("actions.new")).not.toBeInTheDocument();
   });
+
+  it("Given: product with barcode When: rendering Then: should show barcode next to SKU", () => {
+    mockQueryState = {
+      data: {
+        data: [
+          {
+            id: "p-bc",
+            name: "Product With Barcode",
+            sku: "PWB-001",
+            barcode: "7501234567890",
+            categories: [],
+            price: 10,
+            isActive: true,
+            unitOfMeasure: "unit",
+          },
+        ],
+        pagination: { page: 1, totalPages: 1, total: 1, limit: 10 },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
+      isLoading: false,
+      isError: false,
+      error: null,
+    };
+    render(<ProductList />);
+    expect(screen.getByText("PWB-001")).toBeInTheDocument();
+    expect(screen.getByText("7501234567890")).toBeInTheDocument();
+  });
+
+  it("Given: product without barcode When: rendering Then: should not render barcode element", () => {
+    mockQueryState = {
+      data: {
+        data: [
+          {
+            id: "p-nobc",
+            name: "Product No Barcode",
+            sku: "PNB-001",
+            categories: [],
+            price: 10,
+            isActive: true,
+            unitOfMeasure: "unit",
+          },
+        ],
+        pagination: { page: 1, totalPages: 1, total: 1, limit: 10 },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
+      isLoading: false,
+      isError: false,
+      error: null,
+    };
+    const { container } = render(<ProductList />);
+    expect(screen.getByText("PNB-001")).toBeInTheDocument();
+    expect(container.querySelector('[aria-label="fields.barcode"]')).toBeNull();
+  });
 });
