@@ -46,7 +46,10 @@ function ProductRow({ product }: { product: Product }) {
               <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
                 {product.sku && <span>{product.sku}</span>}
                 {product.sku && product.barcode && (
-                  <span aria-hidden="true" className="text-neutral-300 dark:text-neutral-600">
+                  <span
+                    aria-hidden="true"
+                    className="text-neutral-300 dark:text-neutral-600"
+                  >
                     &middot;
                   </span>
                 )}

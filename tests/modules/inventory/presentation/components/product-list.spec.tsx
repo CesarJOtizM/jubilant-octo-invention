@@ -190,7 +190,7 @@ describe("ProductList", () => {
           },
         ],
         pagination: { page: 1, totalPages: 1, total: 1, limit: 10 },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       isLoading: false,
       isError: false,
@@ -216,7 +216,7 @@ describe("ProductList", () => {
           },
         ],
         pagination: { page: 1, totalPages: 1, total: 1, limit: 10 },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       isLoading: false,
       isError: false,

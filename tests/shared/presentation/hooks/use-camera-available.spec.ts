@@ -22,10 +22,12 @@ describe("useCameraAvailable", () => {
   });
 
   it("Given: enumerateDevices returns videoinput When: checking Then: returns 'available'", async () => {
-    const enumerateDevices = vi.fn().mockResolvedValue([
-      { kind: "audioinput" } as MediaDeviceInfo,
-      { kind: "videoinput" } as MediaDeviceInfo,
-    ]);
+    const enumerateDevices = vi
+      .fn()
+      .mockResolvedValue([
+        { kind: "audioinput" } as MediaDeviceInfo,
+        { kind: "videoinput" } as MediaDeviceInfo,
+      ]);
 
     Object.defineProperty(globalThis, "navigator", {
       value: { mediaDevices: { enumerateDevices } },
@@ -41,9 +43,9 @@ describe("useCameraAvailable", () => {
   });
 
   it("Given: enumerateDevices returns no videoinput When: checking Then: returns 'unavailable'", async () => {
-    const enumerateDevices = vi.fn().mockResolvedValue([
-      { kind: "audioinput" } as MediaDeviceInfo,
-    ]);
+    const enumerateDevices = vi
+      .fn()
+      .mockResolvedValue([{ kind: "audioinput" } as MediaDeviceInfo]);
 
     Object.defineProperty(globalThis, "navigator", {
       value: { mediaDevices: { enumerateDevices } },

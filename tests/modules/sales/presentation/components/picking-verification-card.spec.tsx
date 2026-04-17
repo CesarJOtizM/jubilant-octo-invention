@@ -44,12 +44,9 @@ vi.mock("@/shared/presentation/hooks/use-barcode-scanner", () => ({
   useBarcodeScanner: vi.fn(),
 }));
 
-vi.mock(
-  "@/shared/presentation/components/camera-scanner-dialog",
-  () => ({
-    CameraScannerDialog: () => <div data-testid="camera-scanner-dialog" />,
-  }),
-);
+vi.mock("@/shared/presentation/components/camera-scanner-dialog", () => ({
+  CameraScannerDialog: () => <div data-testid="camera-scanner-dialog" />,
+}));
 
 import { PickingVerificationCard } from "@/modules/sales/presentation/components/picking-verification-card";
 

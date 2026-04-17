@@ -32,7 +32,7 @@ export function WebhookCredentialsDisplay({
   const handleCopy = async (
     value: string,
     setCopied: (v: boolean) => void,
-    successMessage: string
+    successMessage: string,
   ) => {
     await navigator.clipboard.writeText(value);
     setCopied(true);
@@ -59,7 +59,7 @@ export function WebhookCredentialsDisplay({
                 handleCopy(
                   webhookUrl,
                   setUrlCopied,
-                  t("detail.webhookUrlCopied")
+                  t("detail.webhookUrlCopied"),
                 )
               }
               aria-label={t("detail.webhookUrlCopied")}
@@ -104,7 +104,7 @@ export function WebhookCredentialsDisplay({
                 handleCopy(
                   webhookSecret,
                   setSecretCopied,
-                  t("detail.webhookSecretCopied")
+                  t("detail.webhookSecretCopied"),
                 )
               }
               aria-label={t("detail.webhookSecretCopied")}

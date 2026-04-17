@@ -73,7 +73,9 @@ function renderWithClient(ui: React.ReactElement) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>);
+  return render(
+    <QueryClientProvider client={client}>{ui}</QueryClientProvider>,
+  );
 }
 
 describe("ProductScanButton", () => {
@@ -122,7 +124,9 @@ describe("ProductScanButton", () => {
       mockLookup.mockResolvedValue(product);
       const onProductScanned = vi.fn();
 
-      renderWithClient(<ProductScanButton onProductScanned={onProductScanned} />);
+      renderWithClient(
+        <ProductScanButton onProductScanned={onProductScanned} />,
+      );
       fireEvent.click(screen.getByRole("button"));
 
       expect(dialogOnScan).toBeTruthy();
@@ -142,7 +146,9 @@ describe("ProductScanButton", () => {
       mockLookup.mockResolvedValue(null);
       const onProductScanned = vi.fn();
 
-      renderWithClient(<ProductScanButton onProductScanned={onProductScanned} />);
+      renderWithClient(
+        <ProductScanButton onProductScanned={onProductScanned} />,
+      );
       fireEvent.click(screen.getByRole("button"));
       dialogOnScan?.("NOT-A-CODE");
 
@@ -156,7 +162,9 @@ describe("ProductScanButton", () => {
       mockLookup.mockRejectedValue(new Error("network"));
       const onProductScanned = vi.fn();
 
-      renderWithClient(<ProductScanButton onProductScanned={onProductScanned} />);
+      renderWithClient(
+        <ProductScanButton onProductScanned={onProductScanned} />,
+      );
       fireEvent.click(screen.getByRole("button"));
       dialogOnScan?.("123");
 
@@ -168,7 +176,9 @@ describe("ProductScanButton", () => {
 
     it("Given: scan code is empty/whitespace When: onScan fires Then: does nothing", async () => {
       const onProductScanned = vi.fn();
-      renderWithClient(<ProductScanButton onProductScanned={onProductScanned} />);
+      renderWithClient(
+        <ProductScanButton onProductScanned={onProductScanned} />,
+      );
       fireEvent.click(screen.getByRole("button"));
       dialogOnScan?.("   ");
 
@@ -184,7 +194,9 @@ describe("ProductScanButton", () => {
       mockLookup.mockResolvedValue(product);
       const onProductScanned = vi.fn();
 
-      renderWithClient(<ProductScanButton onProductScanned={onProductScanned} />);
+      renderWithClient(
+        <ProductScanButton onProductScanned={onProductScanned} />,
+      );
 
       expect(hidOnScan).toBeTruthy();
       hidOnScan?.("7701234567890");
@@ -207,7 +219,9 @@ describe("ProductScanButton", () => {
       mockLookup.mockResolvedValue(product);
       const onProductScanned = vi.fn();
 
-      renderWithClient(<ProductScanButton onProductScanned={onProductScanned} />);
+      renderWithClient(
+        <ProductScanButton onProductScanned={onProductScanned} />,
+      );
 
       // useBarcodeScanner is called BEFORE the early return in the component,
       // so HID stays active even when the camera button is hidden.
