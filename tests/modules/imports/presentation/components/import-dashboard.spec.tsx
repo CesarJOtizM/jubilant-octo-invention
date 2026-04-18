@@ -2,7 +2,9 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations:
+    (ns?: string) => (key: string, _values?: Record<string, unknown>) =>
+      ns ? `${ns}.${key}` : key,
 }));
 
 vi.mock("@/modules/imports/presentation/components/import-type-grid", () => ({
@@ -14,20 +16,19 @@ vi.mock("@/modules/imports/presentation/components/import-type-grid", () => ({
 }));
 
 vi.mock(
+  "@/modules/imports/presentation/components/getting-started-guide",
+  () => ({
+    GettingStartedGuide: () => (
+      <div data-testid="getting-started-guide">GettingStartedGuide</div>
+    ),
+  }),
+);
+
+vi.mock(
   "@/modules/imports/presentation/components/import-wizard-dialog",
   () => ({
-    ImportWizardDialog: ({
-      open,
-      importType,
-    }: {
-      open: boolean;
-      importType: string | null;
-    }) => (
-      <div
-        data-testid="import-wizard-dialog"
-        data-open={open}
-        data-type={importType}
-      >
+    ImportWizardDialog: ({ open }: { open: boolean }) => (
+      <div data-testid="import-wizard-dialog" data-open={open}>
         ImportWizardDialog
       </div>
     ),
@@ -43,6 +44,11 @@ vi.mock("@/modules/imports/presentation/hooks/use-imports", () => ({
     mutate: vi.fn(),
     isPending: false,
   }),
+  useImportTypes: () => ({
+    data: [],
+    isLoading: false,
+    isError: false,
+  }),
 }));
 
 import { ImportDashboard } from "@/modules/imports/presentation/components/import-dashboard";
@@ -51,28 +57,34 @@ describe("ImportDashboard", () => {
   it("Given: the dashboard When: rendering Then: should show page title", () => {
     render(<ImportDashboard />);
 
-    expect(screen.getByText("title")).toBeInTheDocument();
+    expect(screen.getByText("imports.title")).toBeInTheDocument();
   });
 
   it("Given: the dashboard When: rendering Then: should show page description", () => {
     render(<ImportDashboard />);
 
-    expect(screen.getByText("description")).toBeInTheDocument();
+    expect(screen.getByText("imports.description")).toBeInTheDocument();
   });
 
-  it("Given: the dashboard When: rendering Then: should render ImportTypeGrid", () => {
+  it("Given: the dashboard When: rendering Then: should render the getting-started guide", () => {
+    render(<ImportDashboard />);
+
+    expect(screen.getByTestId("getting-started-guide")).toBeInTheDocument();
+  });
+
+  it("Given: the dashboard When: rendering Then: should render the type grid", () => {
     render(<ImportDashboard />);
 
     expect(screen.getByTestId("import-type-grid")).toBeInTheDocument();
   });
 
-  it("Given: the dashboard When: rendering Then: should render ImportWizardDialog", () => {
+  it("Given: the dashboard When: rendering Then: should render the wizard dialog", () => {
     render(<ImportDashboard />);
 
     expect(screen.getByTestId("import-wizard-dialog")).toBeInTheDocument();
   });
 
-  it("Given: the dashboard When: rendering Then: should render ImportHistory", () => {
+  it("Given: the dashboard When: rendering Then: should render the import history", () => {
     render(<ImportDashboard />);
 
     expect(screen.getByTestId("import-history")).toBeInTheDocument();

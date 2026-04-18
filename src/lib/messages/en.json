@@ -2317,7 +2317,87 @@
       "invalidRows": "Invalid rows",
       "processedRows": "Processed rows"
     },
-    "startImport": "Import"
+    "startImport": "Import",
+    "gettingStarted": {
+      "title": "Getting started",
+      "description": "Follow this recommended order to bootstrap a new organization in minutes. Each step reuses the data from the previous ones, so missing references fail fast instead of creating silent duplicates.",
+      "stepLabel": "Step {step}",
+      "available": "Available",
+      "comingSoon": "Coming soon",
+      "dependsOn": "Requires {items}",
+      "dependsOnNone": "No dependencies",
+      "steps": {
+        "companies": {
+          "title": "Companies",
+          "summary": "Multi-company setup. Skip if your organization has a single company."
+        },
+        "warehouses": {
+          "title": "Warehouses",
+          "summary": "Physical or virtual locations that will hold stock."
+        },
+        "brands": {
+          "title": "Brands",
+          "summary": "Optional — brands can also be created on the fly from the Products import."
+        },
+        "categories": {
+          "title": "Categories",
+          "summary": "Optional — categories can also be created on the fly from the Products import."
+        },
+        "products": {
+          "title": "Products",
+          "summary": "The full catalog. References brands and categories; creates any missing ones automatically."
+        },
+        "stock": {
+          "title": "Initial stock",
+          "summary": "On-hand quantities per warehouse. Posted as ADJUST_IN movements for audit traceability."
+        }
+      }
+    },
+    "catalog": {
+      "title": "Available imports",
+      "description": "Every import type is driven by a schema registered on the server. Download the template, fill it in, and upload it back.",
+      "columns": "{count, plural, =0 {No columns} =1 {1 column} other {# columns}}",
+      "required": "{count, plural, =0 {0 required} =1 {1 required} other {# required}}",
+      "optional": "{count, plural, =0 {0 optional} =1 {1 optional} other {# optional}}",
+      "enumHint": "{count, plural, =1 {1 controlled field} other {# controlled fields}}",
+      "multipleHint": "Supports pipe-separated values",
+      "viewSchema": "Columns",
+      "hideSchema": "Hide columns",
+      "emptyTitle": "No import types registered",
+      "emptyDescription": "The server has no registered import handlers. Contact your administrator.",
+      "loadingTitle": "Loading import catalog…",
+      "loadFailedTitle": "Could not load import types",
+      "loadFailedDescription": "Retry in a moment. If the problem persists, check the backend logs."
+    },
+    "references": {
+      "title": "References preview",
+      "description": "Brands and categories referenced by your file will be created or reused when you execute the import.",
+      "cleanTitle": "Everything looks clean",
+      "cleanDescription": "No new brands or categories will be created. You're reusing existing data.",
+      "newBrandsTitle": "{count, plural, =1 {1 new brand will be created} other {# new brands will be created}}",
+      "newCategoriesTitle": "{count, plural, =1 {1 new category will be created} other {# new categories will be created}}",
+      "existingBrands": "{count, plural, =1 {1 existing brand referenced} other {# existing brands referenced}}",
+      "existingCategories": "{count, plural, =1 {1 existing category referenced} other {# existing categories referenced}}",
+      "duplicatesBrandTitle": "Possible brand duplicates",
+      "duplicatesCategoryTitle": "Possible category duplicates",
+      "duplicatesExplain": "These spellings match ignoring case. If they mean the same thing, fix the file before importing or the system will create separate entities.",
+      "duplicatesVariant": "{canonical} ↔ {variants}",
+      "showMore": "Show all ({count})",
+      "showLess": "Show less"
+    },
+    "wizardFlow": {
+      "stepShort": "{step} / {total}",
+      "nextStep": "Continue",
+      "prevStep": "Back",
+      "runDryRun": "Validate file",
+      "runImport": "Import now",
+      "validating": "Validating…",
+      "importing": "Importing…",
+      "dropHint": "Drop your file anywhere on this area",
+      "dropFallback": "Drag and drop, or browse your computer",
+      "supports": "CSV and Excel (.xlsx, .xls) up to {mb}MB",
+      "replaceFile": "Replace file"
+    }
   },
   "settings": {
     "title": "Settings",

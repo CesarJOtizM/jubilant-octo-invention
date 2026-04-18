@@ -2317,7 +2317,87 @@
       "invalidRows": "Filas invalidas",
       "processedRows": "Filas procesadas"
     },
-    "startImport": "Importar"
+    "startImport": "Importar",
+    "gettingStarted": {
+      "title": "Primeros pasos",
+      "description": "Seguí este orden recomendado para dejar lista una organización nueva en minutos. Cada paso reutiliza los datos del anterior, así las referencias faltantes fallan rápido en lugar de crear duplicados silenciosos.",
+      "stepLabel": "Paso {step}",
+      "available": "Disponible",
+      "comingSoon": "Próximamente",
+      "dependsOn": "Requiere {items}",
+      "dependsOnNone": "Sin dependencias",
+      "steps": {
+        "companies": {
+          "title": "Compañías",
+          "summary": "Setup multi-compañía. Saltealo si tu organización tiene una sola."
+        },
+        "warehouses": {
+          "title": "Bodegas",
+          "summary": "Ubicaciones físicas o virtuales donde vive el stock."
+        },
+        "brands": {
+          "title": "Marcas",
+          "summary": "Opcional — las marcas también se crean al vuelo desde la importación de Productos."
+        },
+        "categories": {
+          "title": "Categorías",
+          "summary": "Opcional — las categorías también se crean al vuelo desde la importación de Productos."
+        },
+        "products": {
+          "title": "Productos",
+          "summary": "El catálogo completo. Referencia marcas y categorías; crea las que falten automáticamente."
+        },
+        "stock": {
+          "title": "Stock inicial",
+          "summary": "Cantidades disponibles por bodega. Se registran como ADJUST_IN para trazabilidad en auditoría."
+        }
+      }
+    },
+    "catalog": {
+      "title": "Importaciones disponibles",
+      "description": "Cada tipo de importación es manejado por un schema registrado en el servidor. Descargá la plantilla, completala y subila.",
+      "columns": "{count, plural, =0 {Sin columnas} =1 {1 columna} other {# columnas}}",
+      "required": "{count, plural, =0 {0 requeridas} =1 {1 requerida} other {# requeridas}}",
+      "optional": "{count, plural, =0 {0 opcionales} =1 {1 opcional} other {# opcionales}}",
+      "enumHint": "{count, plural, =1 {1 campo controlado} other {# campos controlados}}",
+      "multipleHint": "Soporta valores separados por barra",
+      "viewSchema": "Columnas",
+      "hideSchema": "Ocultar columnas",
+      "emptyTitle": "No hay tipos de importación registrados",
+      "emptyDescription": "El servidor no tiene handlers de importación registrados. Contactá a tu administrador.",
+      "loadingTitle": "Cargando catálogo de importaciones…",
+      "loadFailedTitle": "No pudimos cargar los tipos de importación",
+      "loadFailedDescription": "Reintentá en unos segundos. Si persiste, revisá los logs del backend."
+    },
+    "references": {
+      "title": "Vista previa de referencias",
+      "description": "Las marcas y categorías que tu archivo referencia se crearán o reutilizarán al ejecutar la importación.",
+      "cleanTitle": "Todo está limpio",
+      "cleanDescription": "No se van a crear marcas ni categorías nuevas. Estás reutilizando datos existentes.",
+      "newBrandsTitle": "{count, plural, =1 {Se creará 1 marca nueva} other {Se crearán # marcas nuevas}}",
+      "newCategoriesTitle": "{count, plural, =1 {Se creará 1 categoría nueva} other {Se crearán # categorías nuevas}}",
+      "existingBrands": "{count, plural, =1 {1 marca existente referenciada} other {# marcas existentes referenciadas}}",
+      "existingCategories": "{count, plural, =1 {1 categoría existente referenciada} other {# categorías existentes referenciadas}}",
+      "duplicatesBrandTitle": "Posibles marcas duplicadas",
+      "duplicatesCategoryTitle": "Posibles categorías duplicadas",
+      "duplicatesExplain": "Estas escrituras coinciden ignorando mayúsculas/minúsculas. Si se refieren a lo mismo, corregí el archivo antes de importar o el sistema creará entidades separadas.",
+      "duplicatesVariant": "{canonical} ↔ {variants}",
+      "showMore": "Ver todo ({count})",
+      "showLess": "Ver menos"
+    },
+    "wizardFlow": {
+      "stepShort": "{step} / {total}",
+      "nextStep": "Continuar",
+      "prevStep": "Atrás",
+      "runDryRun": "Validar archivo",
+      "runImport": "Importar ahora",
+      "validating": "Validando…",
+      "importing": "Importando…",
+      "dropHint": "Soltá tu archivo en cualquier parte de esta zona",
+      "dropFallback": "Arrastrá y soltá, o buscá en tu equipo",
+      "supports": "CSV y Excel (.xlsx, .xls) hasta {mb}MB",
+      "replaceFile": "Reemplazar archivo"
+    }
   },
   "settings": {
     "title": "Configuración",

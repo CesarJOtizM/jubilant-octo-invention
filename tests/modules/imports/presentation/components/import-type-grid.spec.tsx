@@ -2,57 +2,83 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations:
+    (ns?: string) => (key: string, values?: Record<string, unknown>) => {
+      const base = ns ? `${ns}.${key}` : key;
+      if (values && typeof values.count === "number") {
+        return `${base}:${values.count}`;
+      }
+      return base;
+    },
 }));
 
 import { ImportTypeGrid } from "@/modules/imports/presentation/components/import-type-grid";
+import type { ImportTypeSchema } from "@/modules/imports/domain/entities";
+
+const buildSchema = (type: string, displayName: string): ImportTypeSchema => ({
+  type,
+  displayName,
+  description: `${displayName} description`,
+  columns: [],
+  exampleRows: [],
+});
+
+const SCHEMAS: ImportTypeSchema[] = [
+  buildSchema("PRODUCTS", "Products"),
+  buildSchema("WAREHOUSES", "Warehouses"),
+  buildSchema("STOCK", "Stock"),
+];
 
 describe("ImportTypeGrid", () => {
   const defaultProps = {
+    schemas: SCHEMAS,
+    isLoading: false,
+    isError: false,
     onImport: vi.fn(),
     onDownloadTemplate: vi.fn(),
     isDownloading: false,
   };
 
-  it("Given: the grid When: rendering Then: should show all five import type cards", () => {
+  it("Given: schemas available When: rendering Then: should render a card per schema", () => {
     render(<ImportTypeGrid {...defaultProps} />);
 
-    expect(screen.getByText("types.products")).toBeInTheDocument();
-    expect(screen.getByText("types.movements")).toBeInTheDocument();
-    expect(screen.getByText("types.warehouses")).toBeInTheDocument();
-    expect(screen.getByText("types.stock")).toBeInTheDocument();
-    expect(screen.getByText("types.transfers")).toBeInTheDocument();
+    expect(screen.getByText("Products")).toBeInTheDocument();
+    expect(screen.getByText("Warehouses")).toBeInTheDocument();
+    expect(screen.getByText("Stock")).toBeInTheDocument();
+    expect(screen.getAllByText("imports.startImport")).toHaveLength(3);
   });
 
-  it("Given: the grid When: rendering Then: should render five import buttons", () => {
-    render(<ImportTypeGrid {...defaultProps} />);
+  it("Given: isLoading When: rendering Then: should show the loading state", () => {
+    render(<ImportTypeGrid {...defaultProps} schemas={undefined} isLoading />);
 
-    const importButtons = screen.getAllByText("startImport");
-    expect(importButtons).toHaveLength(5);
+    expect(
+      screen.getByText("imports.catalog.loadingTitle"),
+    ).toBeInTheDocument();
   });
 
-  it("Given: the grid When: rendering Then: should render five template buttons", () => {
-    render(<ImportTypeGrid {...defaultProps} />);
+  it("Given: isError When: rendering Then: should show the error state", () => {
+    render(
+      <ImportTypeGrid
+        {...defaultProps}
+        schemas={undefined}
+        isLoading={false}
+        isError
+      />,
+    );
 
-    const templateButtons = screen.getAllByText("template.title");
-    expect(templateButtons).toHaveLength(5);
+    expect(
+      screen.getByText("imports.catalog.loadFailedTitle"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("imports.catalog.loadFailedDescription"),
+    ).toBeInTheDocument();
   });
 
-  it("Given: isDownloading is true When: rendering Then: should disable all template buttons", () => {
-    render(<ImportTypeGrid {...defaultProps} isDownloading={true} />);
+  it("Given: empty schemas When: rendering Then: should show the empty state", () => {
+    render(<ImportTypeGrid {...defaultProps} schemas={[]} />);
 
-    const templateButtons = screen.getAllByText("template.title");
-    templateButtons.forEach((btn) => {
-      expect(btn.closest("button")).toBeDisabled();
-    });
-  });
-
-  it("Given: isDownloading is false When: rendering Then: should enable all template buttons", () => {
-    render(<ImportTypeGrid {...defaultProps} isDownloading={false} />);
-
-    const templateButtons = screen.getAllByText("template.title");
-    templateButtons.forEach((btn) => {
-      expect(btn.closest("button")).not.toBeDisabled();
-    });
+    expect(
+      screen.getByText("imports.catalog.emptyTitle"),
+    ).toBeInTheDocument();
   });
 });

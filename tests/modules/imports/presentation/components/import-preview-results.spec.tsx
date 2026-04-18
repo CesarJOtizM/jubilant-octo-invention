@@ -6,6 +6,17 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
+// Avoid rendering the full references block in these specs — its own
+// spec covers it. Mock as a tiny placeholder.
+vi.mock(
+  "@/modules/imports/presentation/components/import-references-preview",
+  () => ({
+    ImportReferencesPreview: () => (
+      <div data-testid="references-preview">references</div>
+    ),
+  }),
+);
+
 import { ImportPreviewResults } from "@/modules/imports/presentation/components/import-preview-results";
 
 describe("ImportPreviewResults", () => {

@@ -3,7 +3,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { FileDropzone } from "@/modules/imports/presentation/components/file-dropzone";
 
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
+  useTranslations: () => (key: string, _values?: Record<string, unknown>) =>
+    key,
 }));
 
 describe("FileDropzone", () => {
@@ -39,13 +40,9 @@ describe("FileDropzone", () => {
     expect(screen.getByText("products.csv")).toBeDefined();
   });
 
-  it("shows accepted formats text", () => {
+  it("shows the supports hint text", () => {
     render(<FileDropzone onFileSelect={vi.fn()} />);
-    expect(screen.getByText("acceptedFormats")).toBeDefined();
-  });
-
-  it("shows max size text", () => {
-    render(<FileDropzone onFileSelect={vi.fn()} />);
-    expect(screen.getByText("maxSize")).toBeDefined();
+    // The dropzone uses imports.wizardFlow.supports now.
+    expect(screen.getByText("supports")).toBeDefined();
   });
 });
