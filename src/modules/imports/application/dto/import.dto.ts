@@ -52,6 +52,20 @@ export interface ImportStatusResponseDto {
   timestamp: string;
 }
 
+export interface ImportReferenceDuplicateGroupDto {
+  canonical: string;
+  variants: string[];
+}
+
+export interface ImportReferencesDto {
+  newBrandsToCreate: string[];
+  existingBrandsReferenced: string[];
+  newCategoriesToCreate: string[];
+  existingCategoriesReferenced: string[];
+  possibleBrandDuplicates: ImportReferenceDuplicateGroupDto[];
+  possibleCategoryDuplicates: ImportReferenceDuplicateGroupDto[];
+}
+
 export interface ImportPreviewResponseDto {
   success: boolean;
   message: string;
@@ -68,6 +82,11 @@ export interface ImportPreviewResponseDto {
       severity: "error" | "warning";
     }[];
     warnings: string[];
+    /**
+     * Optional because older backends (pre-Phase 1) don't emit this
+     * block. The mapper falls back to empty arrays when missing.
+     */
+    references?: ImportReferencesDto;
   };
   timestamp: string;
 }
@@ -94,3 +113,36 @@ export interface ImportFilters {
 }
 
 export type TemplateFormat = "csv" | "xlsx";
+
+/**
+ * Wire format for GET /imports/types — mirrors the backend's
+ * GetImportTypesResponseDto / ImportTypeSchemaDto.
+ */
+export interface ImportTypeColumnApiDto {
+  canonicalName: string;
+  displayName: string;
+  description: string;
+  dataType: "string" | "number" | "date" | "boolean" | "enum";
+  required: boolean;
+  enumValues?: string[];
+  example: string | number | boolean;
+  multiple?: boolean;
+}
+
+export interface ImportTypeSchemaApiDto {
+  type: string;
+  displayName: string;
+  description: string;
+  columns: ImportTypeColumnApiDto[];
+  exampleRows: Array<Record<string, unknown>>;
+}
+
+export interface ImportTypesResponseDto {
+  success: boolean;
+  message: string;
+  data: {
+    types: ImportTypeSchemaApiDto[];
+    count: number;
+  };
+  timestamp: string;
+}

@@ -364,4 +364,71 @@ describe("ImportApiAdapter", () => {
       );
     });
   });
+
+  describe("findTypes", () => {
+    it("Given: backend returns registered types When: findTypes Then: should map them to ImportTypeSchema", async () => {
+      mockedGet.mockResolvedValue({
+        data: {
+          success: true,
+          message: "ok",
+          data: {
+            types: [
+              {
+                type: "PRODUCTS",
+                displayName: "Products",
+                description: "Product catalog",
+                columns: [
+                  {
+                    canonicalName: "sku",
+                    displayName: "SKU",
+                    description: "Unique SKU",
+                    dataType: "string",
+                    required: true,
+                    example: "PROD-001",
+                  },
+                ],
+                exampleRows: [{ SKU: "PROD-001" }],
+              },
+              {
+                type: "WAREHOUSES",
+                displayName: "Warehouses",
+                description: "Warehouse list",
+                columns: [],
+                exampleRows: [],
+              },
+            ],
+            count: 2,
+          },
+          timestamp: "2024-01-01",
+        },
+        status: 200,
+        headers: {},
+      });
+
+      const result = await adapter.findTypes();
+
+      expect(result).toHaveLength(2);
+      expect(result[0].type).toBe("PRODUCTS");
+      expect(result[0].columns[0].required).toBe(true);
+      expect(result[1].type).toBe("WAREHOUSES");
+      expect(mockedGet).toHaveBeenCalledWith("/imports/types");
+    });
+
+    it("Given: empty registry When: findTypes Then: should return an empty array", async () => {
+      mockedGet.mockResolvedValue({
+        data: {
+          success: true,
+          message: "ok",
+          data: { types: [], count: 0 },
+          timestamp: "2024-01-01",
+        },
+        status: 200,
+        headers: {},
+      });
+
+      const result = await adapter.findTypes();
+
+      expect(result).toEqual([]);
+    });
+  });
 });

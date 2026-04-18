@@ -24,7 +24,10 @@ vi.mock(
       error?: string;
       disabled?: boolean;
     }) => (
-      <div data-testid="combo-item-selector" data-disabled={disabled ? "1" : "0"}>
+      <div
+        data-testid="combo-item-selector"
+        data-disabled={disabled ? "1" : "0"}
+      >
         <span data-testid="items-count">{items.length}</span>
         {error && <span data-testid="items-error">{error}</span>}
       </div>
@@ -264,7 +267,9 @@ describe("ComboForm", () => {
 
       fireEvent.click(screen.getByText("cancel"));
 
-      expect(mockRouterPush).toHaveBeenCalledWith("/dashboard/inventory/combos");
+      expect(mockRouterPush).toHaveBeenCalledWith(
+        "/dashboard/inventory/combos",
+      );
     });
   });
 

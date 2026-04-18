@@ -6,11 +6,9 @@ vi.mock("next-intl", () => ({
 }));
 
 vi.mock("@/ui/components/date-picker", () => ({
-  DatePicker: ({
-    placeholder,
-  }: {
-    placeholder?: string;
-  }) => <div data-testid="date-picker">{placeholder}</div>,
+  DatePicker: ({ placeholder }: { placeholder?: string }) => (
+    <div data-testid="date-picker">{placeholder}</div>
+  ),
 }));
 
 vi.mock("@/ui/components/searchable-select", () => ({
@@ -20,14 +18,16 @@ vi.mock("@/ui/components/searchable-select", () => ({
 }));
 
 let mockReportState: {
-  data: Array<{
-    comboId: string;
-    sku: string;
-    name: string;
-    totalComboUnitsSold: number;
-    totalRevenue: number;
-    salesCount: number;
-  }> | undefined;
+  data:
+    | Array<{
+        comboId: string;
+        sku: string;
+        name: string;
+        totalComboUnitsSold: number;
+        totalRevenue: number;
+        salesCount: number;
+      }>
+    | undefined;
   isLoading: boolean;
   isError: boolean;
   error?: { message: string };
@@ -123,7 +123,9 @@ describe("ComboSalesReport", () => {
 
       render(<ComboSalesReport />);
 
-      expect(screen.getByText(/error\.loading.*network down/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/error\.loading.*network down/i),
+      ).toBeInTheDocument();
     });
   });
 });

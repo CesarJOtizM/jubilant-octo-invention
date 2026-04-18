@@ -1,11 +1,27 @@
 import { Entity } from "@/shared/domain";
 
-export type ImportType =
-  | "PRODUCTS"
-  | "MOVEMENTS"
-  | "WAREHOUSES"
-  | "STOCK"
-  | "TRANSFERS";
+/**
+ * Open string type aligned with the backend. The list of valid
+ * identifiers is owned by the server's handler registry and exposed
+ * via GET /imports/types, so the frontend deliberately avoids a closed
+ * union here: adding a new import type on the server becomes a pure
+ * runtime discovery with zero frontend code changes.
+ *
+ * The KNOWN_IMPORT_TYPES constant keeps the legacy identifiers around
+ * for components that need icon mappings or hardcoded copy while the
+ * full dynamic catalog is fetched from the backend.
+ */
+export type ImportType = string;
+
+export const KNOWN_IMPORT_TYPES = [
+  "PRODUCTS",
+  "MOVEMENTS",
+  "WAREHOUSES",
+  "STOCK",
+  "TRANSFERS",
+] as const;
+
+export type KnownImportType = (typeof KNOWN_IMPORT_TYPES)[number];
 
 export type ImportStatus =
   | "PENDING"

@@ -56,9 +56,7 @@ describe("ComboItemSelector", () => {
         />,
       );
 
-      expect(
-        screen.getAllByTestId("product-search-select"),
-      ).toHaveLength(1);
+      expect(screen.getAllByTestId("product-search-select")).toHaveLength(1);
       const quantityInput = screen.getByPlaceholderText("fields.quantity");
       expect((quantityInput as HTMLInputElement).value).toBe("2");
     });
@@ -147,7 +145,9 @@ describe("ComboItemSelector", () => {
       const removeButtons = screen.getAllByTitle("form.removeItem");
       fireEvent.click(removeButtons[0]);
 
-      expect(onChange).toHaveBeenCalledWith([{ productId: "p-2", quantity: 2 }]);
+      expect(onChange).toHaveBeenCalledWith([
+        { productId: "p-2", quantity: 2 },
+      ]);
     });
 
     it("Given: single item When: clicking remove Then: should be disabled and not call onChange", () => {

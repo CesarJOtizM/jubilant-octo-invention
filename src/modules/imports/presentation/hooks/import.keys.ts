@@ -6,4 +6,5 @@ export const importKeys = {
   list: (filters?: ImportFilters) => [...importKeys.lists(), filters] as const,
   statuses: () => [...importKeys.all, "status"] as const,
   status: (id: string) => [...importKeys.statuses(), id] as const,
+  types: () => [...importKeys.all, "types"] as const,
 };

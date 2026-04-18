@@ -8,11 +8,13 @@ import type {
   ImportFilters,
   ImportPreviewResponseDto,
   ImportStatusResponseDto,
+  ImportTypesResponseDto,
   TemplateFormat,
 } from "@/modules/imports/application/dto/import.dto";
 import type {
   ImportBatch,
   ImportType,
+  ImportTypeSchema,
 } from "@/modules/imports/domain/entities";
 import type { ImportPreview } from "@/modules/imports/domain/entities/import-preview.entity";
 import { ImportMapper } from "@/modules/imports/application/mappers/import.mapper";
@@ -123,5 +125,14 @@ export class ImportApiAdapter implements ImportRepositoryPort {
     return data instanceof Blob
       ? data
       : new Blob([data as BlobPart], { type: mimeType });
+  }
+
+  async findTypes(): Promise<ImportTypeSchema[]> {
+    const response = await apiClient.get<ImportTypesResponseDto>(
+      `${this.basePath}/types`,
+    );
+    return response.data.data.types.map((schema) =>
+      ImportMapper.toTypeSchema(schema),
+    );
   }
 }

@@ -23,6 +23,20 @@ export function useImports(filters?: ImportFilters) {
   });
 }
 
+/**
+ * Fetch the dynamic catalog of import types registered on the backend.
+ * Schemas change rarely in practice — a 5 minute staleTime keeps the
+ * wizard feeling instant without holding stale data through a whole
+ * session.
+ */
+export function useImportTypes() {
+  return useQuery({
+    queryKey: importKeys.types(),
+    queryFn: () => getContainer().importRepository.findTypes(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useImportStatus(id: string | null) {
   return useQuery({
     queryKey: importKeys.status(id ?? ""),

@@ -33,4 +33,40 @@ describe("ImportPreview", () => {
     const preview = new ImportPreview(10, 10, 0, [], [], []);
     expect(preview.hasWarnings).toBe(false);
   });
+
+  it("Given: no references argument When: constructed Then: hasReferences and hasPossibleDuplicates should be false", () => {
+    const preview = new ImportPreview(10, 10, 0, [], [], []);
+
+    expect(preview.hasReferences).toBe(false);
+    expect(preview.hasPossibleDuplicates).toBe(false);
+    expect(preview.references.newBrandsToCreate).toEqual([]);
+  });
+
+  it("Given: new brands to create When: accessing Then: hasReferences should be true", () => {
+    const preview = new ImportPreview(2, 2, 0, [], [], [], {
+      newBrandsToCreate: ["Adidas"],
+      existingBrandsReferenced: [],
+      newCategoriesToCreate: [],
+      existingCategoriesReferenced: [],
+      possibleBrandDuplicates: [],
+      possibleCategoryDuplicates: [],
+    });
+
+    expect(preview.hasReferences).toBe(true);
+  });
+
+  it("Given: possible brand duplicates When: accessing Then: hasPossibleDuplicates should be true", () => {
+    const preview = new ImportPreview(2, 2, 0, [], [], [], {
+      newBrandsToCreate: [],
+      existingBrandsReferenced: [],
+      newCategoriesToCreate: [],
+      existingCategoriesReferenced: [],
+      possibleBrandDuplicates: [
+        { canonical: "Nike", variants: ["Nike", "NIKE"] },
+      ],
+      possibleCategoryDuplicates: [],
+    });
+
+    expect(preview.hasPossibleDuplicates).toBe(true);
+  });
 });
