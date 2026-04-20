@@ -1,9 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, renderHook } from "@testing-library/react";
-import {
-  ContainerProvider,
-  useContainer,
-} from "@/config/di/provider";
+import { ContainerProvider, useContainer } from "@/config/di/provider";
 
 describe("ContainerProvider", () => {
   it("Given: no provider When: useContainer is called Then: should throw an error", () => {

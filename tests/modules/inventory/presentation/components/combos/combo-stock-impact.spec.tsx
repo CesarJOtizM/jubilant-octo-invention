@@ -66,9 +66,7 @@ describe("ComboStockImpact", () => {
       expect(
         screen.getByText("reports.stockImpact.comboSales"),
       ).toBeInTheDocument();
-      expect(
-        screen.getByText("reports.stockImpact.total"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("reports.stockImpact.total")).toBeInTheDocument();
       expect(screen.getByText("10")).toBeInTheDocument();
       expect(screen.getByText("5")).toBeInTheDocument();
       expect(screen.getByText("15")).toBeInTheDocument();
@@ -123,9 +121,7 @@ describe("ComboStockImpact", () => {
 
       render(<ComboStockImpact productId="p-1" />);
 
-      expect(
-        screen.getByText("reports.stockImpact.empty"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("reports.stockImpact.empty")).toBeInTheDocument();
     });
   });
 

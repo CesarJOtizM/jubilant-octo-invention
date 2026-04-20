@@ -119,7 +119,9 @@ describe("SalesSearchSelect", () => {
     });
 
     it("Given: custom excludeStatuses When: opening Then: should only filter those statuses", async () => {
-      renderWithProviders(<SalesSearchSelect excludeStatuses={["CANCELLED"]} />);
+      renderWithProviders(
+        <SalesSearchSelect excludeStatuses={["CANCELLED"]} />,
+      );
 
       fireEvent.click(screen.getByRole("combobox"));
 
@@ -157,7 +159,9 @@ describe("SalesSearchSelect", () => {
     });
 
     it("Given: custom searchPlaceholder When: opening Then: should use it", async () => {
-      renderWithProviders(<SalesSearchSelect searchPlaceholder="Buscar algo" />);
+      renderWithProviders(
+        <SalesSearchSelect searchPlaceholder="Buscar algo" />,
+      );
 
       fireEvent.click(screen.getByRole("combobox"));
 
@@ -174,7 +178,9 @@ describe("SalesSearchSelect", () => {
 
       fireEvent.click(screen.getByRole("combobox"));
 
-      await waitFor(() => expect(screen.getByText("S-001")).toBeInTheDocument());
+      await waitFor(() =>
+        expect(screen.getByText("S-001")).toBeInTheDocument(),
+      );
 
       fireEvent.click(screen.getByText("S-001"));
 
@@ -209,7 +215,9 @@ describe("SalesSearchSelect", () => {
       renderWithProviders(<SalesSearchSelect />);
 
       fireEvent.click(screen.getByRole("combobox"));
-      await waitFor(() => expect(screen.getByText("S-001")).toBeInTheDocument());
+      await waitFor(() =>
+        expect(screen.getByText("S-001")).toBeInTheDocument(),
+      );
 
       fireEvent.keyDown(document, { key: "Escape" });
 
@@ -227,7 +235,9 @@ describe("SalesSearchSelect", () => {
       );
 
       fireEvent.click(screen.getByRole("combobox"));
-      await waitFor(() => expect(screen.getByText("S-001")).toBeInTheDocument());
+      await waitFor(() =>
+        expect(screen.getByText("S-001")).toBeInTheDocument(),
+      );
 
       fireEvent.mouseDown(screen.getByTestId("outside"));
 
@@ -316,9 +326,7 @@ describe("SalesSearchSelect", () => {
       renderWithProviders(<SalesSearchSelect />);
 
       fireEvent.click(screen.getByRole("combobox"));
-      const input = await screen.findByPlaceholderText(
-        /buscar por número/i,
-      );
+      const input = await screen.findByPlaceholderText(/buscar por número/i);
 
       fireEvent.change(input, { target: { value: "S-001" } });
 

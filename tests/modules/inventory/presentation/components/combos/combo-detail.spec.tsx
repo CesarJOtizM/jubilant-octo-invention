@@ -7,13 +7,9 @@ vi.mock("next-intl", () => ({
 }));
 
 vi.mock("@/i18n/navigation", () => ({
-  Link: ({
-    href,
-    children,
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => <a href={href}>{children}</a>,
+  Link: ({ href, children }: { href: string; children: React.ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
 }));
 
 vi.mock("@/shared/presentation/components/permission-gate", () => ({
@@ -256,9 +252,7 @@ describe("ComboDetail", () => {
 
       render(<ComboDetail comboId="c-1" />);
 
-      expect(
-        screen.queryByText("actions.deactivate"),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText("actions.deactivate")).not.toBeInTheDocument();
     });
 
     it("Given: deactivate pending When: rendering Then: should disable the button", () => {

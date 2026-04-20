@@ -306,7 +306,9 @@ describe("ComboApiAdapter", () => {
           salesCount: 2,
         },
       ];
-      vi.mocked(apiClient.get).mockResolvedValue({ data: { data: reportData } });
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: reportData },
+      });
 
       const result = await adapter.getSalesReport();
 

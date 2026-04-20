@@ -330,7 +330,10 @@ function SharedFormFields({
           }: {
             field: { value: string; onChange: (v: string) => void };
           }) => (
-            <Select value={field.value || "AUTO"} onValueChange={field.onChange}>
+            <Select
+              value={field.value || "AUTO"}
+              onValueChange={field.onChange}
+            >
               <SelectTrigger>
                 <SelectValue>
                   {field.value === "DEFAULT_ONLY"

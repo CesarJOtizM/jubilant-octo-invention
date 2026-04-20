@@ -37,7 +37,9 @@ vi.mock("@/ui/components/sortable-header", () => ({
   }) => (
     <th>
       <button onClick={() => onSort(field, "asc")}>{label}</button>
-      <button onClick={() => onSort(field, undefined)}>{`${label}-clear`}</button>
+      <button
+        onClick={() => onSort(field, undefined)}
+      >{`${label}-clear`}</button>
     </th>
   ),
 }));
