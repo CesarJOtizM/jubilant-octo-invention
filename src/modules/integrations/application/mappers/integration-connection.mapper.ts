@@ -6,6 +6,7 @@ import type {
   SyncStrategy,
   SyncDirection,
   TokenStatus,
+  ContactResolutionMode,
 } from "@/modules/integrations/domain/entities/integration-connection.entity";
 
 export class IntegrationConnectionMapper {
@@ -24,6 +25,8 @@ export class IntegrationConnectionMapper {
       warehouseName: dto.warehouseName ?? null,
       defaultContactId: dto.defaultContactId ?? null,
       defaultContactName: dto.defaultContactName ?? null,
+      contactResolutionMode:
+        (dto.contactResolutionMode as ContactResolutionMode) ?? "AUTO",
       companyId: dto.companyId ?? null,
       companyName: dto.companyName ?? null,
       connectedAt: dto.connectedAt ? new Date(dto.connectedAt) : null,

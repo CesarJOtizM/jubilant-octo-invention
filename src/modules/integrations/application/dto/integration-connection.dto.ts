@@ -3,6 +3,7 @@ import type {
   ConnectionStatus,
   SyncStrategy,
   SyncDirection,
+  ContactResolutionMode,
 } from "@/modules/integrations/domain/entities/integration-connection.entity";
 
 export interface IntegrationConnectionResponseDto {
@@ -17,6 +18,7 @@ export interface IntegrationConnectionResponseDto {
   warehouseName?: string | null;
   defaultContactId?: string | null;
   defaultContactName?: string | null;
+  contactResolutionMode?: ContactResolutionMode | null;
   companyId?: string | null;
   companyName?: string | null;
   connectedAt?: string | null;
@@ -55,6 +57,7 @@ export interface CreateIntegrationConnectionDto {
   syncDirection: SyncDirection;
   defaultWarehouseId: string;
   defaultContactId?: string;
+  contactResolutionMode?: ContactResolutionMode;
   companyId?: string;
   syncFromDate?: string;
   orderStatuses?: string;
@@ -68,6 +71,7 @@ export interface UpdateIntegrationConnectionDto {
   syncDirection?: SyncDirection;
   defaultWarehouseId?: string;
   defaultContactId?: string;
+  contactResolutionMode?: ContactResolutionMode;
   companyId?: string;
 }
 

@@ -320,6 +320,40 @@ function SharedFormFields({
         />
       </FormField>
 
+      <FormField>
+        <Label>{t("form.contactResolutionMode")}</Label>
+        <Controller
+          name="contactResolutionMode"
+          control={control}
+          render={({
+            field,
+          }: {
+            field: { value: string; onChange: (v: string) => void };
+          }) => (
+            <Select value={field.value || "AUTO"} onValueChange={field.onChange}>
+              <SelectTrigger>
+                <SelectValue>
+                  {field.value === "DEFAULT_ONLY"
+                    ? t("form.contactResolutionModeDefaultOnly")
+                    : t("form.contactResolutionModeAuto")}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="AUTO">
+                  {t("form.contactResolutionModeAuto")}
+                </SelectItem>
+                <SelectItem value="DEFAULT_ONLY">
+                  {t("form.contactResolutionModeDefaultOnly")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+        <p className="text-xs text-muted-foreground">
+          {t("form.contactResolutionModeDescription")}
+        </p>
+      </FormField>
+
       {multiCompanyEnabled && (
         <FormField>
           <Label>{t("form.company")}</Label>
@@ -436,6 +470,7 @@ function VtexCreateForm({
       syncDirection: "BIDIRECTIONAL",
       defaultWarehouseId: "",
       defaultContactId: "",
+      contactResolutionMode: "AUTO" as const,
       companyId: "",
     },
   });
@@ -720,6 +755,46 @@ function VtexCreateForm({
                 )}
               </div>
 
+              <FormField>
+                <Label>{t("form.contactResolutionMode")}</Label>
+                <Controller
+                  name="contactResolutionMode"
+                  control={control}
+                  render={({
+                    field,
+                  }: {
+                    field: {
+                      value: string;
+                      onChange: (v: string) => void;
+                    };
+                  }) => (
+                    <Select
+                      value={field.value || "AUTO"}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue>
+                          {field.value === "DEFAULT_ONLY"
+                            ? t("form.contactResolutionModeDefaultOnly")
+                            : t("form.contactResolutionModeAuto")}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AUTO">
+                          {t("form.contactResolutionModeAuto")}
+                        </SelectItem>
+                        <SelectItem value="DEFAULT_ONLY">
+                          {t("form.contactResolutionModeDefaultOnly")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t("form.contactResolutionModeDescription")}
+                </p>
+              </FormField>
+
               {/* Section 3: Initial Sync */}
               <SectionHeading>{t("initialSync.title")}</SectionHeading>
 
@@ -815,6 +890,7 @@ function VtexEditForm({
       syncDirection: connection.syncDirection,
       defaultWarehouseId: connection.defaultWarehouseId,
       defaultContactId: connection.defaultContactId || "",
+      contactResolutionMode: connection.contactResolutionMode,
       companyId: connection.companyId || "",
     },
   });

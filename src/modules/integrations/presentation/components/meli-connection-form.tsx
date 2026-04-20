@@ -75,6 +75,7 @@ export function MeliConnectionForm({
       syncDirection: "INBOUND",
       defaultWarehouseId: "",
       defaultContactId: "",
+      contactResolutionMode: "AUTO" as const,
       companyId: "",
     },
   });
@@ -231,6 +232,39 @@ export function MeliConnectionForm({
                   </Select>
                 )}
               />
+            </FormField>
+
+            <FormField>
+              <Label>{t("form.contactResolutionMode")}</Label>
+              <Controller
+                name="contactResolutionMode"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "AUTO"}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue>
+                        {field.value === "DEFAULT_ONLY"
+                          ? t("form.contactResolutionModeDefaultOnly")
+                          : t("form.contactResolutionModeAuto")}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="AUTO">
+                        {t("form.contactResolutionModeAuto")}
+                      </SelectItem>
+                      <SelectItem value="DEFAULT_ONLY">
+                        {t("form.contactResolutionModeDefaultOnly")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("form.contactResolutionModeDescription")}
+              </p>
             </FormField>
 
             {multiCompanyEnabled && (

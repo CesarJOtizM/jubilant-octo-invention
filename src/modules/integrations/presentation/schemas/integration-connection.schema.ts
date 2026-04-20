@@ -20,6 +20,7 @@ export const vtexConnectionSchema = z.object({
   syncDirection: z.enum(["INBOUND", "OUTBOUND", "BIDIRECTIONAL"]),
   defaultWarehouseId: z.string().min(1, "Warehouse is required"),
   defaultContactId: z.string().optional(),
+  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]).default("AUTO"),
   companyId: z.string().optional(),
 });
 
@@ -40,6 +41,7 @@ export function toCreateConnectionDto(
     syncDirection: data.syncDirection,
     defaultWarehouseId: data.defaultWarehouseId,
     defaultContactId: data.defaultContactId || undefined,
+    contactResolutionMode: data.contactResolutionMode,
     companyId: data.companyId || undefined,
     syncFromDate: syncFromDate
       ? new Date(syncFromDate + "T00:00:00Z").toISOString()
@@ -56,6 +58,7 @@ export const updateConnectionSchema = z.object({
   syncDirection: z.enum(["INBOUND", "OUTBOUND", "BIDIRECTIONAL"]),
   defaultWarehouseId: z.string().min(1, "Warehouse is required"),
   defaultContactId: z.string().optional(),
+  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]).default("AUTO"),
   companyId: z.string().optional(),
 });
 
@@ -72,6 +75,7 @@ export function toUpdateConnectionDto(
     syncDirection: data.syncDirection,
     defaultWarehouseId: data.defaultWarehouseId,
     defaultContactId: data.defaultContactId || undefined,
+    contactResolutionMode: data.contactResolutionMode,
     companyId: data.companyId || undefined,
   };
 }
@@ -84,6 +88,7 @@ export const meliConnectionSchema = z.object({
   syncDirection: z.literal("INBOUND"),
   defaultWarehouseId: z.string().min(1, "Warehouse is required"),
   defaultContactId: z.string().optional(),
+  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]).default("AUTO"),
   companyId: z.string().optional(),
 });
 
@@ -102,6 +107,7 @@ export function toMeliCreateConnectionDto(
     syncDirection: "INBOUND",
     defaultWarehouseId: data.defaultWarehouseId,
     defaultContactId: data.defaultContactId || undefined,
+    contactResolutionMode: data.contactResolutionMode,
     companyId: data.companyId || undefined,
   };
 }
