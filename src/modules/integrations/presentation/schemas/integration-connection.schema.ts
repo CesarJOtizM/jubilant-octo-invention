@@ -20,7 +20,7 @@ export const vtexConnectionSchema = z.object({
   syncDirection: z.enum(["INBOUND", "OUTBOUND", "BIDIRECTIONAL"]),
   defaultWarehouseId: z.string().min(1, "Warehouse is required"),
   defaultContactId: z.string().optional(),
-  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]).default("AUTO"),
+  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]),
   companyId: z.string().optional(),
 });
 
@@ -58,7 +58,7 @@ export const updateConnectionSchema = z.object({
   syncDirection: z.enum(["INBOUND", "OUTBOUND", "BIDIRECTIONAL"]),
   defaultWarehouseId: z.string().min(1, "Warehouse is required"),
   defaultContactId: z.string().optional(),
-  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]).default("AUTO"),
+  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]),
   companyId: z.string().optional(),
 });
 
@@ -88,7 +88,7 @@ export const meliConnectionSchema = z.object({
   syncDirection: z.literal("INBOUND"),
   defaultWarehouseId: z.string().min(1, "Warehouse is required"),
   defaultContactId: z.string().optional(),
-  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]).default("AUTO"),
+  contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]),
   companyId: z.string().optional(),
 });
 
