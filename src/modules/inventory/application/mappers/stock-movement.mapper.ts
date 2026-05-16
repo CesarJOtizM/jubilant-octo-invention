@@ -9,13 +9,14 @@ import type {
 
 export class StockMovementMapper {
   static lineToDomain(
-    dto: MovementLineResponseDto & { name?: string; sku?: string },
+    dto: MovementLineResponseDto & { name?: string; sku?: string; barcode?: string },
   ): MovementLine {
     return MovementLine.create({
       id: dto.id,
       productId: dto.productId,
       productName: dto.productName ?? (dto as { name?: string }).name ?? "",
       productSku: dto.productSku ?? (dto as { sku?: string }).sku ?? "",
+      productBarcode: dto.productBarcode ?? (dto as { barcode?: string }).barcode ?? null,
       quantity: dto.quantity,
       unitCost: dto.unitCost,
       currency: dto.currency ?? null,
@@ -56,6 +57,7 @@ export class StockMovementMapper {
       productId: line.productId,
       productName: line.productName,
       productSku: line.productSku,
+      productBarcode: line.productBarcode,
       quantity: line.quantity,
       unitCost: line.unitCost,
     };

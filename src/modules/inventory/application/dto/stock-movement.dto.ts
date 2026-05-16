@@ -12,6 +12,7 @@ export interface MovementLineResponseDto {
   productId: string;
   productName: string;
   productSku: string;
+  productBarcode?: string | null;
   quantity: number;
   unitCost: number | null;
   currency?: string | null;

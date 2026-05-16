@@ -395,6 +395,7 @@ export function MovementDetail({ movementId }: MovementDetailProps) {
                   <tr className="border-b text-left text-sm font-medium text-muted-foreground">
                     <th className="pb-3 pr-4">{t("fields.product")}</th>
                     <th className="pb-3 pr-4">SKU</th>
+                    <th className="pb-3 pr-4">EAN</th>
                     <th className="pb-3 pr-4 text-right">
                       {t("fields.quantity")}
                     </th>
@@ -417,6 +418,9 @@ export function MovementDetail({ movementId }: MovementDetailProps) {
                         </td>
                         <td className="py-4 pr-4 font-mono text-sm text-muted-foreground">
                           {line.productSku}
+                        </td>
+                        <td className="py-4 pr-4 font-mono text-sm text-muted-foreground">
+                          {line.productBarcode ?? "—"}
                         </td>
                         <td className="py-4 pr-4 text-right">
                           <span
@@ -454,7 +458,7 @@ export function MovementDetail({ movementId }: MovementDetailProps) {
                       <tfoot>
                         <tr className="border-t-2">
                           <td
-                            colSpan={3}
+                            colSpan={4}
                             className="pt-4 pr-4 text-sm font-medium text-muted-foreground text-right"
                           >
                             {t("detail.total")}
