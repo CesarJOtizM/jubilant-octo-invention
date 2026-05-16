@@ -66,6 +66,7 @@ vi.mock("@/modules/contacts/presentation/hooks/use-contacts", () => ({
       ],
     },
   }),
+  useContact: () => ({ data: undefined }),
 }));
 
 vi.mock("@/modules/sales/presentation/schemas/sale.schema", () => ({

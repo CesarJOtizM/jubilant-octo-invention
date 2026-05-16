@@ -5,6 +5,7 @@ import { Check, ChevronDown, Loader2, Search } from "lucide-react";
 import { createPortal } from "react-dom";
 import { cn } from "@/ui/lib/utils";
 import { useSalesSearch } from "@/modules/sales/presentation/hooks/use-sales-search";
+import { useSale } from "@/modules/sales/presentation/hooks/use-sales";
 
 interface SelectedSaleInfo {
   id: string;
@@ -72,21 +73,27 @@ export function SalesSearchSelect({
     (sale) => !excludeStatuses.includes(sale.status),
   );
 
-  // Sync selectedInfo when sales load and value is already set (e.g. edit forms)
+  // Resolve pre-set value (edit forms) via individual sale query.
+  const needsResolve = Boolean(value && selectedInfo?.id !== value);
+  const { data: resolvedSale } = useSale(needsResolve ? value! : "");
+
+  // Sync selectedInfo from either the search list or the individual query
   useEffect(() => {
     if (!value) {
       setSelectedInfo(null);
       return;
     }
     if (selectedInfo?.id === value) return;
-    const sale = filteredSales.find((s) => s.id === value);
-    if (sale) {
+
+    const fromList = filteredSales.find((s) => s.id === value);
+    const source = fromList ?? resolvedSale;
+    if (source) {
       setSelectedInfo({
-        id: sale.id,
-        label: `${sale.saleNumber} — ${sale.currency} ${sale.totalAmount.toLocaleString()}`,
+        id: source.id,
+        label: `${source.saleNumber} — ${source.currency} ${source.totalAmount.toLocaleString()}`,
       });
     }
-  }, [value, filteredSales, selectedInfo?.id]);
+  }, [value, filteredSales, resolvedSale, selectedInfo?.id]);
 
   const selectedLabel =
     value && selectedInfo?.id === value ? selectedInfo.label : undefined;

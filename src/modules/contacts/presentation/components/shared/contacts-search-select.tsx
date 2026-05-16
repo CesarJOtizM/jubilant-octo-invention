@@ -5,6 +5,7 @@ import { Check, ChevronDown, Loader2, Search } from "lucide-react";
 import { createPortal } from "react-dom";
 import { cn } from "@/ui/lib/utils";
 import { useContactsSearch } from "@/modules/contacts/presentation/hooks/use-contacts-search";
+import { useContact } from "@/modules/contacts/presentation/hooks/use-contacts";
 import type { ContactType } from "@/modules/contacts/domain/entities/contact.entity";
 
 interface SelectedContactInfo {
@@ -73,21 +74,27 @@ export function ContactsSearchSelect({
     enabled: open,
   });
 
-  // Sync selectedInfo when contacts load and value is already set (e.g. edit forms)
+  // Resolve pre-set value (edit forms) via individual contact query.
+  const needsResolve = Boolean(value && selectedInfo?.id !== value);
+  const { data: resolvedContact } = useContact(needsResolve ? value! : "");
+
+  // Sync selectedInfo from either the search list or the individual query
   useEffect(() => {
     if (!value) {
       setSelectedInfo(null);
       return;
     }
     if (selectedInfo?.id === value) return;
-    const contact = contacts.find((c) => c.id === value);
-    if (contact) {
+
+    const fromList = contacts.find((c) => c.id === value);
+    const source = fromList ?? resolvedContact;
+    if (source) {
       setSelectedInfo({
-        id: contact.id,
-        label: `${contact.name} (${contact.identification})`,
+        id: source.id,
+        label: `${source.name} (${source.identification})`,
       });
     }
-  }, [value, contacts, selectedInfo?.id]);
+  }, [value, contacts, resolvedContact, selectedInfo?.id]);
 
   const selectedLabel =
     value && selectedInfo?.id === value ? selectedInfo.label : undefined;
