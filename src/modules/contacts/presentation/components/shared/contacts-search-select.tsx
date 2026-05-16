@@ -7,6 +7,11 @@ import { cn } from "@/ui/lib/utils";
 import { useContactsSearch } from "@/modules/contacts/presentation/hooks/use-contacts-search";
 import type { ContactType } from "@/modules/contacts/domain/entities/contact.entity";
 
+interface SelectedContactInfo {
+  id: string;
+  label: string;
+}
+
 interface ContactsSearchSelectProps {
   value?: string;
   onValueChange?: (value: string) => void;
@@ -45,6 +50,10 @@ export function ContactsSearchSelect({
     width: 0,
     openAbove: false,
   });
+  // Persist the selected contact info so label survives dropdown close
+  const [selectedInfo, setSelectedInfo] = useState<SelectedContactInfo | null>(
+    null,
+  );
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -64,10 +73,24 @@ export function ContactsSearchSelect({
     enabled: open,
   });
 
-  const selectedContact = contacts.find((c) => c.id === value);
-  const selectedLabel = selectedContact
-    ? `${selectedContact.name} (${selectedContact.identification})`
-    : undefined;
+  // Sync selectedInfo when contacts load and value is already set (e.g. edit forms)
+  useEffect(() => {
+    if (!value) {
+      setSelectedInfo(null);
+      return;
+    }
+    if (selectedInfo?.id === value) return;
+    const contact = contacts.find((c) => c.id === value);
+    if (contact) {
+      setSelectedInfo({
+        id: contact.id,
+        label: `${contact.name} (${contact.identification})`,
+      });
+    }
+  }, [value, contacts, selectedInfo?.id]);
+
+  const selectedLabel =
+    value && selectedInfo?.id === value ? selectedInfo.label : undefined;
 
   // Calcular posición del dropdown
   const updateCoords = useCallback(() => {
@@ -214,6 +237,10 @@ export function ContactsSearchSelect({
                           "bg-accent text-accent-foreground",
                       )}
                       onClick={() => {
+                        setSelectedInfo({
+                          id: contact.id,
+                          label: `${contact.name} (${contact.identification})`,
+                        });
                         onValueChange?.(contact.id);
                         setOpen(false);
                       }}

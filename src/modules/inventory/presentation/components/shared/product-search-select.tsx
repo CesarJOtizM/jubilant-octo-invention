@@ -6,6 +6,11 @@ import { createPortal } from "react-dom";
 import { cn } from "@/ui/lib/utils";
 import { useProductSearch } from "@/modules/inventory/presentation/hooks/use-product-search";
 
+interface SelectedProductInfo {
+  id: string;
+  label: string;
+}
+
 interface ProductSearchSelectProps {
   value?: string;
   onValueChange?: (value: string) => void;
@@ -42,6 +47,10 @@ export function ProductSearchSelect({
     width: 0,
     openAbove: false,
   });
+  // Persist the selected product info so label survives dropdown close
+  const [selectedInfo, setSelectedInfo] = useState<SelectedProductInfo | null>(
+    null,
+  );
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -61,11 +70,25 @@ export function ProductSearchSelect({
     enabled: open, // Solo consulta cuando el dropdown está abierto
   });
 
-  const selectedProduct = products.find((p) => p.id === value);
-  // Si no está en la página actual (valor pre-existente), igual mostramos el id
-  // hasta que cargue la primera página
-  const selectedLabel = selectedProduct
-    ? `${selectedProduct.name} (${selectedProduct.sku})`
+  // Sync selectedInfo when products load and value is already set (e.g. edit forms)
+  useEffect(() => {
+    if (!value) {
+      setSelectedInfo(null);
+      return;
+    }
+    // Only update if we don't already have info for this value
+    if (selectedInfo?.id === value) return;
+    const product = products.find((p) => p.id === value);
+    if (product) {
+      setSelectedInfo({
+        id: product.id,
+        label: `${product.name} (${product.sku})`,
+      });
+    }
+  }, [value, products, selectedInfo?.id]);
+
+  const selectedLabel = value && selectedInfo?.id === value
+    ? selectedInfo.label
     : undefined;
 
   // Calcular posición del dropdown
@@ -213,6 +236,10 @@ export function ProductSearchSelect({
                           "bg-accent text-accent-foreground",
                       )}
                       onClick={() => {
+                        setSelectedInfo({
+                          id: product.id,
+                          label: `${product.name} (${product.sku})`,
+                        });
                         onValueChange?.(product.id);
                         setOpen(false);
                       }}
