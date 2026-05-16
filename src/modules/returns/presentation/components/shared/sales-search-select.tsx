@@ -6,6 +6,11 @@ import { createPortal } from "react-dom";
 import { cn } from "@/ui/lib/utils";
 import { useSalesSearch } from "@/modules/sales/presentation/hooks/use-sales-search";
 
+interface SelectedSaleInfo {
+  id: string;
+  label: string;
+}
+
 interface SalesSearchSelectProps {
   value?: string;
   onValueChange?: (value: string) => void;
@@ -45,6 +50,10 @@ export function SalesSearchSelect({
     width: 0,
     openAbove: false,
   });
+  // Persist the selected sale info so label survives dropdown close
+  const [selectedInfo, setSelectedInfo] = useState<SelectedSaleInfo | null>(
+    null,
+  );
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -63,10 +72,24 @@ export function SalesSearchSelect({
     (sale) => !excludeStatuses.includes(sale.status),
   );
 
-  const selectedSale = filteredSales.find((s) => s.id === value);
-  const selectedLabel = selectedSale
-    ? `${selectedSale.saleNumber} — ${selectedSale.currency} ${selectedSale.totalAmount.toLocaleString()}`
-    : undefined;
+  // Sync selectedInfo when sales load and value is already set (e.g. edit forms)
+  useEffect(() => {
+    if (!value) {
+      setSelectedInfo(null);
+      return;
+    }
+    if (selectedInfo?.id === value) return;
+    const sale = filteredSales.find((s) => s.id === value);
+    if (sale) {
+      setSelectedInfo({
+        id: sale.id,
+        label: `${sale.saleNumber} — ${sale.currency} ${sale.totalAmount.toLocaleString()}`,
+      });
+    }
+  }, [value, filteredSales, selectedInfo?.id]);
+
+  const selectedLabel =
+    value && selectedInfo?.id === value ? selectedInfo.label : undefined;
 
   // Calcular posición del dropdown
   const updateCoords = useCallback(() => {
@@ -212,6 +235,10 @@ export function SalesSearchSelect({
                         value === sale.id && "bg-accent text-accent-foreground",
                       )}
                       onClick={() => {
+                        setSelectedInfo({
+                          id: sale.id,
+                          label: `${sale.saleNumber} — ${sale.currency} ${sale.totalAmount.toLocaleString()}`,
+                        });
                         onValueChange?.(sale.id);
                         setOpen(false);
                       }}
