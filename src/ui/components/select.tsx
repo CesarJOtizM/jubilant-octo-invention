@@ -272,23 +272,24 @@ function computePosition(
   const contentH = contentEl?.offsetHeight || 200;
 
   // Vertical: prefer below, flip above if not enough space
+  // All coordinates are viewport-relative because the portal uses position:fixed
   const spaceBelow = viewportH - triggerRect.bottom - gap;
   const spaceAbove = triggerRect.top - gap;
   let top: number;
   if (spaceBelow >= contentH || spaceBelow >= spaceAbove) {
-    top = triggerRect.bottom + window.scrollY + gap;
+    top = triggerRect.bottom + gap;
   } else {
-    top = triggerRect.top + window.scrollY - contentH - gap;
+    top = triggerRect.top - contentH - gap;
   }
 
   // Horizontal: prefer left-aligned, shift left if overflows right
-  let left = triggerRect.left + window.scrollX;
-  if (left + width > viewportW + window.scrollX) {
-    left = triggerRect.right + window.scrollX - width;
+  let left = triggerRect.left;
+  if (left + width > viewportW) {
+    left = triggerRect.right - width;
   }
   // Clamp to viewport left edge
-  if (left < window.scrollX) {
-    left = window.scrollX + gap;
+  if (left < gap) {
+    left = gap;
   }
 
   return { top, left, width };
@@ -368,7 +369,6 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(
           className,
         )}
         style={{
-          position: "absolute",
           top: coords.top,
           left: coords.left,
           width: coords.width,

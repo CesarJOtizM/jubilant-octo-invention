@@ -13,6 +13,15 @@ export type TokenStatus =
   | "REFRESHING"
   | "REAUTH_REQUIRED";
 
+/**
+ * Controls how a contact is resolved when an incoming order is synced.
+ *
+ * AUTO         — look up the buyer by email / document; create a new contact
+ *                if none is found. Falls back to defaultContactId on error.
+ * DEFAULT_ONLY — always use defaultContactId; buyer data is ignored entirely.
+ */
+export type ContactResolutionMode = "AUTO" | "DEFAULT_ONLY";
+
 export interface IntegrationConnectionProps {
   id: string;
   provider: IntegrationProvider;
@@ -25,6 +34,7 @@ export interface IntegrationConnectionProps {
   warehouseName: string | null;
   defaultContactId: string | null;
   defaultContactName: string | null;
+  contactResolutionMode: ContactResolutionMode;
   companyId: string | null;
   companyName: string | null;
   connectedAt: Date | null;
@@ -62,6 +72,7 @@ export class IntegrationConnection extends Entity<string> {
       warehouseName: props.warehouseName,
       defaultContactId: props.defaultContactId,
       defaultContactName: props.defaultContactName,
+      contactResolutionMode: props.contactResolutionMode,
       companyId: props.companyId,
       companyName: props.companyName,
       connectedAt: props.connectedAt,
@@ -106,6 +117,9 @@ export class IntegrationConnection extends Entity<string> {
   }
   get defaultContactName(): string | null {
     return this.props.defaultContactName;
+  }
+  get contactResolutionMode(): ContactResolutionMode {
+    return this.props.contactResolutionMode;
   }
   get companyId(): string | null {
     return this.props.companyId;

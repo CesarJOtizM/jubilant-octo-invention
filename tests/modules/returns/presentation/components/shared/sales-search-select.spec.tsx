@@ -205,8 +205,11 @@ describe("SalesSearchSelect", () => {
     it("Given: sale selected When: closed Then: trigger shows label with number and total", () => {
       renderWithProviders(<SalesSearchSelect value="s1" />);
 
+      // The trigger label combines saleNumber and totalAmount formatted with
+      // toLocaleString() — the exact thousands separator depends on the runtime
+      // locale, so we match the number regardless of formatting (1000 or 1,000).
       expect(screen.getByText(/S-001/)).toBeInTheDocument();
-      expect(screen.getByText(/1,000/)).toBeInTheDocument();
+      expect(screen.getByText(/1[,.]?000/)).toBeInTheDocument();
     });
   });
 

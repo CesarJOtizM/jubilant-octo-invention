@@ -17,6 +17,7 @@ describe("Integration Connection Schemas", () => {
       syncStrategy: "WEBHOOK",
       syncDirection: "INBOUND",
       defaultWarehouseId: "wh-001",
+      contactResolutionMode: "AUTO",
     };
 
     it("Given: valid data When: parsing Then: should pass validation", () => {
@@ -173,6 +174,33 @@ describe("Integration Connection Schemas", () => {
       }
     });
 
+    it("Given: DEFAULT_ONLY contactResolutionMode When: parsing Then: should pass validation", () => {
+      const data = { ...validData, contactResolutionMode: "DEFAULT_ONLY" };
+
+      const result = vtexConnectionSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.contactResolutionMode).toBe("DEFAULT_ONLY");
+      }
+    });
+
+    it("Given: invalid contactResolutionMode When: parsing Then: should fail validation", () => {
+      const data = { ...validData, contactResolutionMode: "INVALID" };
+
+      const result = vtexConnectionSchema.safeParse(data);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("Given: missing contactResolutionMode When: parsing Then: should fail validation", () => {
+      const { contactResolutionMode: _, ...dataWithout } = validData;
+
+      const result = vtexConnectionSchema.safeParse(dataWithout);
+
+      expect(result.success).toBe(false);
+    });
+
     it("Given: accountName exceeding max length When: parsing Then: should fail validation", () => {
       const data = { ...validData, accountName: "a".repeat(101) };
 
@@ -196,6 +224,7 @@ describe("Integration Connection Schemas", () => {
       syncStrategy: "POLLING",
       syncDirection: "BIDIRECTIONAL",
       defaultWarehouseId: "wh-002",
+      contactResolutionMode: "AUTO",
     };
 
     it("Given: valid data When: parsing Then: should pass validation", () => {
@@ -224,6 +253,25 @@ describe("Integration Connection Schemas", () => {
       const data = { ...validUpdateData, storeName: "" };
 
       const result = updateConnectionSchema.safeParse(data);
+
+      expect(result.success).toBe(false);
+    });
+
+    it("Given: DEFAULT_ONLY contactResolutionMode When: parsing Then: should pass validation", () => {
+      const data = { ...validUpdateData, contactResolutionMode: "DEFAULT_ONLY" };
+
+      const result = updateConnectionSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.contactResolutionMode).toBe("DEFAULT_ONLY");
+      }
+    });
+
+    it("Given: missing contactResolutionMode When: parsing Then: should fail validation", () => {
+      const { contactResolutionMode: _, ...dataWithout } = validUpdateData;
+
+      const result = updateConnectionSchema.safeParse(dataWithout);
 
       expect(result.success).toBe(false);
     });
