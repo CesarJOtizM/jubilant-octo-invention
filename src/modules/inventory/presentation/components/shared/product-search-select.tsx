@@ -5,6 +5,7 @@ import { Check, ChevronDown, Loader2, Search } from "lucide-react";
 import { createPortal } from "react-dom";
 import { cn } from "@/ui/lib/utils";
 import { useProductSearch } from "@/modules/inventory/presentation/hooks/use-product-search";
+import { useProduct } from "@/modules/inventory/presentation/hooks/use-products";
 
 interface SelectedProductInfo {
   id: string;
@@ -70,26 +71,32 @@ export function ProductSearchSelect({
     enabled: open, // Solo consulta cuando el dropdown está abierto
   });
 
-  // Sync selectedInfo when products load and value is already set (e.g. edit forms)
+  // Resolve pre-set value (edit forms) via individual product query.
+  // Only fires when we have a value but no cached label yet.
+  const needsResolve = Boolean(value && selectedInfo?.id !== value);
+  const { data: resolvedProduct } = useProduct(needsResolve ? value! : "");
+
+  // Sync selectedInfo from either the search list or the individual query
   useEffect(() => {
     if (!value) {
       setSelectedInfo(null);
       return;
     }
-    // Only update if we don't already have info for this value
     if (selectedInfo?.id === value) return;
-    const product = products.find((p) => p.id === value);
-    if (product) {
+
+    // Try the search results first (already loaded when dropdown is open)
+    const fromList = products.find((p) => p.id === value);
+    const source = fromList ?? resolvedProduct;
+    if (source) {
       setSelectedInfo({
-        id: product.id,
-        label: `${product.name} (${product.sku})`,
+        id: source.id,
+        label: `${source.name} (${source.sku})`,
       });
     }
-  }, [value, products, selectedInfo?.id]);
+  }, [value, products, resolvedProduct, selectedInfo?.id]);
 
-  const selectedLabel = value && selectedInfo?.id === value
-    ? selectedInfo.label
-    : undefined;
+  const selectedLabel =
+    value && selectedInfo?.id === value ? selectedInfo.label : undefined;
 
   // Calcular posición del dropdown
   const updateCoords = useCallback(() => {
