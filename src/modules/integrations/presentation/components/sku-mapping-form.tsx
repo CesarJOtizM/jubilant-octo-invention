@@ -15,9 +15,8 @@ import {
   SelectValue,
 } from "@/ui/components/select";
 import { useCreateSkuMapping } from "@/modules/integrations/presentation/hooks/use-integrations";
-import { useProducts } from "@/modules/inventory/presentation/hooks/use-products";
+import { ProductSearchSelect } from "@/modules/inventory/presentation/components/shared/product-search-select";
 import { useCombos } from "@/modules/inventory/presentation/hooks/use-combos";
-import type { ProductFilters } from "@/modules/inventory/application/dto";
 
 interface SkuMappingFormProps {
   connectionId: string;
@@ -32,12 +31,6 @@ export function SkuMappingForm({
 }: SkuMappingFormProps) {
   const t = useTranslations("integrations.skuMapping");
   const createMapping = useCreateSkuMapping(connectionId);
-  const productFilters: ProductFilters = {
-    statuses: ["ACTIVE"],
-    limit: 200,
-  };
-  const { data: productsResult } = useProducts(productFilters);
-  const products = productsResult?.data ?? [];
   const { data: combosResult } = useCombos({ limit: 200, isActive: true });
   const combos = combosResult?.data ?? [];
 
@@ -50,16 +43,6 @@ export function SkuMappingForm({
     productId?: string;
     comboId?: string;
   }>({});
-
-  const productOptions = useMemo(
-    () =>
-      products.map((p) => ({
-        value: p.id,
-        label: p.name,
-        description: `SKU: ${p.sku}`,
-      })),
-    [products],
-  );
 
   const comboOptions = useMemo(
     () =>
@@ -133,8 +116,7 @@ export function SkuMappingForm({
       </FormField>
       {mapType === "product" ? (
         <FormField error={errors.productId} className="flex-1 min-w-[200px]">
-          <SearchableSelect
-            options={productOptions}
+          <ProductSearchSelect
             value={productId}
             onValueChange={setProductId}
             placeholder={t("selectProduct")}

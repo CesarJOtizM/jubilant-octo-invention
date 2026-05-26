@@ -23,22 +23,34 @@ vi.mock("@/modules/integrations/presentation/hooks/use-integrations", () => ({
   }),
 }));
 
-const mockProducts = [
-  { id: "prod-1", name: "Product Alpha", sku: "SKU-001" },
-  { id: "prod-2", name: "Product Beta", sku: "SKU-002" },
-  { id: "prod-3", name: "Product Gamma", sku: "SKU-003" },
-];
-
 vi.mock("@/modules/inventory/presentation/hooks/use-combos", () => ({
   useCombos: () => ({ data: undefined, isLoading: false }),
 }));
 
-vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
-  useProducts: () => ({
-    data: { data: mockProducts },
-    isLoading: false,
+vi.mock(
+  "@/modules/inventory/presentation/components/shared/product-search-select",
+  () => ({
+    ProductSearchSelect: ({
+      placeholder,
+      value,
+      onValueChange,
+    }: {
+      placeholder?: string;
+      value?: string;
+      onValueChange?: (v: string) => void;
+    }) => (
+      <button
+        type="button"
+        role="combobox"
+        data-testid="product-search-select"
+        data-value={value}
+        onClick={() => onValueChange?.("prod-1")}
+      >
+        {value || placeholder}
+      </button>
+    ),
   }),
-}));
+);
 
 import { SkuMappingForm } from "@/modules/integrations/presentation/components/sku-mapping-form";
 
