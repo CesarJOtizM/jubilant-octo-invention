@@ -17,6 +17,7 @@ import {
 import { useCreateSkuMapping } from "@/modules/integrations/presentation/hooks/use-integrations";
 import { useProducts } from "@/modules/inventory/presentation/hooks/use-products";
 import { useCombos } from "@/modules/inventory/presentation/hooks/use-combos";
+import type { ProductFilters } from "@/modules/inventory/application/dto";
 
 interface SkuMappingFormProps {
   connectionId: string;
@@ -31,10 +32,11 @@ export function SkuMappingForm({
 }: SkuMappingFormProps) {
   const t = useTranslations("integrations.skuMapping");
   const createMapping = useCreateSkuMapping(connectionId);
-  const { data: productsResult } = useProducts({
-    status: "ACTIVE",
+  const productFilters: ProductFilters = {
+    statuses: ["ACTIVE"],
     limit: 200,
-  } as never);
+  };
+  const { data: productsResult } = useProducts(productFilters);
   const products = productsResult?.data ?? [];
   const { data: combosResult } = useCombos({ limit: 200, isActive: true });
   const combos = combosResult?.data ?? [];
