@@ -23,6 +23,8 @@ export class IntegrationConnectionMapper {
       syncDirection: dto.syncDirection as SyncDirection,
       defaultWarehouseId: dto.defaultWarehouseId,
       warehouseName: dto.warehouseName ?? null,
+      fullWarehouseId: dto.fullWarehouseId ?? null,
+      fullWarehouseName: dto.fullWarehouseName ?? null,
       defaultContactId: dto.defaultContactId ?? null,
       defaultContactName: dto.defaultContactName ?? null,
       contactResolutionMode:
