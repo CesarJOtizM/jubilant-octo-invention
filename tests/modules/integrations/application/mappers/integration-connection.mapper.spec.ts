@@ -13,6 +13,8 @@ describe("IntegrationConnectionMapper", () => {
     syncDirection: "INBOUND",
     defaultWarehouseId: "wh-001",
     warehouseName: "Main Warehouse",
+    fullWarehouseId: "wh-full-001",
+    fullWarehouseName: "Fulfillment Center",
     defaultContactId: "contact-001",
     defaultContactName: "Default Customer",
     companyId: "company-001",
@@ -38,6 +40,8 @@ describe("IntegrationConnectionMapper", () => {
       expect(connection.syncDirection).toBe("INBOUND");
       expect(connection.defaultWarehouseId).toBe("wh-001");
       expect(connection.warehouseName).toBe("Main Warehouse");
+      expect(connection.fullWarehouseId).toBe("wh-full-001");
+      expect(connection.fullWarehouseName).toBe("Fulfillment Center");
       expect(connection.defaultContactId).toBe("contact-001");
       expect(connection.defaultContactName).toBe("Default Customer");
       expect(connection.companyId).toBe("company-001");
@@ -82,6 +86,10 @@ describe("IntegrationConnectionMapper", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (dto as any).warehouseName;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (dto as any).fullWarehouseId;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (dto as any).fullWarehouseName;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (dto as any).defaultContactId;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (dto as any).defaultContactName;
@@ -99,6 +107,8 @@ describe("IntegrationConnectionMapper", () => {
       const connection = IntegrationConnectionMapper.toDomain(dto);
 
       expect(connection.warehouseName).toBeNull();
+      expect(connection.fullWarehouseId).toBeNull();
+      expect(connection.fullWarehouseName).toBeNull();
       expect(connection.defaultContactId).toBeNull();
       expect(connection.defaultContactName).toBeNull();
       expect(connection.companyId).toBeNull();

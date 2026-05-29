@@ -23,6 +23,8 @@ const mockConnection = {
   syncDirection: "INBOUND" as const,
   defaultWarehouseId: "wh-1",
   warehouseName: "Main Warehouse",
+  fullWarehouseId: null,
+  fullWarehouseName: null,
   defaultContactId: "ct-1",
   defaultContactName: "Default Contact",
   companyId: "co-1",
@@ -365,5 +367,33 @@ describe("MeliConnectionDetail", () => {
 
     expect(screen.getByText("syncLogs.title")).toBeInTheDocument();
     expect(screen.getByText("skuMapping.title")).toBeInTheDocument();
+  });
+
+  it("Given: connection without fullWarehouseId When: rendering Then: should show not configured", () => {
+    render(<MeliConnectionDetail connectionId="conn-meli-1" />);
+
+    expect(
+      screen.getByText("detail.fulfillmentWarehouse"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("detail.notConfigured")).toBeInTheDocument();
+  });
+
+  it("Given: connection with fullWarehouseName When: rendering Then: should show fulfillment warehouse name", () => {
+    mockQueryState = {
+      data: {
+        ...mockConnection,
+        fullWarehouseId: "wh-full-1",
+        fullWarehouseName: "Fulfillment Center",
+      },
+      isLoading: false,
+      isError: false,
+    };
+
+    render(<MeliConnectionDetail connectionId="conn-meli-1" />);
+
+    expect(
+      screen.getByText("detail.fulfillmentWarehouse"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Fulfillment Center")).toBeInTheDocument();
   });
 });
