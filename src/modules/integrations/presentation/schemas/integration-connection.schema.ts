@@ -87,6 +87,7 @@ export const meliConnectionSchema = z.object({
   syncStrategy: z.enum(["WEBHOOK", "POLLING", "BOTH"]),
   syncDirection: z.literal("INBOUND"),
   defaultWarehouseId: z.string().min(1, "Warehouse is required"),
+  fullWarehouseId: z.string().optional(),
   defaultContactId: z.string().optional(),
   contactResolutionMode: z.enum(["AUTO", "DEFAULT_ONLY"]),
   companyId: z.string().optional(),
@@ -109,6 +110,7 @@ export function toMeliCreateConnectionDto(
     defaultContactId: data.defaultContactId || undefined,
     contactResolutionMode: data.contactResolutionMode,
     companyId: data.companyId || undefined,
+    fullWarehouseId: data.fullWarehouseId || undefined,
   };
 }
 
