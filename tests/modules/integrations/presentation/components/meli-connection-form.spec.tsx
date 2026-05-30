@@ -166,4 +166,20 @@ describe("MeliConnectionForm", () => {
 
     expect(screen.getByText("form.defaultContact")).toBeInTheDocument();
   });
+
+  it("Given: open dialog When: rendering Then: should show fulfillment warehouse field", () => {
+    render(<MeliConnectionForm {...defaultProps} />);
+
+    expect(
+      screen.getByText("form.fulfillmentWarehouse"),
+    ).toBeInTheDocument();
+  });
+
+  it("Given: open dialog When: rendering Then: should show fulfillment warehouse description", () => {
+    render(<MeliConnectionForm {...defaultProps} />);
+
+    expect(
+      screen.getByText("form.fulfillmentWarehouseDescription"),
+    ).toBeInTheDocument();
+  });
 });

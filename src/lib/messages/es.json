@@ -2595,6 +2595,9 @@
       "syncDirection": "Dirección de sincronización",
       "warehouse": "Almacén por defecto",
       "warehousePlaceholder": "Seleccionar almacén",
+      "fulfillmentWarehouse": "Almacén Fulfillment",
+      "fulfillmentWarehousePlaceholder": "Seleccionar almacén (opcional)",
+      "fulfillmentWarehouseDescription": "Almacén que representa el centro de fulfillment de MeLi. Las órdenes Full se asignarán a este almacén.",
       "defaultContact": "Contacto por defecto",
       "defaultContactPlaceholder": "Seleccionar contacto de respaldo (opcional)",
       "contactResolutionMode": "Resolución de contacto",
@@ -2651,7 +2654,9 @@
       "notFound": "Conexión no encontrada",
       "notFoundDescription": "La integración que buscas no existe o ha sido eliminada.",
       "webhookUrlCopied": "URL del webhook copiada al portapapeles",
-      "webhookSecretCopied": "Webhook secret copiado al portapapeles"
+      "webhookSecretCopied": "Webhook secret copiado al portapapeles",
+      "fulfillmentWarehouse": "Almacén Fulfillment",
+      "notConfigured": "No configurado"
     },
     "syncLogs": {
       "title": "Registro de sincronización",

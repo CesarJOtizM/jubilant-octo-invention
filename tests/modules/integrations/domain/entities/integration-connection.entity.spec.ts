@@ -19,6 +19,8 @@ describe("IntegrationConnection Entity", () => {
     syncDirection: "INBOUND",
     defaultWarehouseId: "wh-001",
     warehouseName: "Main Warehouse",
+    fullWarehouseId: null,
+    fullWarehouseName: null,
     defaultContactId: "contact-001",
     defaultContactName: "Default Customer",
     companyId: "company-001",
@@ -60,6 +62,8 @@ describe("IntegrationConnection Entity", () => {
       const props: IntegrationConnectionProps = {
         ...validProps,
         warehouseName: null,
+        fullWarehouseId: null,
+        fullWarehouseName: null,
         defaultContactId: null,
         defaultContactName: null,
         companyId: null,
@@ -72,6 +76,8 @@ describe("IntegrationConnection Entity", () => {
       const entity = IntegrationConnection.create(props);
 
       expect(entity.warehouseName).toBeNull();
+      expect(entity.fullWarehouseId).toBeNull();
+      expect(entity.fullWarehouseName).toBeNull();
       expect(entity.defaultContactId).toBeNull();
       expect(entity.defaultContactName).toBeNull();
       expect(entity.companyId).toBeNull();
@@ -79,6 +85,19 @@ describe("IntegrationConnection Entity", () => {
       expect(entity.connectedAt).toBeNull();
       expect(entity.lastSyncAt).toBeNull();
       expect(entity.lastSyncError).toBeNull();
+    });
+
+    it("Given: fullWarehouseId and fullWarehouseName When: creating Then: should store values", () => {
+      const props: IntegrationConnectionProps = {
+        ...validProps,
+        fullWarehouseId: "wh-full-001",
+        fullWarehouseName: "Fulfillment Center",
+      };
+
+      const entity = IntegrationConnection.create(props);
+
+      expect(entity.fullWarehouseId).toBe("wh-full-001");
+      expect(entity.fullWarehouseName).toBe("Fulfillment Center");
     });
 
     it("Given: error status with lastSyncError When: creating Then: should store error message", () => {

@@ -16,6 +16,8 @@ export interface IntegrationConnectionResponseDto {
   syncDirection: SyncDirection;
   defaultWarehouseId: string;
   warehouseName?: string | null;
+  fullWarehouseId?: string | null;
+  fullWarehouseName?: string | null;
   defaultContactId?: string | null;
   defaultContactName?: string | null;
   contactResolutionMode?: ContactResolutionMode | null;
@@ -59,6 +61,7 @@ export interface CreateIntegrationConnectionDto {
   defaultContactId?: string;
   contactResolutionMode?: ContactResolutionMode;
   companyId?: string;
+  fullWarehouseId?: string;
   syncFromDate?: string;
   orderStatuses?: string;
 }
@@ -73,6 +76,7 @@ export interface UpdateIntegrationConnectionDto {
   defaultContactId?: string;
   contactResolutionMode?: ContactResolutionMode;
   companyId?: string;
+  fullWarehouseId?: string;
 }
 
 export interface IntegrationConnectionFilters {

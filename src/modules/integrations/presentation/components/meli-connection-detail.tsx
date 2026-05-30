@@ -165,6 +165,12 @@ export function MeliConnectionDetail({
     connection.warehouseName ??
     connection.defaultWarehouseId;
 
+  const fullWarehouseDisplayName = connection.fullWarehouseId
+    ? (warehouses.find((w) => w.id === connection.fullWarehouseId)?.name ??
+      connection.fullWarehouseName ??
+      connection.fullWarehouseId)
+    : null;
+
   return (
     <div className="space-y-6">
       {/* Re-auth Banner */}
@@ -336,6 +342,14 @@ export function MeliConnectionDetail({
                 {t("form.warehouse")}
               </dt>
               <dd className="mt-1 text-sm">{warehouseName}</dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                {t("detail.fulfillmentWarehouse")}
+              </dt>
+              <dd className="mt-1 text-sm">
+                {fullWarehouseDisplayName ?? t("detail.notConfigured")}
+              </dd>
             </div>
             {connection.defaultContactName && (
               <div>

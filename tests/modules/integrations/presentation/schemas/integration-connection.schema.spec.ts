@@ -4,6 +4,8 @@ import {
   toCreateConnectionDto,
   toUpdateConnectionDto,
   updateConnectionSchema,
+  meliConnectionSchema,
+  toMeliCreateConnectionDto,
   skuMappingSchema,
 } from "@/modules/integrations/presentation/schemas/integration-connection.schema";
 
@@ -377,6 +379,75 @@ describe("Integration Connection Schemas", () => {
       expect(dto.appToken).toBeUndefined();
       expect(dto.defaultContactId).toBeUndefined();
       expect(dto.companyId).toBeUndefined();
+    });
+  });
+
+  describe("meliConnectionSchema — fullWarehouseId", () => {
+    const validMeliData = {
+      storeName: "Mi Tienda",
+      clientId: "12345",
+      clientSecret: "secret",
+      syncStrategy: "BOTH" as const,
+      syncDirection: "INBOUND" as const,
+      defaultWarehouseId: "wh-001",
+      contactResolutionMode: "AUTO" as const,
+    };
+
+    it("Given: valid data with fullWarehouseId When: parsing Then: should pass validation", () => {
+      const data = { ...validMeliData, fullWarehouseId: "wh-full-001" };
+
+      const result = meliConnectionSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.fullWarehouseId).toBe("wh-full-001");
+      }
+    });
+
+    it("Given: valid data without fullWarehouseId When: parsing Then: should pass validation", () => {
+      const result = meliConnectionSchema.safeParse(validMeliData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.fullWarehouseId).toBeUndefined();
+      }
+    });
+  });
+
+  describe("toMeliCreateConnectionDto — fullWarehouseId", () => {
+    const validMeliFormData = {
+      storeName: "Mi Tienda",
+      clientId: "12345",
+      clientSecret: "secret",
+      syncStrategy: "BOTH" as const,
+      syncDirection: "INBOUND" as const,
+      defaultWarehouseId: "wh-001",
+      contactResolutionMode: "AUTO" as const,
+    };
+
+    it("Given: form data with fullWarehouseId When: converting Then: DTO should include fullWarehouseId", () => {
+      const dto = toMeliCreateConnectionDto({
+        ...validMeliFormData,
+        fullWarehouseId: "wh-full-001",
+      });
+
+      expect(dto.fullWarehouseId).toBe("wh-full-001");
+      expect(dto.provider).toBe("MERCADOLIBRE");
+    });
+
+    it("Given: form data without fullWarehouseId When: converting Then: DTO should have fullWarehouseId undefined", () => {
+      const dto = toMeliCreateConnectionDto(validMeliFormData);
+
+      expect(dto.fullWarehouseId).toBeUndefined();
+    });
+
+    it("Given: form data with empty fullWarehouseId When: converting Then: DTO should strip it", () => {
+      const dto = toMeliCreateConnectionDto({
+        ...validMeliFormData,
+        fullWarehouseId: "",
+      });
+
+      expect(dto.fullWarehouseId).toBeUndefined();
     });
   });
 

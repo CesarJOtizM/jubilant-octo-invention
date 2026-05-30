@@ -74,6 +74,7 @@ export function MeliConnectionForm({
       syncStrategy: "BOTH",
       syncDirection: "INBOUND",
       defaultWarehouseId: "",
+      fullWarehouseId: "",
       defaultContactId: "",
       contactResolutionMode: "AUTO" as const,
       companyId: "",
@@ -205,6 +206,36 @@ export function MeliConnectionForm({
                   </Select>
                 )}
               />
+            </FormField>
+
+            <FormField>
+              <Label>{t("form.fulfillmentWarehouse")}</Label>
+              <Controller
+                name="fullWarehouseId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || ""}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={t("form.fulfillmentWarehousePlaceholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {warehouses.map((w) => (
+                        <SelectItem key={w.id} value={w.id}>
+                          {w.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("form.fulfillmentWarehouseDescription")}
+              </p>
             </FormField>
 
             <FormField>

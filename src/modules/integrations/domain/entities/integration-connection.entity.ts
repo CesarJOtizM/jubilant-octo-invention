@@ -32,6 +32,8 @@ export interface IntegrationConnectionProps {
   syncDirection: SyncDirection;
   defaultWarehouseId: string;
   warehouseName: string | null;
+  fullWarehouseId: string | null;
+  fullWarehouseName: string | null;
   defaultContactId: string | null;
   defaultContactName: string | null;
   contactResolutionMode: ContactResolutionMode;
@@ -70,6 +72,8 @@ export class IntegrationConnection extends Entity<string> {
       syncDirection: props.syncDirection,
       defaultWarehouseId: props.defaultWarehouseId,
       warehouseName: props.warehouseName,
+      fullWarehouseId: props.fullWarehouseId,
+      fullWarehouseName: props.fullWarehouseName,
       defaultContactId: props.defaultContactId,
       defaultContactName: props.defaultContactName,
       contactResolutionMode: props.contactResolutionMode,
@@ -111,6 +115,12 @@ export class IntegrationConnection extends Entity<string> {
   }
   get warehouseName(): string | null {
     return this.props.warehouseName;
+  }
+  get fullWarehouseId(): string | null {
+    return this.props.fullWarehouseId;
+  }
+  get fullWarehouseName(): string | null {
+    return this.props.fullWarehouseName;
   }
   get defaultContactId(): string | null {
     return this.props.defaultContactId;
