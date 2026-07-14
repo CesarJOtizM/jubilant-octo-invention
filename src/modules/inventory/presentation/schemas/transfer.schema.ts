@@ -42,8 +42,10 @@ export type CreateTransferFormData = {
 // Helper to transform form data to DTO
 export function toCreateTransferDto(
   data: CreateTransferFormData,
+  companyId: string,
 ): CreateTransferDto {
   return {
+    companyId,
     fromWarehouseId: data.fromWarehouseId,
     toWarehouseId: data.toWarehouseId,
     lines: data.lines.map(

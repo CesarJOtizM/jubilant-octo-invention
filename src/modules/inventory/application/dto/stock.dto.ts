@@ -6,6 +6,7 @@
 export interface StockApiRawDto {
   productId: string;
   warehouseId: string;
+  companyId?: string;
   quantity: number;
   averageCost: number;
   totalValue: number;
@@ -29,6 +30,7 @@ export interface StockResponseDto {
   productBarcode?: string;
   warehouseId: string;
   warehouseName?: string;
+  companyId?: string;
   quantity: number;
   reservedQuantity?: number;
   availableQuantity?: number;

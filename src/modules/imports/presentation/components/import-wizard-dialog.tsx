@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
@@ -17,8 +17,12 @@ import {
   usePreviewImport,
   useExecuteImport,
 } from "@/modules/imports/presentation/hooks/use-imports";
+import type { ImportCompanyBind } from "@/modules/imports/application/ports/import.repository.port";
 import type { ImportTypeSchema } from "@/modules/imports/domain/entities";
 import type { ImportPreview } from "@/modules/imports/domain/entities/import-preview.entity";
+import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
+import { useCompany } from "@/modules/companies/presentation/hooks/use-companies";
+import { CompanyRequiredGuard } from "@/modules/companies/presentation/components/company-required-guard";
 import { FileDropzone } from "./file-dropzone";
 import { ImportPreviewResults } from "./import-preview-results";
 import { ImportProgress } from "./import-progress";
@@ -49,6 +53,26 @@ export function ImportWizardDialog({
   const previewMutation = usePreviewImport();
   const executeMutation = useExecuteImport();
 
+  const selectedCompanyId = useCompanyStore((s) => s.selectedCompanyId);
+  const requiresCompany = schema?.type === "STOCK";
+  const { data: selectedCompany, isLoading: isCompanyLoading } = useCompany(
+    selectedCompanyId ?? "",
+  );
+
+  const companyBind: ImportCompanyBind | undefined = useMemo(() => {
+    if (!requiresCompany || !selectedCompanyId || !selectedCompany?.code) {
+      return undefined;
+    }
+    return {
+      companyId: selectedCompanyId,
+      companyCode: selectedCompany.code,
+    };
+  }, [requiresCompany, selectedCompanyId, selectedCompany?.code]);
+
+  const stockBlocked =
+    requiresCompany &&
+    (!selectedCompanyId || isCompanyLoading || !companyBind?.companyCode);
+
   const handleClose = useCallback(() => {
     setStep("upload");
     setFile(null);
@@ -59,23 +83,27 @@ export function ImportWizardDialog({
 
   const handleValidate = useCallback(async () => {
     if (!file || !schema) return;
+    if (requiresCompany && !companyBind) return;
     const result = await previewMutation.mutateAsync({
       file,
       type: schema.type,
+      company: companyBind,
     });
     setPreview(result);
     setStep("preview");
-  }, [file, schema, previewMutation]);
+  }, [file, schema, previewMutation, requiresCompany, companyBind]);
 
   const handleExecute = useCallback(async () => {
     if (!file || !schema) return;
+    if (requiresCompany && !companyBind) return;
     const result = await executeMutation.mutateAsync({
       file,
       type: schema.type,
+      company: companyBind,
     });
     setBatchId(result.id);
     setStep("execute");
-  }, [file, schema, executeMutation]);
+  }, [file, schema, executeMutation, requiresCompany, companyBind]);
 
   if (!schema) return null;
 
@@ -84,127 +112,133 @@ export function ImportWizardDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => (next ? undefined : handleClose())}>
       <DialogContent className="max-h-[88vh] max-w-2xl overflow-hidden p-0">
-        <div className="flex max-h-[88vh] flex-col">
-          {/* Header with title + step indicator */}
-          <div className="border-b border-neutral-200 bg-neutral-50/40 px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900/40">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-semibold tracking-tight">
-                {t("wizard.title", { type: schema.displayName })}
-              </DialogTitle>
-              <DialogDescription className="text-xs text-neutral-500">
-                {schema.description}
-              </DialogDescription>
-            </DialogHeader>
+        <CompanyRequiredGuard active={requiresCompany}>
+          <div className="flex max-h-[88vh] flex-col">
+            {/* Header with title + step indicator */}
+            <div className="border-b border-neutral-200 bg-neutral-50/40 px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900/40">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold tracking-tight">
+                  {t("wizard.title", { type: schema.displayName })}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-neutral-500">
+                  {schema.description}
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className="mt-4">
-              <StepIndicator
-                steps={STEPS.map((key, index) => ({
-                  key,
-                  label: t(`wizard.step${index + 1}`),
-                }))}
-                currentIndex={currentStepIndex}
-              />
+              <div className="mt-4">
+                <StepIndicator
+                  steps={STEPS.map((key, index) => ({
+                    key,
+                    label: t(`wizard.step${index + 1}`),
+                  }))}
+                  currentIndex={currentStepIndex}
+                />
+              </div>
+            </div>
+
+            {/* Body — scrollable, step-specific */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {step === "upload" && (
+                <motion.div
+                  key="upload"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-4"
+                >
+                  <FileDropzone onFileSelect={setFile} />
+                </motion.div>
+              )}
+
+              {step === "preview" && preview && (
+                <motion.div
+                  key="preview"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ImportPreviewResults preview={preview} />
+                </motion.div>
+              )}
+
+              {step === "execute" && batchId && (
+                <motion.div
+                  key="execute"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-4"
+                >
+                  <ImportProgress batchId={batchId} />
+                </motion.div>
+              )}
+            </div>
+
+            {/* Footer — action bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 bg-white px-6 py-4 dark:border-neutral-800 dark:bg-neutral-950">
+              {step === "upload" && (
+                <>
+                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                    {tFlow("stepShort", {
+                      step: currentStepIndex + 1,
+                      total: STEPS.length,
+                    })}
+                  </span>
+                  <div className="ml-auto flex items-center gap-2">
+                    <Button variant="ghost" onClick={handleClose}>
+                      {t("wizard.cancel")}
+                    </Button>
+                    <Button
+                      onClick={handleValidate}
+                      disabled={
+                        !file || previewMutation.isPending || stockBlocked
+                      }
+                    >
+                      {previewMutation.isPending
+                        ? tFlow("validating")
+                        : tFlow("runDryRun")}
+                      {!previewMutation.isPending && (
+                        <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === "preview" && (
+                <>
+                  <Button variant="ghost" onClick={() => setStep("upload")}>
+                    <ArrowLeft className="mr-1.5 h-4 w-4" aria-hidden />
+                    {tFlow("prevStep")}
+                  </Button>
+                  <div className="ml-auto flex items-center gap-2">
+                    <Button variant="ghost" onClick={handleClose}>
+                      {t("wizard.cancel")}
+                    </Button>
+                    <Button
+                      onClick={handleExecute}
+                      disabled={
+                        !preview?.canBeProcessed ||
+                        executeMutation.isPending ||
+                        stockBlocked
+                      }
+                    >
+                      {executeMutation.isPending
+                        ? tFlow("importing")
+                        : tFlow("runImport")}
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {step === "execute" && (
+                <Button className="ml-auto" onClick={handleClose}>
+                  {t("wizard.close")}
+                </Button>
+              )}
             </div>
           </div>
-
-          {/* Body — scrollable, step-specific */}
-          <div className="flex-1 overflow-y-auto px-6 py-5">
-            {step === "upload" && (
-              <motion.div
-                key="upload"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-4"
-              >
-                <FileDropzone onFileSelect={setFile} />
-              </motion.div>
-            )}
-
-            {step === "preview" && preview && (
-              <motion.div
-                key="preview"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ImportPreviewResults preview={preview} />
-              </motion.div>
-            )}
-
-            {step === "execute" && batchId && (
-              <motion.div
-                key="execute"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-4"
-              >
-                <ImportProgress batchId={batchId} />
-              </motion.div>
-            )}
-          </div>
-
-          {/* Footer — action bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 bg-white px-6 py-4 dark:border-neutral-800 dark:bg-neutral-950">
-            {step === "upload" && (
-              <>
-                <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                  {tFlow("stepShort", {
-                    step: currentStepIndex + 1,
-                    total: STEPS.length,
-                  })}
-                </span>
-                <div className="ml-auto flex items-center gap-2">
-                  <Button variant="ghost" onClick={handleClose}>
-                    {t("wizard.cancel")}
-                  </Button>
-                  <Button
-                    onClick={handleValidate}
-                    disabled={!file || previewMutation.isPending}
-                  >
-                    {previewMutation.isPending
-                      ? tFlow("validating")
-                      : tFlow("runDryRun")}
-                    {!previewMutation.isPending && (
-                      <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
-                    )}
-                  </Button>
-                </div>
-              </>
-            )}
-
-            {step === "preview" && (
-              <>
-                <Button variant="ghost" onClick={() => setStep("upload")}>
-                  <ArrowLeft className="mr-1.5 h-4 w-4" aria-hidden />
-                  {tFlow("prevStep")}
-                </Button>
-                <div className="ml-auto flex items-center gap-2">
-                  <Button variant="ghost" onClick={handleClose}>
-                    {t("wizard.cancel")}
-                  </Button>
-                  <Button
-                    onClick={handleExecute}
-                    disabled={
-                      !preview?.canBeProcessed || executeMutation.isPending
-                    }
-                  >
-                    {executeMutation.isPending
-                      ? tFlow("importing")
-                      : tFlow("runImport")}
-                  </Button>
-                </div>
-              </>
-            )}
-
-            {step === "execute" && (
-              <Button className="ml-auto" onClick={handleClose}>
-                {t("wizard.close")}
-              </Button>
-            )}
-          </div>
-        </div>
+        </CompanyRequiredGuard>
       </DialogContent>
     </Dialog>
   );

@@ -5,28 +5,34 @@ import { ProductSearchSelect } from "@/modules/inventory/presentation/components
 
 // --- Mocks ---
 
+const mockUseProductSearch = vi.fn(() => ({
+  products: [
+    {
+      id: "p1",
+      name: "Widget A",
+      sku: "SKU-001",
+      barcode: "BAR-001",
+    },
+    {
+      id: "p2",
+      name: "Widget B",
+      sku: "SKU-002",
+      barcode: "BAR-002",
+    },
+  ],
+  isLoading: false,
+  isFetchingNextPage: false,
+  hasNextPage: false,
+  fetchNextPage: vi.fn(),
+  isError: false,
+}));
+
 vi.mock("@/modules/inventory/presentation/hooks/use-product-search", () => ({
-  useProductSearch: () => ({
-    products: [
-      {
-        id: "p1",
-        name: "Widget A",
-        sku: "SKU-001",
-        barcode: "BAR-001",
-      },
-      {
-        id: "p2",
-        name: "Widget B",
-        sku: "SKU-002",
-        barcode: "BAR-002",
-      },
-    ],
-    isLoading: false,
-    isFetchingNextPage: false,
-    hasNextPage: false,
-    fetchNextPage: vi.fn(),
-    isError: false,
-  }),
+  useProductSearch: (options: unknown) => mockUseProductSearch(options),
+}));
+
+vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
+  useProduct: () => ({ data: undefined }),
 }));
 
 // --- Tests ---
@@ -35,6 +41,7 @@ describe("ProductSearchSelect", () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
+    mockUseProductSearch.mockClear();
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -99,11 +106,8 @@ describe("ProductSearchSelect", () => {
   });
 
   it("Given: product is selected When: rendering Then: should show selected product name and SKU", async () => {
-    const { rerender } = renderWithProviders(
-      <ProductSearchSelect value="p1" />,
-    );
+    renderWithProviders(<ProductSearchSelect value="p1" />);
 
-    // Initially should show the selected value
     await waitFor(() => {
       expect(screen.getByText(/Widget A.*SKU-001/)).toBeInTheDocument();
     });
@@ -119,10 +123,7 @@ describe("ProductSearchSelect", () => {
       expect(screen.getByText("Widget A")).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText(
-      /buscar por nombre, sku o barcode/i,
-    );
-    fireEvent.keyDown(searchInput, { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Escape" });
 
     await waitFor(() => {
       expect(screen.queryByText("Widget A")).not.toBeInTheDocument();
@@ -138,7 +139,6 @@ describe("ProductSearchSelect", () => {
     const trigger = screen.getByRole("combobox");
     fireEvent.click(trigger);
 
-    // Dropdown should not open
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect(screen.queryByText("Widget A")).not.toBeInTheDocument();
   });
@@ -150,32 +150,32 @@ describe("ProductSearchSelect", () => {
     fireEvent.click(trigger);
 
     await waitFor(() => {
-      // Check that SKU and barcode are displayed
       expect(screen.getByText(/SKU-001.*BAR-001/)).toBeInTheDocument();
       expect(screen.getByText(/SKU-002.*BAR-002/)).toBeInTheDocument();
     });
   });
 
-  it("Given: companyId is provided When: rendering Then: should pass it to the hook", async () => {
-    const mockOnValueChange = vi.fn();
-    renderWithProviders(
-      <ProductSearchSelect
-        companyId="comp-123"
-        onValueChange={mockOnValueChange}
-      />,
+  it("Given: inventory shared-catalog picker When: companyId omitted Then: hook receives no ownership companyId", () => {
+    renderWithProviders(<ProductSearchSelect />);
+
+    expect(mockUseProductSearch).toHaveBeenCalled();
+    const options = mockUseProductSearch.mock.calls[0]?.[0] as {
+      companyId?: string;
+    };
+    expect(options.companyId).toBeUndefined();
+  });
+
+  it("Given: companyId is provided When: rendering Then: should pass it to the hook", () => {
+    renderWithProviders(<ProductSearchSelect companyId="comp-123" />);
+
+    expect(mockUseProductSearch).toHaveBeenCalledWith(
+      expect.objectContaining({ companyId: "comp-123" }),
     );
-
-    const trigger = screen.getByRole("combobox");
-    fireEvent.click(trigger);
-
-    await waitFor(() => {
-      expect(screen.getByText("Widget A")).toBeInTheDocument();
-    });
   });
 
   it("Given: product is selected When: clicking trigger again Then: should show dropdown with selection marked", async () => {
     const mockOnValueChange = vi.fn();
-    const { rerender } = renderWithProviders(
+    renderWithProviders(
       <ProductSearchSelect value="p1" onValueChange={mockOnValueChange} />,
     );
 
@@ -184,7 +184,6 @@ describe("ProductSearchSelect", () => {
 
     await waitFor(() => {
       const widgetAItem = screen.getByText("Widget A");
-      // The selected item should have a check mark
       expect(widgetAItem.closest('[role="option"]')).toHaveClass("bg-accent");
     });
   });

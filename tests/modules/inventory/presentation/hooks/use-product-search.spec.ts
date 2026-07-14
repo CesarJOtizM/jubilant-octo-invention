@@ -74,18 +74,20 @@ const mockProducts: Product[] = [
   } as any,
 ];
 
+const mockFindAll = vi.fn(async () => ({
+  data: mockProducts,
+  pagination: {
+    page: 1,
+    limit: 20,
+    total: 2,
+    totalPages: 1,
+  },
+}));
+
 vi.mock("@/config/di/container", () => ({
   getContainer: () => ({
     productRepository: {
-      findAll: vi.fn(async () => ({
-        data: mockProducts,
-        pagination: {
-          page: 1,
-          limit: 20,
-          total: 2,
-          totalPages: 1,
-        },
-      })),
+      findAll: (...args: unknown[]) => mockFindAll(...args),
     },
   }),
 }));
@@ -96,6 +98,7 @@ describe("useProductSearch", () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
+    mockFindAll.mockClear();
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -184,8 +187,25 @@ describe("useProductSearch", () => {
       expect(result.current.products).toHaveLength(2);
     });
 
-    // Query key should include the companyId
-    expect(result.current.products[0].id).toBe("p1");
+    expect(mockFindAll).toHaveBeenCalledWith(
+      expect.objectContaining({ companyId: "comp-123" }),
+    );
+  });
+
+  it("Given: companyId omitted When: fetching Then: findAll filters omit ownership companyId", async () => {
+    const { result } = renderHook(
+      () => useProductSearch({ enabled: true, statuses: ["ACTIVE"] }),
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(result.current.products).toHaveLength(2);
+    });
+
+    const filters = mockFindAll.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(filters).toBeDefined();
+    expect(filters).not.toHaveProperty("companyId");
+    expect(filters.statuses).toEqual(["ACTIVE"]);
   });
 
   it("Given: multiple pages of results When: fetchNextPage is called Then: should append next page results", async () => {

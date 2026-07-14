@@ -86,6 +86,7 @@ export interface CreateTransferLineDto {
 }
 
 export interface CreateTransferDto {
+  companyId: string;
   fromWarehouseId: string;
   toWarehouseId: string;
   note?: string;
@@ -100,6 +101,7 @@ export interface TransferFilters {
   fromWarehouseIds?: string[];
   toWarehouseIds?: string[];
   status?: TransferStatus[];
+  companyId?: string;
   startDate?: string;
   endDate?: string;
   search?: string;

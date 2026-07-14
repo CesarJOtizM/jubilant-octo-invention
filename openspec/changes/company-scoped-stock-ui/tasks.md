@@ -25,7 +25,7 @@ Chain strategy: feature-branch-chain
 | 3 | Shared-catalog pickers | PR 3 | Base PR2 |
 | 4 | STOCK import bind | PR 4 | Base PR3 |
 
-User approved apply with **feature-branch-chain**. Active slice: Unit 1 / PR1.
+User approved apply with **feature-branch-chain**. Active slice: Unit 4 / PR4.
 
 ---
 
@@ -43,26 +43,32 @@ User approved apply with **feature-branch-chain**. Active slice: Unit 1 / PR1.
 
 ## Phase 2: Create inject + CompanyRequiredGuard (PR2)
 
-- [ ] 2.1 RED: sale/movement/transfer/return schema specs — `toCreate*` includes `companyId`
-- [ ] 2.2 GREEN: require Create*Dto.companyId; `toCreate*(data, companyId)` in four schemas
-- [ ] 2.3 RED: `company-required-guard.spec.tsx` — null blocks + copy; company enables
-- [ ] 2.4 GREEN: create `companies/.../company-required-guard.tsx`
-- [ ] 2.5 GREEN: wrap form pages; inject store id into `toCreate*` + adapters
-- [ ] 2.6 GREEN: i18n keys in `messages/en.json` + `es.json`
-- [ ] 2.7 RED/GREEN: form-page specs for inject + guard
-- [ ] 2.8 Verify: vitest create/guard + `tsc --noEmit`
+- [x] 2.1 RED: sale/movement/transfer/return schema specs — `toCreate*` includes `companyId`
+- [x] 2.2 GREEN: require Create*Dto.companyId; `toCreate*(data, companyId)` in four schemas
+- [x] 2.3 RED: `company-required-guard.spec.tsx` — null blocks + copy; company enables
+- [x] 2.4 GREEN: create `companies/.../company-required-guard.tsx`
+- [x] 2.5 GREEN: wrap form pages; inject store id into `toCreate*` + adapters
+- [x] 2.6 GREEN: i18n keys in `messages/en.json` + `es.json`
+- [x] 2.7 RED/GREEN: form-page specs for inject + guard
+- [x] 2.8 Verify: vitest create/guard + `tsc --noEmit`
 
 ## Phase 3: Product pickers shared catalog (PR3)
 
-- [ ] 3.1 RED: product-search/select specs — inventory picker omits ownership `companyId`
-- [ ] 3.2 GREEN: stop passing ownership `companyId` from sale/movement/transfer/return pickers
-- [ ] 3.3 Verify product-admin ownership filter unchanged
-- [ ] 3.4 Verify: vitest pickers + `tsc --noEmit`
+- [x] 3.1 RED: product-search/select specs — inventory picker omits ownership `companyId`
+- [x] 3.2 GREEN: stop passing ownership `companyId` from sale/movement/transfer/return pickers
+- [x] 3.3 Verify product-admin ownership filter unchanged
+- [x] 3.4 Verify: vitest pickers + `tsc --noEmit`
 
 ## Phase 4: STOCK import company bind (PR4)
 
-- [ ] 4.1 RED: `import-api.adapter.spec.ts` — FormData company bind + CSV Company Code enrich
-- [ ] 4.2 GREEN: `companyId?` on import port + `import-api.adapter.ts` preview/execute
-- [ ] 4.3 RED: wizard tests — STOCK+null blocks; company allows
-- [ ] 4.4 GREEN: gate `import-wizard-dialog.tsx`; resolve companyCode; reuse guard i18n
-- [ ] 4.5 Verify: vitest imports + full `vitest run` + `tsc --noEmit`
+- [x] 4.1 RED: `import-api.adapter.spec.ts` — FormData company bind + CSV Company Code enrich
+- [x] 4.2 GREEN: `companyId?` on import port + `import-api.adapter.ts` preview/execute
+- [x] 4.3 RED: wizard tests — STOCK+null blocks; company allows
+- [x] 4.4 GREEN: gate `import-wizard-dialog.tsx`; resolve companyCode; reuse guard i18n
+- [x] 4.5 Verify: vitest imports + full `vitest run` + `tsc --noEmit`
+
+## Delivery status
+- PR4: https://github.com/NevadaTech/jubilant-octo-invention/pull/11
+- Branch: feat/company-scoped-stock-ui-04-stock-import-bind (base PR3)
+- Next: sdd-verify
+- ready_for_verify: true

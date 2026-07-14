@@ -139,18 +139,19 @@ describe("toCreateReturnDto", () => {
       };
 
       // Act
-      const dto = toCreateReturnDto(formData);
+      const dto = toCreateReturnDto(formData, "company-ret-1");
 
       // Assert
       expect(dto.type).toBe("RETURN_CUSTOMER");
       expect(dto.warehouseId).toBe("wh-1");
+      expect(dto.companyId).toBe("company-ret-1");
       expect(dto.saleId).toBe("sale-1");
       expect(dto.sourceMovementId).toBe("mov-1");
       expect(dto.reason).toBe("Defective");
       expect(dto.note).toBe("Please process");
       expect(dto.lines).toHaveLength(1);
-      expect(dto.lines[0].productId).toBe("prod-1");
-      expect(dto.lines[0].quantity).toBe(3);
+      expect(dto.lines![0].productId).toBe("prod-1");
+      expect(dto.lines![0].quantity).toBe(3);
     });
   });
 
@@ -177,9 +178,10 @@ describe("toCreateReturnDto", () => {
       };
 
       // Act
-      const dto = toCreateReturnDto(formData);
+      const dto = toCreateReturnDto(formData, "company-ret-2");
 
       // Assert
+      expect(dto.companyId).toBe("company-ret-2");
       expect(dto.saleId).toBeUndefined();
       expect(dto.sourceMovementId).toBeUndefined();
       expect(dto.reason).toBeUndefined();
@@ -210,10 +212,39 @@ describe("toCreateReturnDto", () => {
       };
 
       // Act
-      const dto = toCreateReturnDto(formData);
+      const dto = toCreateReturnDto(formData, "company-ret-3");
 
       // Assert
-      expect(dto.lines[0]).not.toHaveProperty("maxQuantity");
+      expect(dto.companyId).toBe("company-ret-3");
+      expect(dto.lines![0]).not.toHaveProperty("maxQuantity");
+    });
+  });
+
+  describe("Given selected company available", () => {
+    it("When transform runs, Then DTO must contain that non-empty companyId", () => {
+      // Arrange
+      const formData = {
+        type: "RETURN_CUSTOMER" as const,
+        warehouseId: "wh-1",
+        saleId: "sale-1",
+        lines: [
+          {
+            productId: "prod-1",
+            quantity: 1,
+            maxQuantity: 5,
+            originalSalePrice: 10.0,
+          },
+        ],
+      };
+
+      // Act
+      const dtoA = toCreateReturnDto(formData, "ret-comp-a");
+      const dtoB = toCreateReturnDto(formData, "ret-comp-b");
+
+      // Assert
+      expect(dtoA.companyId).toBe("ret-comp-a");
+      expect(dtoB.companyId).toBe("ret-comp-b");
+      expect(dtoA.companyId).not.toBe(dtoB.companyId);
     });
   });
 });

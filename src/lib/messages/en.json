@@ -832,6 +832,10 @@
         "all": "All Companies",
         "loading": "Loading..."
       },
+      "requiredCompany": {
+        "title": "Select a company to continue",
+        "description": "Choose a specific company in the header selector. Creating sales, movements, transfers, or returns is not allowed while \"All Companies\" is selected."
+      },
       "messages": {
         "created": "Company created successfully",
         "updated": "Company updated successfully",

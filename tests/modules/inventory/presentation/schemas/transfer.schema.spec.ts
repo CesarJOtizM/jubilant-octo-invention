@@ -185,11 +185,12 @@ describe("Transfer Schema", () => {
       };
 
       // Act
-      const dto = toCreateTransferDto(formData);
+      const dto = toCreateTransferDto(formData, "company-xfer-1");
 
       // Assert
       expect(dto.fromWarehouseId).toBe("wh-origin");
       expect(dto.toWarehouseId).toBe("wh-dest");
+      expect(dto.companyId).toBe("company-xfer-1");
       expect(dto.lines).toHaveLength(2);
       expect(dto.lines[0].productId).toBe("prod-1");
       expect(dto.lines[0].quantity).toBe(10);
@@ -208,9 +209,10 @@ describe("Transfer Schema", () => {
       };
 
       // Act
-      const dto = toCreateTransferDto(formData);
+      const dto = toCreateTransferDto(formData, "company-xfer-2");
 
       // Assert
+      expect(dto.companyId).toBe("company-xfer-2");
       expect(dto.note).toBeUndefined();
     });
 
@@ -223,10 +225,29 @@ describe("Transfer Schema", () => {
       };
 
       // Act
-      const dto = toCreateTransferDto(formData);
+      const dto = toCreateTransferDto(formData, "company-xfer-3");
 
       // Assert
+      expect(dto.companyId).toBe("company-xfer-3");
       expect(dto.note).toBeUndefined();
+    });
+
+    it("Given: selected company available When: transform runs Then: DTO must contain that non-empty companyId", () => {
+      // Arrange
+      const formData: CreateTransferFormData = {
+        fromWarehouseId: "wh-a",
+        toWarehouseId: "wh-b",
+        lines: [{ productId: "prod-1", quantity: 1 }],
+      };
+
+      // Act
+      const dtoA = toCreateTransferDto(formData, "xfer-comp-a");
+      const dtoB = toCreateTransferDto(formData, "xfer-comp-b");
+
+      // Assert
+      expect(dtoA.companyId).toBe("xfer-comp-a");
+      expect(dtoB.companyId).toBe("xfer-comp-b");
+      expect(dtoA.companyId).not.toBe(dtoB.companyId);
     });
   });
 });
