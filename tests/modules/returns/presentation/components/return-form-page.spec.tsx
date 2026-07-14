@@ -35,17 +35,21 @@ let mockProductsLoading = false;
 let mockWarehousesLoading = false;
 let mockSalesLoading = false;
 let mockMovementsLoading = false;
+let lastReturnUseProductsArgs: Record<string, unknown> | undefined;
 
 vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
-  useProducts: () => ({
-    data: {
-      data: [
-        { id: "p1", name: "Widget A", sku: "WA-001" },
-        { id: "p2", name: "Widget B", sku: "WB-002" },
-      ],
-    },
-    isLoading: mockProductsLoading,
-  }),
+  useProducts: (args?: Record<string, unknown>) => {
+    lastReturnUseProductsArgs = args;
+    return {
+      data: {
+        data: [
+          { id: "p1", name: "Widget A", sku: "WA-001" },
+          { id: "p2", name: "Widget B", sku: "WB-002" },
+        ],
+      },
+      isLoading: mockProductsLoading,
+    };
+  },
 }));
 
 vi.mock("@/modules/inventory/presentation/hooks/use-warehouses", () => ({
@@ -217,6 +221,7 @@ describe("ReturnFormPage", () => {
     mockMovementsLoading = false;
     mockMovementReference = "REF-001";
     mockSelectedCompanyId = "company-test-1";
+    lastReturnUseProductsArgs = undefined;
     vi.mocked(toCreateReturnDto).mockClear();
   });
 
@@ -414,10 +419,21 @@ describe("ReturnFormPage", () => {
     expect(screen.queryByText("form.createTitle")).not.toBeInTheDocument();
   });
 
-  // --- selectedCompanyId present in useProducts ---
+  // --- Shared-catalog product picker (no product.companyId ownership gate) ---
   it("Given: selectedCompanyId is null When: rendering Then: useProducts is called without companyId", () => {
+    mockSelectedCompanyId = null;
     renderWithQuery(<ReturnFormPage />);
-    expect(screen.getByText("form.createTitle")).toBeInTheDocument();
+    expect(lastReturnUseProductsArgs).toBeDefined();
+    expect(lastReturnUseProductsArgs).not.toHaveProperty("companyId");
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: useProducts omits ownership companyId", () => {
+    mockSelectedCompanyId = "ret-company-shared";
+    renderWithQuery(<ReturnFormPage />);
+
+    expect(lastReturnUseProductsArgs).toBeDefined();
+    expect(lastReturnUseProductsArgs).not.toHaveProperty("companyId");
+    expect(lastReturnUseProductsArgs?.statuses).toEqual(["ACTIVE"]);
   });
 
   // --- Customer return: originalPrice field is shown (isCustomerReturn branch) ---

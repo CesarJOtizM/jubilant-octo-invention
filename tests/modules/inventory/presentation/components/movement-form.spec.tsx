@@ -11,6 +11,9 @@ vi.mock("next-intl", () => ({
 }));
 
 const mockMutateAsync = vi.fn();
+let lastMovementFormSearchOptions: { companyId?: string } | undefined;
+let mockSelectedCompanyId: string | null = null;
+
 vi.mock("@/modules/inventory/presentation/hooks/use-movements", () => ({
   useCreateMovement: () => ({
     isPending: false,
@@ -20,16 +23,27 @@ vi.mock("@/modules/inventory/presentation/hooks/use-movements", () => ({
 }));
 
 vi.mock("@/modules/inventory/presentation/hooks/use-product-search", () => ({
-  useProductSearch: () => ({
-    products: [
-      { id: "p1", name: "Widget A", sku: "WA-001", barcode: "BAR-001" },
-      { id: "p2", name: "Widget B", sku: "WB-002", barcode: "BAR-002" },
-    ],
-    isLoading: false,
-    isFetchingNextPage: false,
-    hasNextPage: false,
-    fetchNextPage: vi.fn(),
-    isError: false,
+  useProductSearch: (options: { companyId?: string }) => {
+    lastMovementFormSearchOptions = options;
+    return {
+      products: [
+        { id: "p1", name: "Widget A", sku: "WA-001", barcode: "BAR-001" },
+        { id: "p2", name: "Widget B", sku: "WB-002", barcode: "BAR-002" },
+      ],
+      isLoading: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
+      isError: false,
+    };
+  },
+}));
+
+vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
+  useProduct: () => ({ data: undefined }),
+  useProductLookupMutation: () => ({
+    mutateAsync: vi.fn().mockResolvedValue(null),
+    isPending: false,
   }),
 }));
 
@@ -81,6 +95,12 @@ vi.mock("@/ui/components/currency-input", () => ({
   ),
 }));
 
+vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
+  useCompanyStore: (
+    selector: (s: { selectedCompanyId: string | null }) => unknown,
+  ) => selector({ selectedCompanyId: mockSelectedCompanyId }),
+}));
+
 // --- Tests ---
 
 describe("MovementForm", () => {
@@ -90,6 +110,8 @@ describe("MovementForm", () => {
   beforeEach(() => {
     mockOnOpenChange.mockClear();
     mockMutateAsync.mockClear();
+    lastMovementFormSearchOptions = undefined;
+    mockSelectedCompanyId = null;
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -178,5 +200,15 @@ describe("MovementForm", () => {
       fireEvent.click(closeButton);
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
     }
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: useProductSearch omits ownership companyId", () => {
+    mockSelectedCompanyId = "mov-dialog-shared";
+    renderWithProviders(
+      <MovementForm open={true} onOpenChange={mockOnOpenChange} />,
+    );
+
+    expect(lastMovementFormSearchOptions).toBeDefined();
+    expect(lastMovementFormSearchOptions?.companyId).toBeUndefined();
   });
 });

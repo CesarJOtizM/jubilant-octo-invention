@@ -56,14 +56,28 @@ let mockQueryState: {
   error: null,
 };
 
+let lastProductListFilters: Record<string, unknown> | undefined;
+let mockSelectedCompanyId: string | null = null;
+
 vi.mock("@/modules/inventory/presentation/hooks", () => ({
-  useProducts: () => mockQueryState,
+  useProducts: (filters?: Record<string, unknown>) => {
+    lastProductListFilters = filters;
+    return mockQueryState;
+  },
   useProductFilters: () => ({ page: 1, limit: 10 }),
   useSetProductFilters: () => vi.fn(),
 }));
 
+vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
+  useCompanyStore: (
+    selector: (s: { selectedCompanyId: string | null }) => unknown,
+  ) => selector({ selectedCompanyId: mockSelectedCompanyId }),
+}));
+
 describe("ProductList", () => {
   beforeEach(() => {
+    lastProductListFilters = undefined;
+    mockSelectedCompanyId = null;
     mockQueryState = {
       data: mockProducts,
       isLoading: false,
@@ -225,5 +239,22 @@ describe("ProductList", () => {
     const { container } = render(<ProductList />);
     expect(screen.getByText("PNB-001")).toBeInTheDocument();
     expect(container.querySelector('[aria-label="fields.barcode"]')).toBeNull();
+  });
+
+  it("Given: selectedCompanyId When: product admin list loads Then: useProducts receives ownership companyId", () => {
+    mockSelectedCompanyId = "admin-company-keep";
+    render(<ProductList />);
+
+    expect(lastProductListFilters).toEqual(
+      expect.objectContaining({ companyId: "admin-company-keep" }),
+    );
+  });
+
+  it("Given: selectedCompanyId is null When: product admin list loads Then: useProducts omits companyId", () => {
+    mockSelectedCompanyId = null;
+    render(<ProductList />);
+
+    expect(lastProductListFilters).toBeDefined();
+    expect(lastProductListFilters).not.toHaveProperty("companyId");
   });
 });

@@ -26,15 +26,20 @@ vi.mock("@/modules/inventory/presentation/hooks/use-transfers", () => ({
   }),
 }));
 
+let lastUseProductsArgs: Record<string, unknown> | undefined;
+
 vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
-  useProducts: () => ({
-    data: {
-      data: [
-        { id: "p1", name: "Widget A", sku: "WA-001" },
-        { id: "p2", name: "Widget B", sku: "WB-002" },
-      ],
-    },
-  }),
+  useProducts: (args?: Record<string, unknown>) => {
+    lastUseProductsArgs = args;
+    return {
+      data: {
+        data: [
+          { id: "p1", name: "Widget A", sku: "WA-001" },
+          { id: "p2", name: "Widget B", sku: "WB-002" },
+        ],
+      },
+    };
+  },
 }));
 
 vi.mock("@/modules/inventory/presentation/hooks/use-warehouses", () => ({
@@ -83,6 +88,7 @@ vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
 describe("TransferFormPage", () => {
   beforeEach(() => {
     mockSelectedCompanyId = "company-test-1";
+    lastUseProductsArgs = undefined;
     vi.mocked(toCreateTransferDto).mockClear();
   });
 
@@ -177,5 +183,14 @@ describe("TransferFormPage", () => {
         "xfer-company-7",
       );
     });
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: useProducts omits ownership companyId", () => {
+    mockSelectedCompanyId = "xfer-company-shared";
+    render(<TransferFormPage />);
+
+    expect(lastUseProductsArgs).toBeDefined();
+    expect(lastUseProductsArgs).not.toHaveProperty("companyId");
+    expect(lastUseProductsArgs?.statuses).toEqual(["ACTIVE"]);
   });
 });

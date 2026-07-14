@@ -38,7 +38,6 @@ export function TransferFormPage() {
   const { data: productsData } = useProducts({
     limit: 100,
     statuses: ["ACTIVE"],
-    ...(selectedCompanyId && { companyId: selectedCompanyId }),
   });
   const { data: warehousesData } = useWarehouses({
     limit: 100,

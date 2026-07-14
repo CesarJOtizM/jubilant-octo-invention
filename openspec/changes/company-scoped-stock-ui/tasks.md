@@ -25,7 +25,7 @@ Chain strategy: feature-branch-chain
 | 3 | Shared-catalog pickers | PR 3 | Base PR2 |
 | 4 | STOCK import bind | PR 4 | Base PR3 |
 
-User approved apply with **feature-branch-chain**. Active slice: Unit 2 / PR2.
+User approved apply with **feature-branch-chain**. Active slice: Unit 3 / PR3.
 
 ---
 
@@ -54,10 +54,10 @@ User approved apply with **feature-branch-chain**. Active slice: Unit 2 / PR2.
 
 ## Phase 3: Product pickers shared catalog (PR3)
 
-- [ ] 3.1 RED: product-search/select specs — inventory picker omits ownership `companyId`
-- [ ] 3.2 GREEN: stop passing ownership `companyId` from sale/movement/transfer/return pickers
-- [ ] 3.3 Verify product-admin ownership filter unchanged
-- [ ] 3.4 Verify: vitest pickers + `tsc --noEmit`
+- [x] 3.1 RED: product-search/select specs — inventory picker omits ownership `companyId`
+- [x] 3.2 GREEN: stop passing ownership `companyId` from sale/movement/transfer/return pickers
+- [x] 3.3 Verify product-admin ownership filter unchanged
+- [x] 3.4 Verify: vitest pickers + `tsc --noEmit`
 
 ## Phase 4: STOCK import company bind (PR4)
 

@@ -217,7 +217,6 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
                               <ProductSearchSelect
                                 value={selectField.value}
                                 onValueChange={selectField.onChange}
-                                companyId={selectedCompanyId ?? undefined}
                                 placeholder={t("fields.productPlaceholder")}
                                 searchPlaceholder={t("fields.searchProduct")}
                                 emptyMessage={t("fields.noProducts")}
