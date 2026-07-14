@@ -122,6 +122,76 @@ describe("ImportApiAdapter", () => {
         expect.any(FormData),
       );
     });
+
+    it("Given: company bind When: preview Then: FormData includes companyId and companyCode", async () => {
+      mockedPost.mockResolvedValue({
+        data: {
+          success: true,
+          data: {
+            totalRows: 1,
+            validRows: 1,
+            invalidRows: 0,
+            structureErrors: [],
+            rowErrors: [],
+            warnings: [],
+          },
+        },
+        status: 200,
+        headers: {},
+      });
+
+      const csv = [
+        "Product SKU,Warehouse Code,Quantity,Company Code",
+        "PROD-001,WH-001,10,NEG-002",
+      ].join("\n");
+      const file = new File([csv], "stock.csv", { type: "text/csv" });
+
+      await adapter.preview(file, "STOCK", {
+        companyId: "company-42",
+        companyCode: "NEG-002",
+      });
+
+      const formData = mockedPost.mock.calls[0][1] as FormData;
+      expect(formData.get("companyId")).toBe("company-42");
+      expect(formData.get("companyCode")).toBe("NEG-002");
+      expect(formData.get("type")).toBe("STOCK");
+    });
+
+    it("Given: STOCK CSV missing Company Code When: preview with companyCode Then: enriches CSV before upload", async () => {
+      mockedPost.mockResolvedValue({
+        data: {
+          success: true,
+          data: {
+            totalRows: 1,
+            validRows: 1,
+            invalidRows: 0,
+            structureErrors: [],
+            rowErrors: [],
+            warnings: [],
+          },
+        },
+        status: 200,
+        headers: {},
+      });
+
+      const csv = [
+        "Product SKU,Warehouse Code,Quantity",
+        "PROD-001,WH-001,10",
+      ].join("\n");
+      const file = new File([csv], "stock.csv", { type: "text/csv" });
+
+      await adapter.preview(file, "STOCK", {
+        companyId: "company-42",
+        companyCode: "NEG-002",
+      });
+
+      const formData = mockedPost.mock.calls[0][1] as FormData;
+      const uploaded = formData.get("file") as File;
+      expect(uploaded).toBeInstanceOf(File);
+      const uploadedText = await uploaded.text();
+      expect(uploadedText).toContain("Company Code");
+      expect(uploadedText).toContain("NEG-002");
+    });
   });
 
   describe("findAll", () => {
@@ -194,6 +264,71 @@ describe("ImportApiAdapter", () => {
       expect(result).toBeDefined();
       const calledFormData = mockedPost.mock.calls[0][1] as FormData;
       expect(calledFormData.get("note")).toBe("my note");
+    });
+
+    it("Given: company bind When: execute Then: FormData includes companyId and companyCode", async () => {
+      mockedPost.mockResolvedValue({
+        data: {
+          success: true,
+          data: {
+            id: "b-stock",
+            status: "PROCESSING",
+            totalRows: 1,
+            processedRows: 0,
+            validRows: 0,
+            invalidRows: 0,
+          },
+        },
+      });
+
+      const csv = [
+        "Product SKU,Warehouse Code,Quantity,Company Code",
+        "PROD-001,WH-001,10,NEG-002",
+      ].join("\n");
+      const file = new File([csv], "stock.csv", { type: "text/csv" });
+
+      await adapter.execute(file, "STOCK", undefined, {
+        companyId: "company-99",
+        companyCode: "NEG-002",
+      });
+
+      const formData = mockedPost.mock.calls[0][1] as FormData;
+      expect(formData.get("companyId")).toBe("company-99");
+      expect(formData.get("companyCode")).toBe("NEG-002");
+      expect(formData.get("type")).toBe("STOCK");
+    });
+
+    it("Given: STOCK CSV missing Company Code When: execute with companyCode Then: enriches CSV before upload", async () => {
+      mockedPost.mockResolvedValue({
+        data: {
+          success: true,
+          data: {
+            id: "b-stock-2",
+            status: "PROCESSING",
+            totalRows: 1,
+            processedRows: 0,
+            validRows: 0,
+            invalidRows: 0,
+          },
+        },
+      });
+
+      const csv = [
+        "Product SKU,Warehouse Code,Quantity",
+        "PROD-001,WH-001,10",
+      ].join("\n");
+      const file = new File([csv], "stock.csv", { type: "text/csv" });
+
+      await adapter.execute(file, "STOCK", undefined, {
+        companyId: "company-99",
+        companyCode: "NEG-002",
+      });
+
+      const formData = mockedPost.mock.calls[0][1] as FormData;
+      const uploaded = formData.get("file") as File;
+      const uploadedText = await uploaded.text();
+      expect(uploadedText).toContain("Company Code");
+      expect(uploadedText).toContain("NEG-002");
     });
 
     it("Given: file and type without note When: execute Then: should not append note", async () => {

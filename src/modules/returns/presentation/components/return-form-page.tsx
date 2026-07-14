@@ -53,7 +53,6 @@ export function ReturnFormPage() {
   const { data: productsData, isLoading: productsLoading } = useProducts({
     limit: 100,
     statuses: ["ACTIVE"],
-    ...(selectedCompanyId && { companyId: selectedCompanyId }),
   });
   const { data: warehousesData, isLoading: warehousesLoading } = useWarehouses({
     limit: 100,

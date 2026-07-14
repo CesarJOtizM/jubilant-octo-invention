@@ -138,13 +138,16 @@ vi.mock(
       placeholder,
       value,
       onValueChange,
+      companyId,
     }: {
       placeholder?: string;
       value?: string;
       onValueChange?: (v: string) => void;
+      companyId?: string;
     }) => (
       <select
         data-testid="product-search-select"
+        data-company-id={companyId ?? ""}
         value={value}
         onChange={(e) => onValueChange?.(e.target.value)}
       >
@@ -268,5 +271,16 @@ describe("SaleFormPage", () => {
         "sale-company-99",
       );
     });
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: ProductSearchSelect omits ownership companyId", () => {
+    mockSelectedCompanyId = "sale-company-shared";
+    renderWithQuery(<SaleFormPage />);
+
+    const pickers = screen.getAllByTestId("product-search-select");
+    expect(pickers.length).toBeGreaterThan(0);
+    for (const picker of pickers) {
+      expect(picker).toHaveAttribute("data-company-id", "");
+    }
   });
 });

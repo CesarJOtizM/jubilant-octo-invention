@@ -342,7 +342,6 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
                                 <ProductSearchSelect
                                   value={selectField.value}
                                   onValueChange={selectField.onChange}
-                                  companyId={selectedCompanyId ?? undefined}
                                   placeholder={t("fields.productPlaceholder")}
                                   searchPlaceholder={tCommon("search")}
                                   emptyMessage={tCommon("noResults")}
