@@ -8,6 +8,7 @@ export interface StockProps {
   productBarcode?: string;
   warehouseId: string;
   warehouseName: string;
+  companyId: string;
   quantity: number;
   reservedQuantity: number;
   availableQuantity: number;
@@ -33,6 +34,7 @@ export class Stock extends Entity<string> {
       productBarcode: props.productBarcode,
       warehouseId: props.warehouseId,
       warehouseName: props.warehouseName,
+      companyId: props.companyId,
       quantity: props.quantity,
       reservedQuantity: props.reservedQuantity,
       availableQuantity: props.availableQuantity,
@@ -65,6 +67,10 @@ export class Stock extends Entity<string> {
 
   get warehouseName(): string {
     return this.props.warehouseName;
+  }
+
+  get companyId(): string {
+    return this.props.companyId;
   }
 
   get quantity(): number {

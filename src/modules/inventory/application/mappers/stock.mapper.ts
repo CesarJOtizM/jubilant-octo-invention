@@ -4,6 +4,18 @@ import type {
   StockApiRawDto,
 } from "@/modules/inventory/application/dto/stock.dto";
 
+function resolveCompanyId(dto: StockApiRawDto | StockResponseDto): string {
+  return ("companyId" in dto ? dto.companyId : undefined) ?? "";
+}
+
+function resolveCompositeId(
+  dto: StockApiRawDto | StockResponseDto,
+  index?: number,
+): string {
+  const companyId = resolveCompanyId(dto);
+  return `${dto.productId}:${dto.warehouseId}:${companyId}:${index ?? 0}`;
+}
+
 export class StockMapper {
   static toDomain(
     dto: StockApiRawDto | StockResponseDto,
@@ -11,15 +23,17 @@ export class StockMapper {
   ): Stock {
     const quantity = dto.quantity ?? 0;
     const reservedQuantity = dto.reservedQuantity ?? 0;
+    const companyId = resolveCompanyId(dto);
 
     return Stock.create({
-      id: dto.id ?? `${dto.productId}:${dto.warehouseId}:${index ?? 0}`,
+      id: dto.id ?? resolveCompositeId(dto, index),
       productId: dto.productId,
       productName: dto.productName ?? "",
       productSku: dto.productSku ?? "",
       productBarcode: dto.productBarcode,
       warehouseId: dto.warehouseId,
       warehouseName: dto.warehouseName ?? "",
+      companyId,
       quantity,
       reservedQuantity,
       availableQuantity: dto.availableQuantity ?? quantity - reservedQuantity,
@@ -42,6 +56,7 @@ export class StockMapper {
       productBarcode: entity.productBarcode,
       warehouseId: entity.warehouseId,
       warehouseName: entity.warehouseName,
+      companyId: entity.companyId,
       quantity: entity.quantity,
       reservedQuantity: entity.reservedQuantity,
       availableQuantity: entity.availableQuantity,

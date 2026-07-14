@@ -25,7 +25,8 @@
     "selected": "seleccionados",
     "pagination": {
       "showing": "Mostrando {from} a {to} de {total}",
-      "perPage": "Por página"
+      "perPage": "Por página",
+      "all": "Todos"
     }
   },
   "auth": {
@@ -831,6 +832,10 @@
         "placeholder": "Selecciona una empresa",
         "all": "Todas las Empresas",
         "loading": "Cargando..."
+      },
+      "requiredCompany": {
+        "title": "Selecciona una empresa para continuar",
+        "description": "Elige una empresa específica en el selector del encabezado. No se pueden crear ventas, movimientos, transferencias o devoluciones mientras esté seleccionada \"Todas las Empresas\"."
       },
       "messages": {
         "created": "Empresa creada exitosamente",

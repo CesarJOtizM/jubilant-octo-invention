@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MovementFormPage } from "@/modules/inventory/presentation/components/movements/movement-form-page";
+import { toCreateMovementDto } from "@/modules/inventory/presentation/schemas/movement.schema";
 
 // --- Mocks ---
 
@@ -52,17 +53,30 @@ vi.mock("@/modules/inventory/presentation/hooks/use-movements", () => ({
   useMovement: () => mockMovementData,
 }));
 
+let lastProductSearchOptions: { companyId?: string } | undefined;
+
 vi.mock("@/modules/inventory/presentation/hooks/use-product-search", () => ({
-  useProductSearch: () => ({
-    products: [
-      { id: "p1", name: "Widget A", sku: "WA-001", barcode: "BAR-001" },
-      { id: "p2", name: "Widget B", sku: "WB-002", barcode: "BAR-002" },
-    ],
-    isLoading: false,
-    isFetchingNextPage: false,
-    hasNextPage: false,
-    fetchNextPage: vi.fn(),
-    isError: false,
+  useProductSearch: (options: { companyId?: string }) => {
+    lastProductSearchOptions = options;
+    return {
+      products: [
+        { id: "p1", name: "Widget A", sku: "WA-001", barcode: "BAR-001" },
+        { id: "p2", name: "Widget B", sku: "WB-002", barcode: "BAR-002" },
+      ],
+      isLoading: false,
+      isFetchingNextPage: false,
+      hasNextPage: false,
+      fetchNextPage: vi.fn(),
+      isError: false,
+    };
+  },
+}));
+
+vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
+  useProduct: () => ({ data: undefined }),
+  useProductLookupMutation: () => ({
+    mutateAsync: vi.fn().mockResolvedValue(null),
+    isPending: false,
   }),
 }));
 
@@ -90,11 +104,32 @@ vi.mock("@/modules/contacts/presentation/hooks/use-contacts", () => ({
 
 vi.mock("@/modules/inventory/presentation/schemas/movement.schema", () => ({
   createMovementSchema: { parse: vi.fn() },
-  toCreateMovementDto: vi.fn((d: unknown) => d),
+  toCreateMovementDto: vi.fn((d: unknown, companyId: string) => ({
+    ...(d as object),
+    companyId,
+  })),
 }));
 
 vi.mock("@hookform/resolvers/zod", () => ({
-  zodResolver: () => vi.fn(),
+  zodResolver: () => async (values: unknown) => ({
+    values,
+    errors: {},
+  }),
+}));
+
+let mockSelectedCompanyId: string | null = "company-test-1";
+
+vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
+  useCompanyStore: (
+    selector: (state: {
+      selectedCompanyId: string | null;
+      setSelectedCompany: (id: string | null) => void;
+    }) => unknown,
+  ) =>
+    selector({
+      selectedCompanyId: mockSelectedCompanyId,
+      setSelectedCompany: vi.fn(),
+    }),
 }));
 
 vi.mock("@/ui/components/currency-input", () => ({
@@ -115,6 +150,9 @@ describe("MovementFormPage", () => {
 
   beforeEach(() => {
     mockPush.mockClear();
+    mockSelectedCompanyId = "company-test-1";
+    lastProductSearchOptions = undefined;
+    vi.mocked(toCreateMovementDto).mockClear();
     mockMovementData = { data: null, isLoading: false };
     queryClient = new QueryClient({
       defaultOptions: {
@@ -246,5 +284,38 @@ describe("MovementFormPage", () => {
 
     expect(screen.getByText("save")).toBeInTheDocument();
     expect(screen.queryByText("create")).not.toBeInTheDocument();
+  });
+
+  it("Given: selectedCompanyId is null When: opening create Then: guard blocks submit with required-company copy", () => {
+    mockSelectedCompanyId = null;
+    renderWithProviders(<MovementFormPage />);
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText("requiredCompany.title")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "create" })).toBeDisabled();
+  });
+
+  it("Given: non-null selectedCompanyId When: submitting create Then: toCreateMovementDto receives that companyId", async () => {
+    mockSelectedCompanyId = "mov-company-3";
+    const { container } = renderWithProviders(<MovementFormPage />);
+
+    const form = container.querySelector("form");
+    expect(form).not.toBeNull();
+    fireEvent.submit(form!);
+
+    await waitFor(() => {
+      expect(toCreateMovementDto).toHaveBeenCalledWith(
+        expect.anything(),
+        "mov-company-3",
+      );
+    });
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: useProductSearch omits ownership companyId", () => {
+    mockSelectedCompanyId = "mov-company-shared";
+    renderWithProviders(<MovementFormPage />);
+
+    expect(lastProductSearchOptions).toBeDefined();
+    expect(lastProductSearchOptions?.companyId).toBeUndefined();
   });
 });

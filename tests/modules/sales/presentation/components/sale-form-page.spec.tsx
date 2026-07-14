@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SaleFormPage } from "@/modules/sales/presentation/components/sale-form-page";
 import { createQueryWrapper } from "@tests/utils/create-query-wrapper";
+import { toCreateSaleDto } from "@/modules/sales/presentation/schemas/sale.schema";
 
 // --- Mocks ---
 
@@ -71,11 +72,32 @@ vi.mock("@/modules/contacts/presentation/hooks/use-contacts", () => ({
 
 vi.mock("@/modules/sales/presentation/schemas/sale.schema", () => ({
   createSaleSchema: { parse: vi.fn() },
-  toCreateSaleDto: vi.fn((d: unknown) => d),
+  toCreateSaleDto: vi.fn((d: unknown, companyId: string) => ({
+    ...(d as object),
+    companyId,
+  })),
 }));
 
 vi.mock("@hookform/resolvers/zod", () => ({
-  zodResolver: () => vi.fn(),
+  zodResolver: () => async (values: unknown) => ({
+    values,
+    errors: {},
+  }),
+}));
+
+let mockSelectedCompanyId: string | null = "company-test-1";
+
+vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
+  useCompanyStore: (
+    selector: (state: {
+      selectedCompanyId: string | null;
+      setSelectedCompany: (id: string | null) => void;
+    }) => unknown,
+  ) =>
+    selector({
+      selectedCompanyId: mockSelectedCompanyId,
+      setSelectedCompany: vi.fn(),
+    }),
 }));
 
 vi.mock("@/ui/components/currency-input", () => ({
@@ -116,13 +138,16 @@ vi.mock(
       placeholder,
       value,
       onValueChange,
+      companyId,
     }: {
       placeholder?: string;
       value?: string;
       onValueChange?: (v: string) => void;
+      companyId?: string;
     }) => (
       <select
         data-testid="product-search-select"
+        data-company-id={companyId ?? ""}
         value={value}
         onChange={(e) => onValueChange?.(e.target.value)}
       >
@@ -142,6 +167,11 @@ function renderWithQuery(component: React.ReactElement) {
 // --- Tests ---
 
 describe("SaleFormPage", () => {
+  beforeEach(() => {
+    mockSelectedCompanyId = "company-test-1";
+    vi.mocked(toCreateSaleDto).mockClear();
+  });
+
   it("Given: component renders When: rendering Then: should show create title and description", () => {
     renderWithQuery(<SaleFormPage />);
 
@@ -216,5 +246,41 @@ describe("SaleFormPage", () => {
     renderWithQuery(<SaleFormPage />);
 
     expect(screen.getByTestId("currency-input")).toBeInTheDocument();
+  });
+
+  it("Given: selectedCompanyId is null When: opening create Then: guard blocks submit with required-company copy", () => {
+    mockSelectedCompanyId = null;
+    renderWithQuery(<SaleFormPage />);
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText("requiredCompany.title")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "create" })).toBeDisabled();
+  });
+
+  it("Given: non-null selectedCompanyId When: submitting create Then: toCreateSaleDto receives that companyId", async () => {
+    mockSelectedCompanyId = "sale-company-99";
+    const { container } = renderWithQuery(<SaleFormPage />);
+
+    const form = container.querySelector("form");
+    expect(form).not.toBeNull();
+    fireEvent.submit(form!);
+
+    await waitFor(() => {
+      expect(toCreateSaleDto).toHaveBeenCalledWith(
+        expect.anything(),
+        "sale-company-99",
+      );
+    });
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: ProductSearchSelect omits ownership companyId", () => {
+    mockSelectedCompanyId = "sale-company-shared";
+    renderWithQuery(<SaleFormPage />);
+
+    const pickers = screen.getAllByTestId("product-search-select");
+    expect(pickers.length).toBeGreaterThan(0);
+    for (const picker of pickers) {
+      expect(picker).toHaveAttribute("data-company-id", "");
+    }
   });
 });

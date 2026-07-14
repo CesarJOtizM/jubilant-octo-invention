@@ -51,6 +51,17 @@ describe("use-stock hooks", () => {
         "location",
         "p-1",
         "w-1",
+        undefined,
+      ]);
+    });
+
+    it("Given product warehouse and companyId, When calling location(), Then key includes companyId", () => {
+      expect(stockKeys.location("p-1", "w-1", "company-1")).toEqual([
+        "stock",
+        "location",
+        "p-1",
+        "w-1",
+        "company-1",
       ]);
     });
   });
@@ -108,7 +119,35 @@ describe("use-stock hooks", () => {
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(mockFindByProductAndWarehouse).toHaveBeenCalledWith("p-1", "w-1");
+      expect(mockFindByProductAndWarehouse).toHaveBeenCalledWith(
+        "p-1",
+        "w-1",
+        undefined,
+      );
+      expect(result.current.data).toEqual(mockStock);
+    });
+
+    it("Given companyId, When the hook fetches, Then it passes companyId to the repository", async () => {
+      const mockStock = {
+        productId: "p-1",
+        warehouseId: "w-1",
+        companyId: "company-tekshop",
+        quantity: 25,
+      };
+      mockFindByProductAndWarehouse.mockResolvedValueOnce(mockStock);
+      const { Wrapper } = createQueryWrapper();
+
+      const { result } = renderHook(
+        () => useStockByLocation("p-1", "w-1", "company-tekshop"),
+        { wrapper: Wrapper },
+      );
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(mockFindByProductAndWarehouse).toHaveBeenCalledWith(
+        "p-1",
+        "w-1",
+        "company-tekshop",
+      );
       expect(result.current.data).toEqual(mockStock);
     });
 

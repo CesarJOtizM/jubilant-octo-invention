@@ -36,6 +36,7 @@ import {
 } from "@/modules/inventory/presentation/hooks/use-movements";
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
+import { CompanyRequiredGuard } from "@/modules/companies/presentation/components/company-required-guard";
 import { useContacts } from "@/modules/contacts/presentation/hooks/use-contacts";
 import type { UpdateStockMovementDto } from "@/modules/inventory/application/dto/stock-movement.dto";
 
@@ -138,7 +139,8 @@ export function MovementFormPage({ movementId }: MovementFormPageProps) {
         };
         await updateMovement.mutateAsync({ id: movementId, data: dto });
       } else {
-        const dto = toCreateMovementDto(data);
+        if (!selectedCompanyId) return;
+        const dto = toCreateMovementDto(data, selectedCompanyId);
         await createMovement.mutateAsync(dto);
       }
       router.push(returnTo);
@@ -182,6 +184,7 @@ export function MovementFormPage({ movementId }: MovementFormPageProps) {
         </div>
       </div>
 
+      <CompanyRequiredGuard active={!isEditing}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {isError && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -374,7 +377,6 @@ export function MovementFormPage({ movementId }: MovementFormPageProps) {
                             <ProductSearchSelect
                               value={selectField.value}
                               onValueChange={selectField.onChange}
-                              companyId={selectedCompanyId ?? undefined}
                               placeholder={t("fields.productPlaceholder")}
                               searchPlaceholder={tCommon("search")}
                               emptyMessage={tCommon("noResults")}
@@ -447,6 +449,7 @@ export function MovementFormPage({ movementId }: MovementFormPageProps) {
           </Button>
         </div>
       </form>
+      </CompanyRequiredGuard>
     </div>
   );
 }

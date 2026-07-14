@@ -9,5 +9,6 @@ export interface StockRepositoryPort {
   findByProductAndWarehouse(
     productId: string,
     warehouseId: string,
+    companyId?: string,
   ): Promise<Stock | null>;
 }

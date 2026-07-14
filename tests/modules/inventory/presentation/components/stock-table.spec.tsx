@@ -51,6 +51,7 @@ function makeStock(
     productName: string;
     productSku: string;
     warehouseName: string;
+    companyId: string;
     quantity: number;
     averageCost: number;
     totalValue: number;
@@ -63,6 +64,7 @@ function makeStock(
     productSku: overrides.productSku ?? "WA-001",
     warehouseId: "wh-1",
     warehouseName: overrides.warehouseName ?? "Main Warehouse",
+    companyId: overrides.companyId ?? "company-1",
     quantity: overrides.quantity ?? 100,
     reservedQuantity: 5,
     availableQuantity: 95,
@@ -199,6 +201,7 @@ describe("StockTable", () => {
       productSku: "SK-1",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 50,
       reservedQuantity: 0,
       availableQuantity: 50,
@@ -227,6 +230,7 @@ describe("StockTable", () => {
       productSku: "",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 50,
       reservedQuantity: 0,
       availableQuantity: 50,
@@ -255,6 +259,7 @@ describe("StockTable", () => {
       productSku: "SK-1",
       warehouseId: "wh-fallback",
       warehouseName: "",
+      companyId: "company-1",
       quantity: 50,
       reservedQuantity: 0,
       availableQuantity: 50,
@@ -283,6 +288,7 @@ describe("StockTable", () => {
       productSku: "SK-LOW",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 5,
       reservedQuantity: 0,
       availableQuantity: 5,
@@ -313,6 +319,7 @@ describe("StockTable", () => {
       productSku: "SK-OOS",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 0,
       reservedQuantity: 0,
       availableQuantity: 0,
@@ -343,6 +350,7 @@ describe("StockTable", () => {
       productSku: "SK-NM",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 50,
       reservedQuantity: 0,
       availableQuantity: 50,
@@ -402,6 +410,7 @@ describe("StockTable", () => {
       productBarcode: "7501234567890",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 10,
       reservedQuantity: 0,
       availableQuantity: 10,
@@ -431,6 +440,7 @@ describe("StockTable", () => {
       productSku: "WNB-001",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 10,
       reservedQuantity: 0,
       availableQuantity: 10,
@@ -462,6 +472,7 @@ describe("StockTable", () => {
       productBarcode: "7501234567890",
       warehouseId: "wh-1",
       warehouseName: "Main",
+      companyId: "company-1",
       quantity: 10,
       reservedQuantity: 0,
       availableQuantity: 10,

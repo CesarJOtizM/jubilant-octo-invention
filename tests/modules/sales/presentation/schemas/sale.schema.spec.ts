@@ -247,18 +247,19 @@ describe("Sale Schema", () => {
       };
 
       // Act
-      const dto = toCreateSaleDto(formData);
+      const dto = toCreateSaleDto(formData, "company-alpha");
 
       // Assert
       expect(dto.warehouseId).toBe("wh-001");
+      expect(dto.companyId).toBe("company-alpha");
       expect(dto.customerReference).toBe("CUST-001");
       expect(dto.externalReference).toBe("EXT-123");
       expect(dto.note).toBe("Important sale");
       expect(dto.lines).toHaveLength(2);
-      expect(dto.lines[0].productId).toBe("prod-1");
-      expect(dto.lines[0].quantity).toBe(3);
-      expect(dto.lines[0].salePrice).toBe(25.0);
-      expect(dto.lines[1].currency).toBe("USD");
+      expect(dto.lines![0].productId).toBe("prod-1");
+      expect(dto.lines![0].quantity).toBe(3);
+      expect(dto.lines![0].salePrice).toBe(25.0);
+      expect(dto.lines![1].currency).toBe("USD");
     });
 
     it("Given: form data with empty optional strings When: converting to DTO Then: should set them as undefined", () => {
@@ -280,9 +281,10 @@ describe("Sale Schema", () => {
       };
 
       // Act
-      const dto = toCreateSaleDto(formData);
+      const dto = toCreateSaleDto(formData, "company-beta");
 
       // Assert
+      expect(dto.companyId).toBe("company-beta");
       expect(dto.customerReference).toBeUndefined();
       expect(dto.externalReference).toBeUndefined();
       expect(dto.note).toBeUndefined();
@@ -304,12 +306,38 @@ describe("Sale Schema", () => {
       };
 
       // Act
-      const dto = toCreateSaleDto(formData);
+      const dto = toCreateSaleDto(formData, "company-gamma");
 
       // Assert
+      expect(dto.companyId).toBe("company-gamma");
       expect(dto.customerReference).toBeUndefined();
       expect(dto.externalReference).toBeUndefined();
       expect(dto.note).toBeUndefined();
+    });
+
+    it("Given: selected company available When: transform runs Then: DTO must contain that non-empty companyId", () => {
+      // Arrange
+      const formData: CreateSaleFormData = {
+        warehouseId: "wh-001",
+        contactId: "contact-001",
+        lines: [
+          {
+            lineType: "product",
+            productId: "prod-1",
+            quantity: 1,
+            salePrice: 10.0,
+          },
+        ],
+      };
+
+      // Act
+      const dtoA = toCreateSaleDto(formData, "comp-a");
+      const dtoB = toCreateSaleDto(formData, "comp-b");
+
+      // Assert
+      expect(dtoA.companyId).toBe("comp-a");
+      expect(dtoB.companyId).toBe("comp-b");
+      expect(dtoA.companyId).not.toBe(dtoB.companyId);
     });
   });
 });

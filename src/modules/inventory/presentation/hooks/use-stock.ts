@@ -17,13 +17,18 @@ export function useStock(filters?: StockFilters) {
   });
 }
 
-export function useStockByLocation(productId: string, warehouseId: string) {
+export function useStockByLocation(
+  productId: string,
+  warehouseId: string,
+  companyId?: string,
+) {
   return useQuery({
-    queryKey: stockKeys.location(productId, warehouseId),
+    queryKey: stockKeys.location(productId, warehouseId, companyId),
     queryFn: () =>
       getContainer().stockRepository.findByProductAndWarehouse(
         productId,
         warehouseId,
+        companyId,
       ),
     staleTime: STALE_TIME,
     enabled: Boolean(productId) && Boolean(warehouseId),

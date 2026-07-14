@@ -36,8 +36,20 @@ let mockQueryState: {
   isError: boolean;
 } = { data: undefined, isLoading: false, isError: false };
 
+let mockSelectedCompanyId: string | null = null;
+let lastTransfersFilters: unknown;
+
+vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
+  useCompanyStore: (
+    selector: (s: { selectedCompanyId: string | null }) => unknown,
+  ) => selector({ selectedCompanyId: mockSelectedCompanyId }),
+}));
+
 vi.mock("@/modules/inventory/presentation/hooks/use-transfers", () => ({
-  useTransfers: () => mockQueryState,
+  useTransfers: (filters?: unknown) => {
+    lastTransfersFilters = filters;
+    return mockQueryState;
+  },
   useUpdateTransferStatus: () => ({ isPending: false, mutateAsync: vi.fn() }),
 }));
 
@@ -114,6 +126,47 @@ function makeTransfer(
 describe("TransferList", () => {
   beforeEach(() => {
     mockQueryState = { data: undefined, isLoading: false, isError: false };
+    mockSelectedCompanyId = null;
+    lastTransfersFilters = undefined;
+  });
+
+  it("Given: non-null selectedCompanyId When: list loads Then: useTransfers receives companyId filter", () => {
+    mockSelectedCompanyId = "company-tekshop";
+    mockQueryState = {
+      data: {
+        data: [makeTransfer()],
+        pagination: { page: 1, totalPages: 1, total: 1, limit: 10 },
+      },
+      isLoading: false,
+      isError: false,
+    };
+
+    render(<TransferList />);
+
+    expect(lastTransfersFilters).toEqual(
+      expect.objectContaining({
+        companyId: "company-tekshop",
+        page: 1,
+        limit: 10,
+      }),
+    );
+  });
+
+  it("Given: selectedCompanyId is null When: list loads Then: useTransfers omits companyId filter", () => {
+    mockSelectedCompanyId = null;
+    mockQueryState = {
+      data: {
+        data: [makeTransfer()],
+        pagination: { page: 1, totalPages: 1, total: 1, limit: 10 },
+      },
+      isLoading: false,
+      isError: false,
+    };
+
+    render(<TransferList />);
+
+    expect(lastTransfersFilters).toEqual({ page: 1, limit: 10 });
+    expect(lastTransfersFilters).not.toHaveProperty("companyId");
   });
 
   it("Given: data loaded When: rendering Then: should display the list title", () => {

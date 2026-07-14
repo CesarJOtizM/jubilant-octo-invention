@@ -29,6 +29,7 @@ import {
 import { useCreateMovement } from "@/modules/inventory/presentation/hooks/use-movements";
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
+import { CompanyRequiredGuard } from "@/modules/companies/presentation/components/company-required-guard";
 import { useContacts } from "@/modules/contacts/presentation/hooks/use-contacts";
 import type { Product } from "@/modules/inventory/domain/entities/product.entity";
 
@@ -123,8 +124,9 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
   });
 
   const onSubmit = async (data: CreateMovementFormData) => {
+    if (!selectedCompanyId) return;
     try {
-      const dto = toCreateMovementDto(data);
+      const dto = toCreateMovementDto(data, selectedCompanyId);
       await createMovement.mutateAsync(dto);
       onOpenChange(false);
       reset();
@@ -154,6 +156,7 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
           </Button>
         </CardHeader>
         <CardContent>
+          <CompanyRequiredGuard>
           <form onSubmit={handleSubmit(onSubmit)}>
             <fieldset disabled={createMovement.isPending} className="space-y-6">
               {createMovement.isError && (
@@ -339,7 +342,6 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
                                 <ProductSearchSelect
                                   value={selectField.value}
                                   onValueChange={selectField.onChange}
-                                  companyId={selectedCompanyId ?? undefined}
                                   placeholder={t("fields.productPlaceholder")}
                                   searchPlaceholder={tCommon("search")}
                                   emptyMessage={tCommon("noResults")}
@@ -412,6 +414,7 @@ export function MovementForm({ open, onOpenChange }: MovementFormProps) {
               </div>
             </fieldset>
           </form>
+          </CompanyRequiredGuard>
         </CardContent>
       </Card>
     </div>

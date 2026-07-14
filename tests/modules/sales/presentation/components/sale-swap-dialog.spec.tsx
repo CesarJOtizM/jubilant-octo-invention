@@ -20,6 +20,7 @@ let mockWarehousesData: unknown = {
 };
 
 let mockSelectedCompanyId: string | null = null;
+let lastSwapUseProductsArgs: Record<string, unknown> | undefined;
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string, params?: Record<string, unknown>) => {
@@ -29,9 +30,12 @@ vi.mock("next-intl", () => ({
 }));
 
 vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
-  useProducts: () => ({
-    data: mockProductsData,
-  }),
+  useProducts: (args?: Record<string, unknown>) => {
+    lastSwapUseProductsArgs = args;
+    return {
+      data: mockProductsData,
+    };
+  },
 }));
 
 vi.mock("@/modules/inventory/presentation/hooks/use-warehouses", () => ({
@@ -135,6 +139,7 @@ describe("SaleSwapDialog", () => {
     vi.clearAllMocks();
     mockSwapIsPending = false;
     mockSelectedCompanyId = null;
+    lastSwapUseProductsArgs = undefined;
     mockProductsData = {
       data: [
         { id: "prod-2", name: "Replacement Product", sku: "SKU-REPL" },
@@ -313,10 +318,12 @@ describe("SaleSwapDialog", () => {
     expect(mockMutateAsync).not.toHaveBeenCalled();
   });
 
-  // --- Branch: selectedCompanyId present ---
-  it("Given: selectedCompanyId is set When: rendering Then: products should load with companyId", () => {
+  // --- Shared-catalog product picker (no product.companyId ownership gate) ---
+  it("Given: selectedCompanyId is set When: rendering Then: useProducts omits ownership companyId", () => {
     mockSelectedCompanyId = "company-1";
     render(<SaleSwapDialog {...defaultProps} />);
+    expect(lastSwapUseProductsArgs).toBeDefined();
+    expect(lastSwapUseProductsArgs).not.toHaveProperty("companyId");
     expect(screen.getByText("swapLine.replacementProduct")).toBeDefined();
   });
 

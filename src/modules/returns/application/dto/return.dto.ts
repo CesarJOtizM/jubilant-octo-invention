@@ -98,6 +98,7 @@ export interface CreateReturnLineDto {
 }
 
 export interface CreateReturnDto {
+  companyId: string;
   type: ReturnType;
   warehouseId: string;
   saleId?: string;

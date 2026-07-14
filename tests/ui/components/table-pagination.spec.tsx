@@ -59,6 +59,7 @@ vi.mock("@/ui/components/select", () => ({
         <option value="20">20</option>
         <option value="50">50</option>
         <option value="100">100</option>
+        <option value="all">All</option>
       </select>
     </div>
   ),
@@ -305,6 +306,62 @@ describe("TablePagination", () => {
     const select = screen.getByTestId("page-size-select");
     fireEvent.change(select, { target: { value: "50" } });
     expect(mockOnPageSizeChange).toHaveBeenCalledWith(50);
+  });
+
+  it("Given: All option When: selecting all Then: should call onPageSizeChange with total", () => {
+    render(
+      <TablePagination
+        page={1}
+        totalPages={5}
+        total={157}
+        limit={10}
+        onPageChange={mockOnPageChange}
+        onPageSizeChange={mockOnPageSizeChange}
+        showingLabel="Showing"
+        allLabel="Todos"
+      />,
+    );
+    const select = screen.getByTestId("page-size-select");
+    fireEvent.change(select, { target: { value: "all" } });
+    expect(mockOnPageSizeChange).toHaveBeenCalledWith(157);
+  });
+
+  it("Given: limit outside presets When: rendering Then: select value is all", () => {
+    render(
+      <TablePagination
+        page={1}
+        totalPages={1}
+        total={157}
+        limit={157}
+        onPageChange={mockOnPageChange}
+        onPageSizeChange={mockOnPageSizeChange}
+        showingLabel="Showing"
+      />,
+    );
+    expect(screen.getByTestId("select-root")).toHaveAttribute(
+      "data-value",
+      "all",
+    );
+  });
+
+  it("Given: All option in content When: rendering Then: should show All / custom allLabel", () => {
+    render(
+      <TablePagination
+        page={1}
+        totalPages={1}
+        total={5}
+        limit={10}
+        onPageChange={mockOnPageChange}
+        onPageSizeChange={mockOnPageSizeChange}
+        showingLabel="Showing"
+        allLabel="Todos"
+      />,
+    );
+    const selectContent = screen.getByTestId("select-content");
+    expect(selectContent.querySelector('[data-value="all"]')).not.toBeNull();
+    expect(selectContent.querySelector('[data-value="all"]')?.textContent).toBe(
+      "Todos",
+    );
   });
 
   // --- getPageNumbers: totalPages <= 7 (no ellipsis) ---

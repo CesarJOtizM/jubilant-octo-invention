@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ReturnFormPage } from "@/modules/returns/presentation/components/return-form-page";
 import { createQueryWrapper } from "@tests/utils/create-query-wrapper";
+import { toCreateReturnDto } from "@/modules/returns/presentation/schemas/return.schema";
 
 // --- Mocks ---
 
@@ -34,17 +35,21 @@ let mockProductsLoading = false;
 let mockWarehousesLoading = false;
 let mockSalesLoading = false;
 let mockMovementsLoading = false;
+let lastReturnUseProductsArgs: Record<string, unknown> | undefined;
 
 vi.mock("@/modules/inventory/presentation/hooks/use-products", () => ({
-  useProducts: () => ({
-    data: {
-      data: [
-        { id: "p1", name: "Widget A", sku: "WA-001" },
-        { id: "p2", name: "Widget B", sku: "WB-002" },
-      ],
-    },
-    isLoading: mockProductsLoading,
-  }),
+  useProducts: (args?: Record<string, unknown>) => {
+    lastReturnUseProductsArgs = args;
+    return {
+      data: {
+        data: [
+          { id: "p1", name: "Widget A", sku: "WA-001" },
+          { id: "p2", name: "Widget B", sku: "WB-002" },
+        ],
+      },
+      isLoading: mockProductsLoading,
+    };
+  },
 }));
 
 vi.mock("@/modules/inventory/presentation/hooks/use-warehouses", () => ({
@@ -109,19 +114,27 @@ vi.mock("@/modules/inventory/presentation/hooks/use-combos", () => ({
   useCombos: () => ({ data: undefined, isLoading: false }),
 }));
 
+let mockSelectedCompanyId: string | null = "company-test-1";
+
 vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
   useCompanyStore: (
     selector: (s: { selectedCompanyId: string | null }) => unknown,
-  ) => selector({ selectedCompanyId: null }),
+  ) => selector({ selectedCompanyId: mockSelectedCompanyId }),
 }));
 
 vi.mock("@/modules/returns/presentation/schemas/return.schema", () => ({
   createReturnSchema: { parse: vi.fn() },
-  toCreateReturnDto: vi.fn((d: unknown) => d),
+  toCreateReturnDto: vi.fn((d: unknown, companyId: string) => ({
+    ...(d as object),
+    companyId,
+  })),
 }));
 
 vi.mock("@hookform/resolvers/zod", () => ({
-  zodResolver: () => vi.fn(),
+  zodResolver: () => async (values: unknown) => ({
+    values,
+    errors: {},
+  }),
 }));
 
 vi.mock("@/ui/components/searchable-select", () => ({
@@ -207,6 +220,9 @@ describe("ReturnFormPage", () => {
     mockSalesLoading = false;
     mockMovementsLoading = false;
     mockMovementReference = "REF-001";
+    mockSelectedCompanyId = "company-test-1";
+    lastReturnUseProductsArgs = undefined;
+    vi.mocked(toCreateReturnDto).mockClear();
   });
 
   // --- Loading skeleton ---
@@ -403,10 +419,21 @@ describe("ReturnFormPage", () => {
     expect(screen.queryByText("form.createTitle")).not.toBeInTheDocument();
   });
 
-  // --- selectedCompanyId present in useProducts ---
+  // --- Shared-catalog product picker (no product.companyId ownership gate) ---
   it("Given: selectedCompanyId is null When: rendering Then: useProducts is called without companyId", () => {
+    mockSelectedCompanyId = null;
     renderWithQuery(<ReturnFormPage />);
-    expect(screen.getByText("form.createTitle")).toBeInTheDocument();
+    expect(lastReturnUseProductsArgs).toBeDefined();
+    expect(lastReturnUseProductsArgs).not.toHaveProperty("companyId");
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: useProducts omits ownership companyId", () => {
+    mockSelectedCompanyId = "ret-company-shared";
+    renderWithQuery(<ReturnFormPage />);
+
+    expect(lastReturnUseProductsArgs).toBeDefined();
+    expect(lastReturnUseProductsArgs).not.toHaveProperty("companyId");
+    expect(lastReturnUseProductsArgs?.statuses).toEqual(["ACTIVE"]);
   });
 
   // --- Customer return: originalPrice field is shown (isCustomerReturn branch) ---
@@ -466,11 +493,27 @@ describe("ReturnFormPage", () => {
     expect(screen.getByText("fields.product *")).toBeInTheDocument();
   });
 
-  // --- Branch: selectedCompanyId is non-null ---
-  it("Given: selectedCompanyId is set When: rendering Then: products fetch includes companyId", () => {
-    // The mock always uses null; we just verify no crash
+  // --- Branch: selectedCompanyId guard + inject ---
+  it("Given: selectedCompanyId is null When: opening create Then: guard blocks submit with required-company copy", () => {
+    mockSelectedCompanyId = null;
     renderWithQuery(<ReturnFormPage />);
-    expect(screen.getByText("form.createTitle")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText("requiredCompany.title")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "create" })).toBeDisabled();
+  });
+
+  it("Given: non-null selectedCompanyId When: submitting create Then: toCreateReturnDto receives that companyId", async () => {
+    mockSelectedCompanyId = "ret-company-5";
+    const { container } = renderWithQuery(<ReturnFormPage />);
+    const form = container.querySelector("form");
+    expect(form).not.toBeNull();
+    fireEvent.submit(form!);
+    await waitFor(() => {
+      expect(toCreateReturnDto).toHaveBeenCalledWith(
+        expect.anything(),
+        "ret-company-5",
+      );
+    });
   });
 
   // --- Branch: movement with non-null reference ---

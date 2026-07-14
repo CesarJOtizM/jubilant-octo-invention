@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/ui/components/select";
 
+export const TABLE_PAGINATION_ALL_VALUE = "all";
+
 interface TablePaginationProps {
   page: number;
   totalPages: number;
@@ -18,8 +20,11 @@ interface TablePaginationProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
   pageSizeOptions?: number[];
+  /** When true (default), adds an "All" option that requests `total` items. */
+  includeAllOption?: boolean;
   showingLabel: string;
   perPageLabel?: string;
+  allLabel?: string;
 }
 
 function getPageNumbers(page: number, totalPages: number): (number | "...")[] {
@@ -51,6 +56,12 @@ function getPageNumbers(page: number, totalPages: number): (number | "...")[] {
   return pages;
 }
 
+function resolveSelectValue(limit: number, pageSizeOptions: number[]): string {
+  return pageSizeOptions.includes(limit)
+    ? String(limit)
+    : TABLE_PAGINATION_ALL_VALUE;
+}
+
 export function TablePagination({
   page,
   totalPages,
@@ -59,12 +70,23 @@ export function TablePagination({
   onPageChange,
   onPageSizeChange,
   pageSizeOptions = [10, 20, 50, 100],
+  includeAllOption = true,
   showingLabel,
   perPageLabel = "Per page",
+  allLabel = "All",
 }: TablePaginationProps) {
   if (total === 0) return null;
 
   const pageNumbers = getPageNumbers(page, totalPages);
+  const selectValue = resolveSelectValue(limit, pageSizeOptions);
+
+  const handlePageSizeChange = (value: string) => {
+    if (value === TABLE_PAGINATION_ALL_VALUE) {
+      onPageSizeChange(Math.max(total, 1));
+      return;
+    }
+    onPageSizeChange(Number(value));
+  };
 
   return (
     <div className="mt-4 flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
@@ -75,11 +97,8 @@ export function TablePagination({
           <span className="text-sm text-muted-foreground whitespace-nowrap">
             {perPageLabel}
           </span>
-          <Select
-            value={String(limit)}
-            onValueChange={(v) => onPageSizeChange(Number(v))}
-          >
-            <SelectTrigger className="h-8 w-[70px]">
+          <Select value={selectValue} onValueChange={handlePageSizeChange}>
+            <SelectTrigger className="h-8 w-[5.5rem]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -88,6 +107,11 @@ export function TablePagination({
                   {size}
                 </SelectItem>
               ))}
+              {includeAllOption ? (
+                <SelectItem value={TABLE_PAGINATION_ALL_VALUE}>
+                  {allLabel}
+                </SelectItem>
+              ) : null}
             </SelectContent>
           </Select>
         </div>

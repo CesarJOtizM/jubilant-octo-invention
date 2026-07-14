@@ -284,6 +284,7 @@ export function SyncLogTable({ connectionId }: SyncLogTableProps) {
             total: pagination.total,
           })}
           perPageLabel={tCommon("pagination.perPage")}
+                allLabel={tCommon("pagination.all")}
         />
       )}
 

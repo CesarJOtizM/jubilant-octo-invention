@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import {
   Plus,
@@ -28,6 +28,7 @@ import {
   useTransfers,
   useUpdateTransferStatus,
 } from "@/modules/inventory/presentation/hooks/use-transfers";
+import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
 import { formatDateTimeMedium } from "@/lib/date";
 import { TransferStatusBadge } from "./transfer-status-badge";
 import { TransferFiltersComponent } from "./transfer-filters";
@@ -44,7 +45,15 @@ export function TransferList() {
     limit: 10,
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const { data, isLoading, isError } = useTransfers(filters);
+  const selectedCompanyId = useCompanyStore((s) => s.selectedCompanyId);
+  const filtersWithCompany = useMemo(
+    () =>
+      selectedCompanyId
+        ? { ...filters, companyId: selectedCompanyId }
+        : filters,
+    [filters, selectedCompanyId],
+  );
+  const { data, isLoading, isError } = useTransfers(filtersWithCompany);
   const updateStatus = useUpdateTransferStatus();
 
   const handlePageSizeChange = (size: number) => {
@@ -280,6 +289,7 @@ export function TransferList() {
                   total: data.pagination.total,
                 })}
                 perPageLabel={tCommon("pagination.perPage")}
+                allLabel={tCommon("pagination.all")}
               />
             </>
           )}

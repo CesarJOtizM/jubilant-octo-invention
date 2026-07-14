@@ -12,11 +12,26 @@ import type {
 
 export type { PaginatedResult };
 
+/** Optional company bind for STOCK (and future typed) imports. */
+export interface ImportCompanyBind {
+  companyId: string;
+  companyCode?: string;
+}
+
 export interface ImportRepositoryPort {
   findAll(filters: ImportFilters): Promise<PaginatedResult<ImportBatch>>;
   getStatus(id: string): Promise<ImportBatch | null>;
-  preview(file: File, type: ImportType): Promise<ImportPreview>;
-  execute(file: File, type: ImportType, note?: string): Promise<ImportBatch>;
+  preview(
+    file: File,
+    type: ImportType,
+    company?: ImportCompanyBind,
+  ): Promise<ImportPreview>;
+  execute(
+    file: File,
+    type: ImportType,
+    note?: string,
+    company?: ImportCompanyBind,
+  ): Promise<ImportBatch>;
   downloadTemplate(type: ImportType, format: TemplateFormat): Promise<Blob>;
   downloadErrors(id: string, format: TemplateFormat): Promise<Blob>;
   /**

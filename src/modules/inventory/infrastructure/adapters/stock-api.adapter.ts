@@ -40,11 +40,15 @@ export class StockApiAdapter implements StockRepositoryPort {
   async findByProductAndWarehouse(
     productId: string,
     warehouseId: string,
+    companyId?: string,
   ): Promise<Stock | null> {
     try {
-      const response = await apiClient.get<ApiResponse<StockResponseDto>>(
-        `${this.basePath}/product/${productId}/warehouse/${warehouseId}`,
-      );
+      const url = `${this.basePath}/product/${productId}/warehouse/${warehouseId}`;
+      const response = companyId
+        ? await apiClient.get<ApiResponse<StockResponseDto>>(url, {
+            params: { companyId },
+          })
+        : await apiClient.get<ApiResponse<StockResponseDto>>(url);
       return StockMapper.toDomain(response.data.data);
     } catch (error) {
       if (this.isNotFoundError(error)) {
