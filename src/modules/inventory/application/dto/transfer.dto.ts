@@ -100,6 +100,7 @@ export interface TransferFilters {
   fromWarehouseIds?: string[];
   toWarehouseIds?: string[];
   status?: TransferStatus[];
+  companyId?: string;
   startDate?: string;
   endDate?: string;
   search?: string;

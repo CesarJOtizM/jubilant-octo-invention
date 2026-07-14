@@ -11,6 +11,7 @@ describe("Stock Entity", () => {
     productSku: "SKU-001",
     warehouseId: "wh-001",
     warehouseName: "Main Warehouse",
+    companyId: "company-001",
     quantity: 100,
     reservedQuantity: 20,
     availableQuantity: 80,
@@ -35,6 +36,7 @@ describe("Stock Entity", () => {
       expect(entity.productSku).toBe(props.productSku);
       expect(entity.warehouseId).toBe(props.warehouseId);
       expect(entity.warehouseName).toBe(props.warehouseName);
+      expect(entity.companyId).toBe(props.companyId);
       expect(entity.quantity).toBe(100);
       expect(entity.reservedQuantity).toBe(20);
       expect(entity.availableQuantity).toBe(80);
@@ -42,6 +44,36 @@ describe("Stock Entity", () => {
       expect(entity.totalValue).toBe(1050);
       expect(entity.currency).toBe("USD");
       expect(entity.lastMovementAt).toBe(now);
+    });
+
+    it("Given: companyId When: create Then: should retain companyId", () => {
+      const entity = Stock.create({
+        ...validProps,
+        companyId: "company-tekshop",
+      });
+
+      expect(entity.companyId).toBe("company-tekshop");
+    });
+
+    it("Given: same product+warehouse different companyId When: create Then: buckets stay distinct", () => {
+      const bucketA = Stock.create({
+        ...validProps,
+        id: "prod-001:wh-001:company-a:0",
+        companyId: "company-a",
+        quantity: 10,
+      });
+      const bucketB = Stock.create({
+        ...validProps,
+        id: "prod-001:wh-001:company-b:0",
+        companyId: "company-b",
+        quantity: 5,
+      });
+
+      expect(bucketA.id).not.toBe(bucketB.id);
+      expect(bucketA.companyId).toBe("company-a");
+      expect(bucketB.companyId).toBe("company-b");
+      expect(bucketA.productId).toBe(bucketB.productId);
+      expect(bucketA.warehouseId).toBe(bucketB.warehouseId);
     });
   });
 

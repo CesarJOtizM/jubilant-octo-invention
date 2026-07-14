@@ -9,6 +9,7 @@ describe("StockMapper", () => {
     productSku: "WDG-001",
     warehouseId: "wh-1",
     warehouseName: "Main",
+    companyId: "company-1",
     quantity: 100,
     reservedQuantity: 10,
     availableQuantity: 90,
@@ -33,12 +34,47 @@ describe("StockMapper", () => {
       expect(entity.productSku).toBe("WDG-001");
       expect(entity.warehouseId).toBe("wh-1");
       expect(entity.warehouseName).toBe("Main");
+      expect(entity.companyId).toBe("company-1");
       expect(entity.quantity).toBe(100);
       expect(entity.reservedQuantity).toBe(10);
       expect(entity.availableQuantity).toBe(90);
       expect(entity.averageCost).toBe(5.5);
       expect(entity.totalValue).toBe(550);
       expect(entity.currency).toBe("USD");
+    });
+
+    it("Given a DTO with companyId and no id, When toDomain is called with an index, Then composite id includes companyId", () => {
+      const dtoWithoutId = { ...mockRawDto, companyId: "company-tekshop" };
+      delete (dtoWithoutId as Record<string, unknown>).id;
+
+      const entity = StockMapper.toDomain(dtoWithoutId, 3);
+
+      expect(entity.id).toBe("prod-1:wh-1:company-tekshop:3");
+      expect(entity.companyId).toBe("company-tekshop");
+    });
+
+    it("Given two buckets same product+warehouse different companyId, When mapped without id, Then composite ids stay distinct", () => {
+      const dtoA = {
+        productId: "prod-1",
+        warehouseId: "wh-1",
+        companyId: "company-a",
+        quantity: 10,
+        averageCost: 1,
+        totalValue: 10,
+        currency: "USD",
+      };
+      const dtoB = {
+        ...dtoA,
+        companyId: "company-b",
+        quantity: 5,
+      };
+
+      const entityA = StockMapper.toDomain(dtoA, 0);
+      const entityB = StockMapper.toDomain(dtoB, 0);
+
+      expect(entityA.id).toBe("prod-1:wh-1:company-a:0");
+      expect(entityB.id).toBe("prod-1:wh-1:company-b:0");
+      expect(entityA.id).not.toBe(entityB.id);
     });
 
     it("Given a DTO without an id, When toDomain is called with an index, Then it should generate a composite id", () => {
@@ -50,7 +86,7 @@ describe("StockMapper", () => {
       const entity = StockMapper.toDomain(dtoWithoutId, 3);
 
       // Assert
-      expect(entity.id).toBe("prod-1:wh-1:3");
+      expect(entity.id).toBe("prod-1:wh-1:company-1:3");
     });
 
     it("Given a DTO without an id and no index, When toDomain is called, Then it should generate a composite id with index 0", () => {
@@ -62,7 +98,7 @@ describe("StockMapper", () => {
       const entity = StockMapper.toDomain(dtoWithoutId);
 
       // Assert
-      expect(entity.id).toBe("prod-1:wh-1:0");
+      expect(entity.id).toBe("prod-1:wh-1:company-1:0");
     });
 
     it("Given a DTO with missing optional fields, When toDomain is called, Then defaults should be applied", () => {
@@ -79,11 +115,13 @@ describe("StockMapper", () => {
       expect(entity.productName).toBe("");
       expect(entity.productSku).toBe("");
       expect(entity.warehouseName).toBe("");
+      expect(entity.companyId).toBe("");
       expect(entity.quantity).toBe(0);
       expect(entity.reservedQuantity).toBe(0);
       expect(entity.averageCost).toBe(0);
       expect(entity.totalValue).toBe(0);
       expect(entity.currency).toBe("USD");
+      expect(entity.id).toBe("prod-2:wh-2::0");
     });
 
     it("Given a DTO with a lastMovementAt string, When toDomain is called, Then it should convert to a Date object", () => {
@@ -149,6 +187,7 @@ describe("StockMapper", () => {
       expect(dto.productSku).toBe("WDG-001");
       expect(dto.warehouseId).toBe("wh-1");
       expect(dto.warehouseName).toBe("Main");
+      expect(dto.companyId).toBe("company-1");
       expect(dto.quantity).toBe(100);
       expect(dto.reservedQuantity).toBe(10);
       expect(dto.availableQuantity).toBe(90);

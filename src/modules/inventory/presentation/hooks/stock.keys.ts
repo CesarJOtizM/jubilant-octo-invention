@@ -5,6 +5,6 @@ export const stockKeys = {
   lists: () => [...stockKeys.all, "list"] as const,
   list: (filters?: StockFilters) => [...stockKeys.lists(), filters] as const,
   byLocation: () => [...stockKeys.all, "location"] as const,
-  location: (productId: string, warehouseId: string) =>
-    [...stockKeys.byLocation(), productId, warehouseId] as const,
+  location: (productId: string, warehouseId: string, companyId?: string) =>
+    [...stockKeys.byLocation(), productId, warehouseId, companyId] as const,
 };

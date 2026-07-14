@@ -100,6 +100,9 @@ export class TransferApiAdapter implements TransferRepositoryPort {
     if (filters.status?.length) {
       params.status = filters.status.join(",");
     }
+    if (filters.companyId) {
+      params.companyId = filters.companyId;
+    }
     if (filters.search) {
       params.search = filters.search;
     }

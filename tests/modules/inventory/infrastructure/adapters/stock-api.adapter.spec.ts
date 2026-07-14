@@ -157,6 +157,45 @@ describe("StockApiAdapter", () => {
       expect(result).toBeTruthy();
     });
 
+    it("Given: companyId When: findByProductAndWarehouse is called Then: should append companyId query param", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: mockStockItem },
+        status: 200,
+        headers: {},
+      });
+
+      await adapter.findByProductAndWarehouse(
+        "prod-001",
+        "wh-001",
+        "company-tekshop",
+      );
+
+      expect(apiClient.get).toHaveBeenCalledWith(
+        "/inventory/stock/product/prod-001/warehouse/wh-001",
+        { params: { companyId: "company-tekshop" } },
+      );
+    });
+
+    it("Given: companyId omitted When: findByProductAndWarehouse is called Then: should not send companyId params", async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: { data: mockStockItem },
+        status: 200,
+        headers: {},
+      });
+
+      await adapter.findByProductAndWarehouse("prod-001", "wh-001");
+
+      expect(apiClient.get).toHaveBeenCalledWith(
+        "/inventory/stock/product/prod-001/warehouse/wh-001",
+      );
+      expect(apiClient.get).not.toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          params: expect.objectContaining({ companyId: expect.anything() }),
+        }),
+      );
+    });
+
     it("Given: a non-existent stock record When: findByProductAndWarehouse is called Then: should return null on 404", async () => {
       vi.mocked(apiClient.get).mockRejectedValue({
         response: { status: 404 },

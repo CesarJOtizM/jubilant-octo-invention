@@ -141,6 +141,42 @@ describe("TransferApiAdapter", () => {
       });
     });
 
+    it("Given: companyId filter When: findAll is called Then: should include companyId in params", async () => {
+      const listResponse: TransferListResponseDto = {
+        data: [],
+        pagination: mockPagination,
+      };
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: listResponse,
+        status: 200,
+        headers: {},
+      });
+
+      await adapter.findAll({ companyId: "company-tekshop", page: 1 });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/transfers", {
+        params: { companyId: "company-tekshop", page: 1 },
+      });
+    });
+
+    it("Given: companyId omitted When: findAll is called Then: should not include companyId in params", async () => {
+      const listResponse: TransferListResponseDto = {
+        data: [],
+        pagination: mockPagination,
+      };
+      vi.mocked(apiClient.get).mockResolvedValue({
+        data: listResponse,
+        status: 200,
+        headers: {},
+      });
+
+      await adapter.findAll({ page: 2, limit: 5 });
+
+      expect(apiClient.get).toHaveBeenCalledWith("/inventory/transfers", {
+        params: { page: 2, limit: 5 },
+      });
+    });
+
     it("Given: API response with null data When: findAll is called Then: should default to empty array", async () => {
       vi.mocked(apiClient.get).mockResolvedValue({
         data: { data: null, pagination: mockPagination },
