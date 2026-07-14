@@ -1,6 +1,9 @@
 import { apiClient } from "@/shared/infrastructure/http";
 import type { PaginatedResult } from "@/shared/application/dto/pagination.dto";
-import type { ImportRepositoryPort } from "@/modules/imports/application/ports/import.repository.port";
+import type {
+  ImportCompanyBind,
+  ImportRepositoryPort,
+} from "@/modules/imports/application/ports/import.repository.port";
 import type {
   ImportBatchApiDto,
   ImportBatchListResponseDto,
@@ -18,6 +21,7 @@ import type {
 } from "@/modules/imports/domain/entities";
 import type { ImportPreview } from "@/modules/imports/domain/entities/import-preview.entity";
 import { ImportMapper } from "@/modules/imports/application/mappers/import.mapper";
+import { enrichCsvWithCompanyCode } from "@/modules/imports/application/utils/enrich-csv-with-company-code";
 
 export class ImportApiAdapter implements ImportRepositoryPort {
   private readonly basePath = "/imports";
@@ -52,10 +56,13 @@ export class ImportApiAdapter implements ImportRepositoryPort {
     }
   }
 
-  async preview(file: File, type: ImportType): Promise<ImportPreview> {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", type);
+  async preview(
+    file: File,
+    type: ImportType,
+    company?: ImportCompanyBind,
+  ): Promise<ImportPreview> {
+    const prepared = await this.prepareFile(file, company);
+    const formData = this.buildImportFormData(prepared, type, company);
 
     const response = await apiClient.post<ImportPreviewResponseDto>(
       `${this.basePath}/preview`,
@@ -69,10 +76,10 @@ export class ImportApiAdapter implements ImportRepositoryPort {
     file: File,
     type: ImportType,
     note?: string,
+    company?: ImportCompanyBind,
   ): Promise<ImportBatch> {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", type);
+    const prepared = await this.prepareFile(file, company);
+    const formData = this.buildImportFormData(prepared, type, company);
     if (note) formData.append("note", note);
 
     const response = await apiClient.post<ImportExecuteResponseDto>(
@@ -134,5 +141,45 @@ export class ImportApiAdapter implements ImportRepositoryPort {
     return response.data.data.types.map((schema) =>
       ImportMapper.toTypeSchema(schema),
     );
+  }
+
+  private buildImportFormData(
+    file: File,
+    type: ImportType,
+    company?: ImportCompanyBind,
+  ): FormData {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", type);
+    if (company?.companyId) {
+      formData.append("companyId", company.companyId);
+    }
+    if (company?.companyCode) {
+      formData.append("companyCode", company.companyCode);
+    }
+    return formData;
+  }
+
+  /**
+   * Prefer CSV Company Code enrichment (BE reads row companyCode today).
+   * FormData companyId/companyCode are also sent for future BE honor.
+   */
+  private async prepareFile(
+    file: File,
+    company?: ImportCompanyBind,
+  ): Promise<File> {
+    if (!company?.companyCode || !this.isCsvFile(file)) {
+      return file;
+    }
+    const text = await file.text();
+    const enriched = enrichCsvWithCompanyCode(text, company.companyCode);
+    return new File([enriched], file.name, {
+      type: file.type || "text/csv",
+    });
+  }
+
+  private isCsvFile(file: File): boolean {
+    const name = file.name.toLowerCase();
+    return name.endsWith(".csv") || file.type === "text/csv";
   }
 }

@@ -86,6 +86,7 @@ export interface CreateTransferLineDto {
 }
 
 export interface CreateTransferDto {
+  companyId: string;
   fromWarehouseId: string;
   toWarehouseId: string;
   note?: string;

@@ -57,13 +57,16 @@ vi.mock(
       placeholder,
       value,
       onValueChange,
+      companyId,
     }: {
       placeholder?: string;
       value?: string;
       onValueChange?: (v: string) => void;
+      companyId?: string;
     }) => (
       <select
         data-testid="product-search-select"
+        data-company-id={companyId ?? ""}
         value={value}
         onChange={(e) => onValueChange?.(e.target.value)}
       >
@@ -73,10 +76,12 @@ vi.mock(
   }),
 );
 
+let mockSelectedCompanyId: string | null = null;
+
 vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
   useCompanyStore: (
     selector: (s: { selectedCompanyId: string | null }) => unknown,
-  ) => selector({ selectedCompanyId: null }),
+  ) => selector({ selectedCompanyId: mockSelectedCompanyId }),
 }));
 
 // --- Test helper ---
@@ -103,6 +108,7 @@ describe("TransferForm", () => {
   beforeEach(() => {
     mockOnOpenChange.mockClear();
     mockMutateAsync.mockClear();
+    mockSelectedCompanyId = null;
   });
 
   it("Given: open is false When: rendering Then: should render nothing", () => {
@@ -182,6 +188,19 @@ describe("TransferForm", () => {
     if (closeButton) {
       fireEvent.click(closeButton);
       expect(mockOnOpenChange).toHaveBeenCalledWith(false);
+    }
+  });
+
+  it("Given: non-null selectedCompanyId When: rendering inventory product picker Then: ProductSearchSelect omits ownership companyId", () => {
+    mockSelectedCompanyId = "xfer-company-shared";
+    renderWithQuery(
+      <TransferForm open={true} onOpenChange={mockOnOpenChange} />,
+    );
+
+    const pickers = screen.getAllByTestId("product-search-select");
+    expect(pickers.length).toBeGreaterThan(0);
+    for (const picker of pickers) {
+      expect(picker).toHaveAttribute("data-company-id", "");
     }
   });
 });

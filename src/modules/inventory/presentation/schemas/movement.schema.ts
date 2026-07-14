@@ -50,8 +50,10 @@ export interface CreateMovementFormData {
 // Helper to transform form data to DTO
 export function toCreateMovementDto(
   data: CreateMovementFormData,
+  companyId: string,
 ): CreateStockMovementDto {
   return {
+    companyId,
     warehouseId: data.warehouseId,
     type: data.type,
     contactId: data.contactId || undefined,

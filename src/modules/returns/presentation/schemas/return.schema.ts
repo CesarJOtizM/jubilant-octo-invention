@@ -47,7 +47,10 @@ export const createReturnSchema = z
 
 export type CreateReturnFormData = z.infer<typeof createReturnSchema>;
 
-export function toCreateReturnDto(data: CreateReturnFormData): CreateReturnDto {
+export function toCreateReturnDto(
+  data: CreateReturnFormData,
+  companyId: string,
+): CreateReturnDto {
   const lines: CreateReturnLineDto[] = data.lines.map((line) => ({
     productId: line.productId,
     comboId: line.comboId,
@@ -59,6 +62,7 @@ export function toCreateReturnDto(data: CreateReturnFormData): CreateReturnDto {
   }));
 
   return {
+    companyId,
     type: data.type,
     warehouseId: data.warehouseId,
     saleId: data.saleId || undefined,

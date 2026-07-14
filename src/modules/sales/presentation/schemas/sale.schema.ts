@@ -53,7 +53,10 @@ export const createSaleSchema = z.object({
 
 export type CreateSaleFormData = z.infer<typeof createSaleSchema>;
 
-export function toCreateSaleDto(data: CreateSaleFormData): CreateSaleDto {
+export function toCreateSaleDto(
+  data: CreateSaleFormData,
+  companyId: string,
+): CreateSaleDto {
   const lines: CreateSaleLineDto[] = data.lines.map((line) => {
     if (line.lineType === "combo") {
       return {
@@ -71,6 +74,7 @@ export function toCreateSaleDto(data: CreateSaleFormData): CreateSaleDto {
   });
 
   return {
+    companyId,
     warehouseId: data.warehouseId,
     contactId: data.contactId,
     customerReference: data.customerReference || undefined,

@@ -139,10 +139,11 @@ describe("Movement Schema", () => {
       };
 
       // Act
-      const dto = toCreateMovementDto(formData);
+      const dto = toCreateMovementDto(formData, "company-mov-1");
 
       // Assert
       expect(dto.warehouseId).toBe(formData.warehouseId);
+      expect(dto.companyId).toBe("company-mov-1");
       expect(dto.type).toBe(formData.type);
       expect(dto.reference).toBe(formData.reference);
       expect(dto.reason).toBe(formData.reason);
@@ -165,12 +166,31 @@ describe("Movement Schema", () => {
       };
 
       // Act
-      const dto = toCreateMovementDto(formData);
+      const dto = toCreateMovementDto(formData, "company-mov-2");
 
       // Assert
+      expect(dto.companyId).toBe("company-mov-2");
       expect(dto.reference).toBeUndefined();
       expect(dto.reason).toBeUndefined();
       expect(dto.note).toBeUndefined();
+    });
+
+    it("Given: selected company available When: transform runs Then: DTO must contain that non-empty companyId", () => {
+      // Arrange
+      const formData: CreateMovementFormData = {
+        warehouseId: "wh-1",
+        type: "IN",
+        lines: [{ productId: "prod-1", quantity: 5 }],
+      };
+
+      // Act
+      const dtoA = toCreateMovementDto(formData, "mov-comp-a");
+      const dtoB = toCreateMovementDto(formData, "mov-comp-b");
+
+      // Assert
+      expect(dtoA.companyId).toBe("mov-comp-a");
+      expect(dtoB.companyId).toBe("mov-comp-b");
+      expect(dtoA.companyId).not.toBe(dtoB.companyId);
     });
   });
 });
