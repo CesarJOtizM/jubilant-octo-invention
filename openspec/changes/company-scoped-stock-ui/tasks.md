@@ -68,6 +68,7 @@ User approved apply with **feature-branch-chain**. Active slice: Unit 4 / PR4.
 - [x] 4.5 Verify: vitest imports + full `vitest run` + `tsc --noEmit`
 
 ## Delivery status
-- PR4: pending
+- PR4: https://github.com/NevadaTech/jubilant-octo-invention/pull/11
 - Branch: feat/company-scoped-stock-ui-04-stock-import-bind (base PR3)
 - Next: sdd-verify
+- ready_for_verify: true
