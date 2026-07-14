@@ -227,6 +227,7 @@ export function WarehouseList() {
                 total: data.pagination.total,
               })}
               perPageLabel={tCommon("pagination.perPage")}
+                allLabel={tCommon("pagination.all")}
             />
           </>
         )}

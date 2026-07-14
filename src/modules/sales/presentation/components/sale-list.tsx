@@ -321,6 +321,7 @@ export function SaleList() {
                   total: data.pagination.total,
                 })}
                 perPageLabel={tCommon("pagination.perPage")}
+                allLabel={tCommon("pagination.all")}
               />
             </>
           )}

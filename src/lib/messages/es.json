@@ -25,7 +25,8 @@
     "selected": "seleccionados",
     "pagination": {
       "showing": "Mostrando {from} a {to} de {total}",
-      "perPage": "Por página"
+      "perPage": "Por página",
+      "all": "Todos"
     }
   },
   "auth": {
