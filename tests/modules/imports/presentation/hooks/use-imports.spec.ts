@@ -216,7 +216,34 @@ describe("use-imports hooks", () => {
         await result.current.mutateAsync({ file, type: "PRODUCTS" });
       });
 
-      expect(mockPreview).toHaveBeenCalledWith(file, "PRODUCTS");
+      expect(mockPreview).toHaveBeenCalledWith(file, "PRODUCTS", undefined);
+    });
+
+    it("Given: STOCK with company bind When: mutate Then: passes company to preview", async () => {
+      mockPreview.mockResolvedValueOnce({
+        totalRows: 1,
+        validRows: 1,
+        invalidRows: 0,
+        structureErrors: [],
+        rowErrors: [],
+        warnings: [],
+      });
+      const { Wrapper } = createQueryWrapper();
+      const { result } = renderHook(() => usePreviewImport(), {
+        wrapper: Wrapper,
+      });
+
+      const file = new File(["content"], "stock.csv", { type: "text/csv" });
+      const company = { companyId: "company-42", companyCode: "NEG-002" };
+      await act(async () => {
+        await result.current.mutateAsync({
+          file,
+          type: "STOCK",
+          company,
+        });
+      });
+
+      expect(mockPreview).toHaveBeenCalledWith(file, "STOCK", company);
     });
 
     it("Given: server error When: mutate Then: shows error toast", async () => {
@@ -263,7 +290,12 @@ describe("use-imports hooks", () => {
         await result.current.mutateAsync({ file, type: "PRODUCTS" });
       });
 
-      expect(mockExecute).toHaveBeenCalledWith(file, "PRODUCTS", undefined);
+      expect(mockExecute).toHaveBeenCalledWith(
+        file,
+        "PRODUCTS",
+        undefined,
+        undefined,
+      );
       expect(toast.success).toHaveBeenCalledWith(
         "imports.messages.importStarted",
       );
@@ -297,6 +329,32 @@ describe("use-imports hooks", () => {
         file,
         "WAREHOUSES",
         "Initial import",
+        undefined,
+      );
+    });
+
+    it("Given: STOCK with company bind When: mutate Then: passes company to execute", async () => {
+      mockExecute.mockResolvedValueOnce({ id: "batch-stock", status: "PENDING" });
+      const { Wrapper } = createQueryWrapper();
+      const { result } = renderHook(() => useExecuteImport(), {
+        wrapper: Wrapper,
+      });
+
+      const file = new File(["content"], "stock.csv", { type: "text/csv" });
+      const company = { companyId: "company-99", companyCode: "NEG-002" };
+      await act(async () => {
+        await result.current.mutateAsync({
+          file,
+          type: "STOCK",
+          company,
+        });
+      });
+
+      expect(mockExecute).toHaveBeenCalledWith(
+        file,
+        "STOCK",
+        undefined,
+        company,
       );
     });
 
