@@ -1,0 +1,105 @@
+schema: spec-driven
+
+context: |
+  Next.js 16 frontend (React 19, App Router, Turbopack) for inventory management SaaS.
+  Clean/Hexagonal Architecture: modules/{domain}/{domain,application,infrastructure,presentation}.
+  Stack: TypeScript strict, Tailwind CSS 4, shadcn/ui, Zustand 5, TanStack Query/Table,
+  Zod 4, React Hook Form, next-intl (i18n), Sentry, Framer Motion, Axios.
+  DI container in src/config/di/. Shared kernel in src/shared/{domain,application,infrastructure,presentation}.
+  15 business modules: audit, authentication, brands, companies, contacts, dashboard, imports,
+  integrations, inventory, reports, returns, roles, sales, settings, users.
+  Backend: separate repo (improved-parakeet). Deploys to Vercel (region iad1) + Docker standalone.
+
+strict_tdd: true
+
+testing:
+  unit:
+    available: true
+    runner: vitest
+    command: "vitest run"
+    coverage_command: "vitest run --coverage"
+    coverage_provider: v8
+    environment: jsdom
+    setup: tests/setup.ts
+    pattern: "tests/**/*.spec.{ts,tsx}"
+    framework_libs:
+      - "@testing-library/react"
+      - "@testing-library/jest-dom"
+    test_count: 339
+  integration:
+    available: true
+    tool: "@testing-library/react"
+    notes: "Component integration tests with jsdom, mocking infrastructure"
+  e2e:
+    available: true
+    runner: playwright
+    command: "npx playwright test"
+    config: playwright.config.ts
+    test_dir: tests/e2e/tests
+    test_count: 16
+    projects:
+      - setup (auth)
+      - chromium
+      - chromium-rbac
+  coverage:
+    available: true
+    provider: v8
+    reporters: [text, json, html]
+    directory: ./coverage
+  quality:
+    linter:
+      available: true
+      tool: eslint
+      version: 10
+      command: "eslint src/"
+      config: eslint.config.mjs
+      plugins:
+        - "@eslint-react/eslint-plugin"
+        - "@next/eslint-plugin-next"
+        - typescript-eslint
+    type_checker:
+      available: true
+      tool: tsc
+      command: "tsc --noEmit"
+      strict: true
+    formatter:
+      available: true
+      tool: prettier
+      command: "prettier --write ."
+      check_command: "prettier --check ."
+      plugins:
+        - prettier-plugin-tailwindcss
+
+ci:
+  platform: github-actions
+  config: .github/workflows/ci.yml
+  jobs: [quality, test, build]
+  package_manager: bun
+  pre_commit: "bun run lint && bun run build && bun run test:run"
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Note impact on backend API if any
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Reference affected module(s) by domain path
+  design:
+    - Follow existing hexagonal layer boundaries (domain/application/infrastructure/presentation)
+    - Document which ports/adapters are affected
+    - Include component hierarchy for presentation changes
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+    - Include test tasks alongside implementation tasks
+  apply:
+    tdd: true
+    test_command: "vitest run"
+  verify:
+    test_command: "vitest run --coverage"
+    build_command: "next build"
+    e2e_command: "npx playwright test"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

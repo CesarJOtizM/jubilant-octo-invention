@@ -1,0 +1,127 @@
+change: company-scoped-stock-ui
+artifact_store: openspec
+project: jubilant-octo-invention
+backend_contract: improved-parakeet/openspec/specs/company-scoped-stock/spec.md
+backend_archive: improved-parakeet/openspec/changes/archive/2026-07-13-company-scoped-stock
+created_at: "2026-07-13"
+updated_at: "2026-07-14T02:45:00Z"
+status: active
+current_phase: apply
+next_phase: apply
+ready_for_propose: true
+ready_for_spec: true
+ready_for_design: true
+ready_for_tasks: true
+ready_for_apply: true
+
+phases:
+  explore:
+    status: completed
+    artifact: exploration.md
+    completed_at: "2026-07-13"
+  propose:
+    status: completed
+    artifact: proposal.md
+    completed_at: "2026-07-13"
+    approach: header_inject_from_global_store_with_null_guard
+    capability: company-scoped-stock-ui
+  design:
+    status: completed
+    artifact: design.md
+    completed_at: "2026-07-13"
+    approach: store_inject_fail_closed_shared_catalog_stock_identity_import_bind
+  tasks:
+    status: completed
+    artifact: tasks.md
+    completed_at: "2026-07-13"
+    phase_count: 4
+    task_count: 26
+    first_apply_slice: stock_identity_and_transfer_list_filters
+    tdd: true
+    test_runner: vitest
+  apply:
+    status: in_progress
+    completed_phases: [1]
+    completed_tasks: [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]
+    remaining_phases: [2, 3, 4]
+    branch: feat/company-scoped-stock-ui-01-stock-identity
+    tracker_branch: feat/company-scoped-stock-ui
+    chain_strategy: feature-branch-chain
+    unit: 1
+    pr: 1
+    updated_at: "2026-07-14T02:45:00Z"
+
+dependencies:
+  - repo: improved-parakeet
+    change: company-scoped-stock
+    relation: backend_contract_shipped
+    note: >
+      BE archived; Stock.companyId bucket + required header companyId on
+      Movement/Sale/Transfer/Return create; list filters use stock/header
+      companyId not product.companyId.
+  - change: meli-full-warehouse-ui
+    relation: parallel_active_no_conflict
+    note: >
+      Active FE change for MeLi fullWarehouseId. Do not archive. File overlap
+      with company-scoped-stock-ui is none (integrations vs inventory/sales).
+
+closed_decisions_from_be:
+  - shared_product_catalog
+  - shared_physical_warehouse
+  - separate_qty_and_sales_per_company_via_stock_and_headers
+  - fe_must_send_header_companyId_on_create
+  - fe_must_filter_inventory_sales_by_stock_or_header_companyId
+  - out_of_scope_cross_company_transfers
+  - out_of_scope_duplicate_skus
+  - out_of_scope_warehouse_companyId
+
+locked_proposal_decisions:
+  - inject_header_companyId_from_useCompanyStore_selectedCompanyId
+  - fail_closed_create_when_company_is_all_or_null
+  - expose_stock_companyId_for_identity
+  - align_transfer_list_and_inventory_filters_with_be
+  - inventory_product_pickers_shared_catalog_no_ownership_gate
+  - stock_import_require_selected_company_and_inject
+  - out_of_scope_approach_2_per_form_company_select
+  - do_not_archive_meli_full_warehouse_ui
+
+locked_design_decisions:
+  - toCreate_dto_second_arg_companyId
+  - company_required_guard_shared_component
+  - stock_mapper_exposes_companyId_composite_id
+  - findByProductAndWarehouse_optional_companyId
+  - transfer_filters_companyId_inject_when_non_null
+  - inventory_pickers_omit_product_ownership_companyId
+  - stock_import_guard_plus_formdata_and_csv_companyCode_enrichment
+  - chained_prs_four_slices
+
+exploration_findings:
+  create_payloads_missing_companyId: true
+  list_filters_mostly_wired: true
+  transfer_list_missing_company_filter: true
+  stock_entity_missing_companyId: true
+  product_search_uses_product_companyId: true
+  import_wizard_no_company_inject: true
+  be_import_preview_execute_no_companyId_multipart_yet: true
+
+delivery:
+  chained_prs_recommended: true
+  line_budget_risk: High
+  delivery_strategy: auto-chain
+  decision_needed_before_apply: false
+  chain_strategy: feature-branch-chain
+  suggested_slices:
+    - stock_identity_and_transfer_list_filters
+    - create_header_inject_and_null_guard
+    - shared_catalog_product_pickers
+    - stock_import_company_bind
+  active_slice: stock_identity_and_transfer_list_filters
+  tracker_branch: feat/company-scoped-stock-ui
+  pr1_branch: feat/company-scoped-stock-ui-01-stock-identity
+
+recommendation: header_inject_from_global_store_with_null_guard
+ready_for_proposal: true
+
+human_gate: >
+  Phase 1 (PR1) applied on feature-branch-chain. Next: sdd-apply Phase 2
+  (Create inject + CompanyRequiredGuard) on branch based on PR1.
