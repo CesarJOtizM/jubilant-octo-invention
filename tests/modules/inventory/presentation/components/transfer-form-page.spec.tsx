@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TransferFormPage } from "@/modules/inventory/presentation/components/transfers/transfer-form-page";
+import { toCreateTransferDto } from "@/modules/inventory/presentation/schemas/transfer.schema";
 
 // --- Mocks ---
 
@@ -21,7 +22,7 @@ vi.mock("@/modules/inventory/presentation/hooks/use-transfers", () => ({
   useCreateTransfer: () => ({
     isPending: false,
     isError: false,
-    mutateAsync: vi.fn(),
+    mutateAsync: vi.fn().mockResolvedValue({ id: "xfer-1" }),
   }),
 }));
 
@@ -49,16 +50,42 @@ vi.mock("@/modules/inventory/presentation/hooks/use-warehouses", () => ({
 
 vi.mock("@/modules/inventory/presentation/schemas/transfer.schema", () => ({
   createTransferSchema: { parse: vi.fn() },
-  toCreateTransferDto: vi.fn((d: unknown) => d),
+  toCreateTransferDto: vi.fn((d: unknown, companyId: string) => ({
+    ...(d as object),
+    companyId,
+  })),
 }));
 
 vi.mock("@hookform/resolvers/zod", () => ({
-  zodResolver: () => vi.fn(),
+  zodResolver: () => async (values: unknown) => ({
+    values,
+    errors: {},
+  }),
+}));
+
+let mockSelectedCompanyId: string | null = "company-test-1";
+
+vi.mock("@/modules/companies/infrastructure/store/company.store", () => ({
+  useCompanyStore: (
+    selector: (state: {
+      selectedCompanyId: string | null;
+      setSelectedCompany: (id: string | null) => void;
+    }) => unknown,
+  ) =>
+    selector({
+      selectedCompanyId: mockSelectedCompanyId,
+      setSelectedCompany: vi.fn(),
+    }),
 }));
 
 // --- Tests ---
 
 describe("TransferFormPage", () => {
+  beforeEach(() => {
+    mockSelectedCompanyId = "company-test-1";
+    vi.mocked(toCreateTransferDto).mockClear();
+  });
+
   it("Given: component renders When: rendering Then: should show create title and description", () => {
     render(<TransferFormPage />);
 
@@ -125,5 +152,30 @@ describe("TransferFormPage", () => {
     // At least one line should be rendered with a quantity input
     const numberInputs = container.querySelectorAll('input[type="number"]');
     expect(numberInputs.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("Given: selectedCompanyId is null When: opening create Then: guard blocks submit with required-company copy", () => {
+    mockSelectedCompanyId = null;
+    render(<TransferFormPage />);
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText("requiredCompany.title")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "create" })).toBeDisabled();
+  });
+
+  it("Given: non-null selectedCompanyId When: submitting create Then: toCreateTransferDto receives that companyId", async () => {
+    mockSelectedCompanyId = "xfer-company-7";
+    const { container } = render(<TransferFormPage />);
+
+    const form = container.querySelector("form");
+    expect(form).not.toBeNull();
+    fireEvent.submit(form!);
+
+    await waitFor(() => {
+      expect(toCreateTransferDto).toHaveBeenCalledWith(
+        expect.anything(),
+        "xfer-company-7",
+      );
+    });
   });
 });

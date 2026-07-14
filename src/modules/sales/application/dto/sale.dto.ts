@@ -134,6 +134,7 @@ export interface CreateSaleLineDto {
 }
 
 export interface CreateSaleDto {
+  companyId: string;
   warehouseId: string;
   contactId: string;
   customerReference?: string;

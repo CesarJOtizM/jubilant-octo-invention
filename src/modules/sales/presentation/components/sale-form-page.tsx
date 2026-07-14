@@ -34,6 +34,7 @@ import { useCreateSale } from "@/modules/sales/presentation/hooks/use-sales";
 import { useCombos } from "@/modules/inventory/presentation/hooks/use-combos";
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
+import { CompanyRequiredGuard } from "@/modules/companies/presentation/components/company-required-guard";
 
 export function SaleFormPage() {
   const t = useTranslations("sales");
@@ -163,8 +164,9 @@ export function SaleFormPage() {
   );
 
   const onSubmit = async (data: CreateSaleFormData) => {
+    if (!selectedCompanyId) return;
     try {
-      const dto = toCreateSaleDto(data);
+      const dto = toCreateSaleDto(data, selectedCompanyId);
       await createSale.mutateAsync(dto);
       router.push("/dashboard/sales");
     } catch {
@@ -201,6 +203,7 @@ export function SaleFormPage() {
         </div>
       </div>
 
+      <CompanyRequiredGuard>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {createSale.isError && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -501,6 +504,7 @@ export function SaleFormPage() {
           </Button>
         </div>
       </form>
+      </CompanyRequiredGuard>
     </div>
   );
 }

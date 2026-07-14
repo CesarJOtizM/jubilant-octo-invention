@@ -59,6 +59,7 @@ export interface CreateMovementLineDto {
 }
 
 export interface CreateStockMovementDto {
+  companyId: string;
   warehouseId: string;
   type: MovementType;
   contactId?: string;

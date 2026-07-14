@@ -27,6 +27,7 @@ import { useCreateTransfer } from "@/modules/inventory/presentation/hooks/use-tr
 import { useProducts } from "@/modules/inventory/presentation/hooks/use-products";
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
+import { CompanyRequiredGuard } from "@/modules/companies/presentation/components/company-required-guard";
 
 export function TransferFormPage() {
   const t = useTranslations("inventory.transfers");
@@ -87,8 +88,9 @@ export function TransferFormPage() {
   };
 
   const onSubmit = async (data: CreateTransferFormData) => {
+    if (!selectedCompanyId) return;
     try {
-      const dto = toCreateTransferDto(data);
+      const dto = toCreateTransferDto(data, selectedCompanyId);
       const newTransfer = await createTransfer.mutateAsync(dto);
       router.push(`/dashboard/inventory/transfers/${newTransfer.id}`);
     } catch {
@@ -120,6 +122,7 @@ export function TransferFormPage() {
       </div>
 
       {/* Form */}
+      <CompanyRequiredGuard>
       <Card>
         <CardHeader>
           <CardTitle>{t("form.transferInfo")}</CardTitle>
@@ -305,6 +308,7 @@ export function TransferFormPage() {
           </form>
         </CardContent>
       </Card>
+      </CompanyRequiredGuard>
     </div>
   );
 }

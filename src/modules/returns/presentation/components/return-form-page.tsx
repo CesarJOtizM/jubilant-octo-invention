@@ -33,6 +33,7 @@ import { useCreateReturn } from "@/modules/returns/presentation/hooks/use-return
 import { useProducts } from "@/modules/inventory/presentation/hooks/use-products";
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
+import { CompanyRequiredGuard } from "@/modules/companies/presentation/components/company-required-guard";
 import {
   useSale,
   useSaleReturns,
@@ -291,8 +292,9 @@ export function ReturnFormPage() {
   }, [selectedMovementId, returnType, movementLineProducts, replace]);
 
   const onSubmit = async (data: CreateReturnFormData) => {
+    if (!selectedCompanyId) return;
     try {
-      const dto = toCreateReturnDto(data);
+      const dto = toCreateReturnDto(data, selectedCompanyId);
       await createReturn.mutateAsync(dto);
       router.push("/dashboard/returns");
     } catch {
@@ -440,6 +442,7 @@ export function ReturnFormPage() {
         </div>
       </div>
 
+      <CompanyRequiredGuard>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {createReturn.isError && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -1019,6 +1022,7 @@ export function ReturnFormPage() {
           </Button>
         </div>
       </form>
+      </CompanyRequiredGuard>
     </div>
   );
 }

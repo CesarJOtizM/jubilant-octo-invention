@@ -25,7 +25,7 @@ Chain strategy: feature-branch-chain
 | 3 | Shared-catalog pickers | PR 3 | Base PR2 |
 | 4 | STOCK import bind | PR 4 | Base PR3 |
 
-User approved apply with **feature-branch-chain**. Active slice: Unit 1 / PR1.
+User approved apply with **feature-branch-chain**. Active slice: Unit 2 / PR2.
 
 ---
 
@@ -43,14 +43,14 @@ User approved apply with **feature-branch-chain**. Active slice: Unit 1 / PR1.
 
 ## Phase 2: Create inject + CompanyRequiredGuard (PR2)
 
-- [ ] 2.1 RED: sale/movement/transfer/return schema specs — `toCreate*` includes `companyId`
-- [ ] 2.2 GREEN: require Create*Dto.companyId; `toCreate*(data, companyId)` in four schemas
-- [ ] 2.3 RED: `company-required-guard.spec.tsx` — null blocks + copy; company enables
-- [ ] 2.4 GREEN: create `companies/.../company-required-guard.tsx`
-- [ ] 2.5 GREEN: wrap form pages; inject store id into `toCreate*` + adapters
-- [ ] 2.6 GREEN: i18n keys in `messages/en.json` + `es.json`
-- [ ] 2.7 RED/GREEN: form-page specs for inject + guard
-- [ ] 2.8 Verify: vitest create/guard + `tsc --noEmit`
+- [x] 2.1 RED: sale/movement/transfer/return schema specs — `toCreate*` includes `companyId`
+- [x] 2.2 GREEN: require Create*Dto.companyId; `toCreate*(data, companyId)` in four schemas
+- [x] 2.3 RED: `company-required-guard.spec.tsx` — null blocks + copy; company enables
+- [x] 2.4 GREEN: create `companies/.../company-required-guard.tsx`
+- [x] 2.5 GREEN: wrap form pages; inject store id into `toCreate*` + adapters
+- [x] 2.6 GREEN: i18n keys in `messages/en.json` + `es.json`
+- [x] 2.7 RED/GREEN: form-page specs for inject + guard
+- [x] 2.8 Verify: vitest create/guard + `tsc --noEmit`
 
 ## Phase 3: Product pickers shared catalog (PR3)
 

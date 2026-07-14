@@ -25,6 +25,7 @@ import {
 import { useCreateTransfer } from "@/modules/inventory/presentation/hooks/use-transfers";
 import { useWarehouses } from "@/modules/inventory/presentation/hooks/use-warehouses";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
+import { CompanyRequiredGuard } from "@/modules/companies/presentation/components/company-required-guard";
 
 interface TransferFormProps {
   open: boolean;
@@ -70,8 +71,9 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
     warehousesData?.data.filter((w) => w.id !== selectedFromWarehouse) || [];
 
   const onSubmit = async (data: CreateTransferFormData) => {
+    if (!selectedCompanyId) return;
     try {
-      const dto = toCreateTransferDto(data);
+      const dto = toCreateTransferDto(data, selectedCompanyId);
       await createTransfer.mutateAsync(dto);
       onOpenChange(false);
       reset();
@@ -101,6 +103,7 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
           </Button>
         </CardHeader>
         <CardContent>
+          <CompanyRequiredGuard>
           <form onSubmit={handleSubmit(onSubmit)}>
             <fieldset disabled={createTransfer.isPending} className="space-y-4">
               {createTransfer.isError && (
@@ -273,6 +276,7 @@ export function TransferForm({ open, onOpenChange }: TransferFormProps) {
               </div>
             </fieldset>
           </form>
+          </CompanyRequiredGuard>
         </CardContent>
       </Card>
     </div>
