@@ -9,6 +9,7 @@ import type {
   ImportFilters,
   TemplateFormat,
 } from "@/modules/imports/application/dto/import.dto";
+import type { ImportCompanyBind } from "@/modules/imports/application/ports/import.repository.port";
 import type { ImportType } from "@/modules/imports/domain/entities";
 import { importKeys } from "./import.keys";
 
@@ -92,8 +93,15 @@ export function usePreviewImport() {
   const tErrors = useTranslations("apiErrors");
 
   return useMutation({
-    mutationFn: ({ file, type }: { file: File; type: ImportType }) =>
-      getContainer().importRepository.preview(file, type),
+    mutationFn: ({
+      file,
+      type,
+      company,
+    }: {
+      file: File;
+      type: ImportType;
+      company?: ImportCompanyBind;
+    }) => getContainer().importRepository.preview(file, type, company),
     onError: (error) => {
       toast.error(getApiErrorMessage(error, tErrors));
     },
@@ -110,11 +118,13 @@ export function useExecuteImport() {
       file,
       type,
       note,
+      company,
     }: {
       file: File;
       type: ImportType;
       note?: string;
-    }) => getContainer().importRepository.execute(file, type, note),
+      company?: ImportCompanyBind;
+    }) => getContainer().importRepository.execute(file, type, note, company),
     onSuccess: (_data, variables) => {
       toast.success(t("imports.messages.importStarted"));
       queryClient.invalidateQueries({ queryKey: importKeys.lists() });

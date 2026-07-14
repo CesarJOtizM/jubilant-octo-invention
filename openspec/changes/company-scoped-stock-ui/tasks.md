@@ -25,7 +25,7 @@ Chain strategy: feature-branch-chain
 | 3 | Shared-catalog pickers | PR 3 | Base PR2 |
 | 4 | STOCK import bind | PR 4 | Base PR3 |
 
-User approved apply with **feature-branch-chain**. Active slice: Unit 3 / PR3.
+User approved apply with **feature-branch-chain**. Active slice: Unit 4 / PR4.
 
 ---
 
@@ -61,8 +61,13 @@ User approved apply with **feature-branch-chain**. Active slice: Unit 3 / PR3.
 
 ## Phase 4: STOCK import company bind (PR4)
 
-- [ ] 4.1 RED: `import-api.adapter.spec.ts` — FormData company bind + CSV Company Code enrich
-- [ ] 4.2 GREEN: `companyId?` on import port + `import-api.adapter.ts` preview/execute
-- [ ] 4.3 RED: wizard tests — STOCK+null blocks; company allows
-- [ ] 4.4 GREEN: gate `import-wizard-dialog.tsx`; resolve companyCode; reuse guard i18n
-- [ ] 4.5 Verify: vitest imports + full `vitest run` + `tsc --noEmit`
+- [x] 4.1 RED: `import-api.adapter.spec.ts` — FormData company bind + CSV Company Code enrich
+- [x] 4.2 GREEN: `companyId?` on import port + `import-api.adapter.ts` preview/execute
+- [x] 4.3 RED: wizard tests — STOCK+null blocks; company allows
+- [x] 4.4 GREEN: gate `import-wizard-dialog.tsx`; resolve companyCode; reuse guard i18n
+- [x] 4.5 Verify: vitest imports + full `vitest run` + `tsc --noEmit`
+
+## Delivery status
+- PR4: pending
+- Branch: feat/company-scoped-stock-ui-04-stock-import-bind (base PR3)
+- Next: sdd-verify
