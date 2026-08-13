@@ -87,7 +87,8 @@ export function toUpdateProductDto(
   if (data.price !== undefined) dto.price = data.price;
   if (data.isActive !== undefined) dto.isActive = data.isActive;
   if (data.companyId !== undefined) dto.companyId = data.companyId || undefined;
-  if (data.brandId !== undefined) dto.brandId = data.brandId || undefined;
+  // Empty string is meaningful: it tells the backend to unset the brand.
+  if (data.brandId !== undefined) dto.brandId = data.brandId;
   if (data.barcode !== undefined)
     dto.barcode = data.barcode?.trim() || undefined;
 

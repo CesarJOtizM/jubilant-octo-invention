@@ -1,0 +1,41 @@
+change: frontend-ux-foundation
+status: tasked
+phase: tasks
+updated: 2026-07-14
+artifact_store: hybrid
+phases:
+  explore:
+    status: done
+    artifact: openspec/changes/frontend-ux-foundation/exploration.md
+  propose:
+    status: done
+    artifact: openspec/changes/frontend-ux-foundation/proposal.md
+  design:
+    status: done
+    artifact: openspec/changes/frontend-ux-foundation/design.md
+  spec:
+    status: done
+    artifact: openspec/changes/frontend-ux-foundation/specs/
+  tasks:
+    status: done
+    artifact: openspec/changes/frontend-ux-foundation/tasks.md
+  apply:
+    status: pending
+  verify:
+    status: pending
+  archive:
+    status: pending
+decisions:
+  url_approach: useSearchParams shared hook (no nuqs)
+  list_scope: all lists
+  filter_persist: false (URL SoT; empty = defaults)
+  company_in_url: false (global selector)
+  a11y_exclude: integrations until meli-full-warehouse-ui merges
+  delivery: chained PRs A/B/C
+  chain_strategy: feature-branch-chain
+  decision_needed_before_apply: true
+notes: |
+  Sprint 1 only. Sprint 2/3 deferred.
+  Tasks: 4 phases, 21 checkbox tasks, strict TDD, PR A→B→C.
+  Human gate required before sdd-apply (feature-branch-chain + Unit A approval).
+  ready_for_apply: false until gate.

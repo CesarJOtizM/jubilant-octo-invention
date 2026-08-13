@@ -20,6 +20,12 @@ export function useImports(filters?: ImportFilters) {
       getContainer().importRepository.findAll(
         filters ?? { page: 1, limit: 20 },
       ),
+    // A batch that is still running finishes server-side without notifying
+    // the client, so keep the list refreshing until every row is terminal.
+    refetchInterval: (query) => {
+      const batches = query.state.data?.data ?? [];
+      return batches.some((batch) => !batch.isTerminal) ? 5000 : false;
+    },
     staleTime: 30 * 1000,
   });
 }
