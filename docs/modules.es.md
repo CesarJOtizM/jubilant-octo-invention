@@ -505,8 +505,8 @@ Importacion masiva de datos desde archivos Excel (.xlsx) y CSV. Soporta cinco ti
 | Productos      | `PRODUCTS`  | Importar catalogo de productos (SKU, nombre, precio, etc.) |
 | Movimientos    | `MOVEMENTS` | Importar movimientos de stock (IN/OUT/ADJUST)              |
 | Transferencias | `TRANSFERS` | Importar registros de transferencias entre bodegas         |
-| Ventas         | `SALES`     | Importar ventas historicas                                 |
-| Devoluciones   | `RETURNS`   | Importar registros de devoluciones                         |
+| Ventas         | `SALES`     | Importar ventas operativas (agrupa por factura y confirma) |
+| Devoluciones   | `RETURNS`   | Importar registros de devoluciones (pendiente)             |
 
 ### Flujo de Dos Fases
 

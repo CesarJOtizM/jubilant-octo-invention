@@ -153,6 +153,14 @@ const STOCK_SCHEMA: ImportTypeSchema = {
   exampleRows: [],
 };
 
+const SALES_SCHEMA: ImportTypeSchema = {
+  type: "SALES",
+  displayName: "Sales",
+  description: "Import sales",
+  columns: [],
+  exampleRows: [],
+};
+
 describe("ImportWizardDialog", () => {
   const defaultProps = {
     open: true,
@@ -268,5 +276,16 @@ describe("ImportWizardDialog", () => {
     expect(
       screen.getByRole("button", { name: /runDryRun/i }),
     ).toBeDisabled(); // still disabled: no file yet
+  });
+
+  it("Given: SALES import and selectedCompanyId null When: rendering Then: blocks preview and shows required-company copy", () => {
+    mockSelectedCompanyId = null;
+
+    render(
+      <ImportWizardDialog {...defaultProps} schema={SALES_SCHEMA} />,
+    );
+
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+    expect(screen.getByText("requiredCompany.title")).toBeInTheDocument();
   });
 });

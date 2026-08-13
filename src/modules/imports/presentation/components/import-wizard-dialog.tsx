@@ -54,7 +54,8 @@ export function ImportWizardDialog({
   const executeMutation = useExecuteImport();
 
   const selectedCompanyId = useCompanyStore((s) => s.selectedCompanyId);
-  const requiresCompany = schema?.type === "STOCK";
+  const requiresCompany =
+    schema?.type === "STOCK" || schema?.type === "SALES";
   const { data: selectedCompany, isLoading: isCompanyLoading } = useCompany(
     selectedCompanyId ?? "",
   );

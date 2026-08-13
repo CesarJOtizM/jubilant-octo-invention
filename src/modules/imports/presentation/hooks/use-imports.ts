@@ -135,6 +135,7 @@ export function useExecuteImport() {
         WAREHOUSES: "warehouses",
         STOCK: "stock",
         TRANSFERS: "transfers",
+        SALES: "sales",
       };
       const moduleKey = moduleKeyMap[variables.type];
       if (moduleKey) {

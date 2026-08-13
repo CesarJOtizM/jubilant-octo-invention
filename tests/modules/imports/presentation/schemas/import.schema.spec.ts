@@ -95,8 +95,8 @@ describe("Import Schemas", () => {
   });
 
   describe("IMPORT_TYPES", () => {
-    it("Given: the constant When: reading Then: should have all five import types", () => {
-      expect(IMPORT_TYPES).toHaveLength(5);
+    it("Given: the constant When: reading Then: should have all six import types", () => {
+      expect(IMPORT_TYPES).toHaveLength(6);
     });
 
     it("Given: the constant When: reading Then: should include PRODUCTS type", () => {
@@ -127,6 +127,12 @@ describe("Import Schemas", () => {
       const transfers = IMPORT_TYPES.find((t) => t.value === "TRANSFERS");
       expect(transfers).toBeDefined();
       expect(transfers?.labelKey).toBe("imports.types.transfers");
+    });
+
+    it("Given: the constant When: reading Then: should include SALES type", () => {
+      const sales = IMPORT_TYPES.find((t) => t.value === "SALES");
+      expect(sales).toBeDefined();
+      expect(sales?.labelKey).toBe("imports.types.sales");
     });
   });
 });

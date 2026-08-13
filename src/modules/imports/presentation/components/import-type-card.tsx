@@ -17,6 +17,7 @@ import {
   Warehouse,
   BarChart3,
   Repeat,
+  ShoppingCart,
   Download,
   Upload,
   ChevronDown,
@@ -42,6 +43,7 @@ const TYPE_ICON_MAP: Record<string, React.ElementType> = {
   WAREHOUSES: Warehouse,
   STOCK: BarChart3,
   TRANSFERS: Repeat,
+  SALES: ShoppingCart,
 };
 
 interface ImportTypeCardProps {
