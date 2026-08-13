@@ -95,10 +95,16 @@ export function ImportDetailSheet({
                   </div>
                 )}
 
-                {/* The backend only rejects the report for PENDING batches,
-                    which have nothing validated yet. */}
+                {/* Execution failures (e.g. optimistic-lock conflicts) are stored
+                    on the rows after schema validation already passed, so the
+                    batch often stays COMPLETED with invalidRows=0. Gate on
+                    row-level errors / errorMessage, not FAILED status. */}
                 {batch.status !== "PENDING" &&
-                  (batch.invalidRows > 0 || batch.status === "FAILED") && (
+                  (Boolean(batch.errorMessage) ||
+                    batch.invalidRows > 0 ||
+                    batch.rows.some(
+                      (row) => !row.isValid || row.errors.length > 0,
+                    )) && (
                     <div className="mt-3">
                       <Button
                         variant="outline"

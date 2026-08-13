@@ -288,10 +288,14 @@ describe("ImportDetailSheet", () => {
   });
 
   describe("error report download", () => {
-    const buildBatch = (overrides: Partial<{
-      status: string;
-      invalidRows: number;
-    }>) =>
+    const buildBatch = (
+      overrides: Partial<{
+        status: string;
+        invalidRows: number;
+        errorMessage: string;
+        rows: ImportBatch["rows"];
+      }> = {},
+    ) =>
       ImportBatch.create("batch-1", {
         type: "PRODUCTS",
         status: (overrides.status ?? "COMPLETED") as never,
@@ -303,11 +307,25 @@ describe("ImportDetailSheet", () => {
         progress: 100,
         createdBy: "user-1",
         createdAt: "2026-01-15T10:00:00.000Z",
-        rows: [],
+        errorMessage: overrides.errorMessage,
+        rows: overrides.rows ?? [],
       });
 
-    it("Given: failed batch When: rendering Then: should show download button", () => {
-      mockBatchData = buildBatch({ status: "FAILED" });
+    it("Given: completed batch with execution row errors When: rendering Then: should show download button", () => {
+      // Optimistic-lock / runtime failures leave COMPLETED + invalidRows=0,
+      // with errors only on the persisted rows.
+      mockBatchData = buildBatch({
+        invalidRows: 0,
+        rows: [
+          {
+            rowNumber: 2,
+            data: { sku: "SKU-1" },
+            isValid: false,
+            errors: ["Execution error: Optimistic lock conflict"],
+            warnings: [],
+          },
+        ],
+      });
 
       render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
 
@@ -322,7 +340,17 @@ describe("ImportDetailSheet", () => {
       expect(screen.getByText("errorReport.download")).toBeInTheDocument();
     });
 
-    it("Given: completed batch without invalid rows When: rendering Then: should hide download button", () => {
+    it("Given: batch with errorMessage When: rendering Then: should show download button", () => {
+      mockBatchData = buildBatch({
+        errorMessage: "Failed to process 3 row(s)",
+      });
+
+      render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
+
+      expect(screen.getByText("errorReport.download")).toBeInTheDocument();
+    });
+
+    it("Given: completed batch without errors When: rendering Then: should hide download button", () => {
       mockBatchData = buildBatch({ invalidRows: 0 });
 
       render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
@@ -343,7 +371,17 @@ describe("ImportDetailSheet", () => {
     });
 
     it("Given: download button When: clicked Then: should request the xlsx report for the batch", () => {
-      mockBatchData = buildBatch({ status: "FAILED", invalidRows: 5 });
+      mockBatchData = buildBatch({
+        rows: [
+          {
+            rowNumber: 2,
+            data: { sku: "SKU-1" },
+            isValid: false,
+            errors: ["Execution error: Optimistic lock conflict"],
+            warnings: [],
+          },
+        ],
+      });
 
       render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
       fireEvent.click(screen.getByText("errorReport.download"));
@@ -355,7 +393,9 @@ describe("ImportDetailSheet", () => {
     });
 
     it("Given: download in progress When: rendering Then: should disable the button", () => {
-      mockBatchData = buildBatch({ status: "FAILED" });
+      mockBatchData = buildBatch({
+        errorMessage: "Failed to process 1 row(s)",
+      });
       mockIsDownloading = true;
 
       render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);

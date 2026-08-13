@@ -27,6 +27,14 @@ export function ImportProgress({ batchId, initialBatch }: ImportProgressProps) {
 
   const isCompleted = current.status === "COMPLETED";
   const isFailed = current.status === "FAILED";
+  // Same rule as the detail sheet: execution errors often leave the batch
+  // COMPLETED with row-level errors (invalidRows stays at validation-time 0).
+  const canDownloadErrorReport =
+    current.status !== "PENDING" &&
+    (isFailed ||
+      Boolean(current.errorMessage) ||
+      current.invalidRows > 0 ||
+      current.rows.some((row) => !row.isValid || row.errors.length > 0));
 
   return (
     <div className="space-y-4">
@@ -62,16 +70,19 @@ export function ImportProgress({ batchId, initialBatch }: ImportProgressProps) {
           )}
 
           {isFailed && (
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-red-800 dark:bg-red-950 dark:text-red-200">
-                <XCircle className="h-5 w-5" />
-                <div>
-                  <p className="font-medium">{t("execute.failed")}</p>
-                  {current.errorMessage && (
-                    <p className="text-sm">{current.errorMessage}</p>
-                  )}
-                </div>
+            <div className="mt-4 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-red-800 dark:bg-red-950 dark:text-red-200">
+              <XCircle className="h-5 w-5" />
+              <div>
+                <p className="font-medium">{t("execute.failed")}</p>
+                {current.errorMessage && (
+                  <p className="text-sm">{current.errorMessage}</p>
+                )}
               </div>
+            </div>
+          )}
+
+          {canDownloadErrorReport && (
+            <div className="mt-4">
               <Button
                 variant="outline"
                 size="sm"
