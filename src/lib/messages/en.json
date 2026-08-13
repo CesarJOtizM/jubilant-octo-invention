@@ -2204,14 +2204,16 @@
       "movements": "Movements",
       "warehouses": "Warehouses",
       "stock": "Stock",
-      "transfers": "Transfers"
+      "transfers": "Transfers",
+      "sales": "Sales"
     },
     "typeDescriptions": {
       "products": "Import products with SKU, name, unit, and other attributes",
       "movements": "Import inventory movements (IN, OUT, adjustments)",
       "warehouses": "Import warehouse definitions",
       "stock": "Import initial stock levels as adjustment movements",
-      "transfers": "Import transfer requests between warehouses"
+      "transfers": "Import transfer requests between warehouses",
+      "sales": "Import operational sales (grouped by invoice) and deduct stock"
     },
     "template": {
       "title": "Download Template",

@@ -19,6 +19,7 @@ export const KNOWN_IMPORT_TYPES = [
   "WAREHOUSES",
   "STOCK",
   "TRANSFERS",
+  "SALES",
 ] as const;
 
 export type KnownImportType = (typeof KNOWN_IMPORT_TYPES)[number];

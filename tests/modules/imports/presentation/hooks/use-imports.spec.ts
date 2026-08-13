@@ -358,6 +358,24 @@ describe("use-imports hooks", () => {
       );
     });
 
+    it("Given: SALES import When: mutate Then: invalidates sales queries", async () => {
+      mockExecute.mockResolvedValueOnce({ id: "batch-sales", status: "PENDING" });
+      const { Wrapper, queryClient } = createQueryWrapper();
+      const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+      const { result } = renderHook(() => useExecuteImport(), {
+        wrapper: Wrapper,
+      });
+
+      const file = new File(["content"], "sales.csv", { type: "text/csv" });
+      await act(async () => {
+        await result.current.mutateAsync({ file, type: "SALES" });
+      });
+
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: ["sales"],
+      });
+    });
+
     it("Given: server error When: mutate Then: shows error toast", async () => {
       mockExecute.mockRejectedValueOnce(new Error("Fail"));
       const { Wrapper } = createQueryWrapper();

@@ -7,6 +7,7 @@ export const IMPORT_TYPES: { value: ImportType; labelKey: string }[] = [
   { value: "WAREHOUSES", labelKey: "imports.types.warehouses" },
   { value: "STOCK", labelKey: "imports.types.stock" },
   { value: "TRANSFERS", labelKey: "imports.types.transfers" },
+  { value: "SALES", labelKey: "imports.types.sales" },
 ];
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

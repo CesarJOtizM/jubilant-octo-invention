@@ -2204,14 +2204,16 @@
       "movements": "Movimientos",
       "warehouses": "Almacenes",
       "stock": "Stock",
-      "transfers": "Transferencias"
+      "transfers": "Transferencias",
+      "sales": "Ventas"
     },
     "typeDescriptions": {
       "products": "Importar productos con SKU, nombre, unidad y otros atributos",
       "movements": "Importar movimientos de inventario (entradas, salidas, ajustes)",
       "warehouses": "Importar definiciones de almacenes",
       "stock": "Importar niveles de stock inicial como movimientos de ajuste",
-      "transfers": "Importar solicitudes de transferencia entre almacenes"
+      "transfers": "Importar solicitudes de transferencia entre almacenes",
+      "sales": "Importar ventas operativas (agrupadas por factura) y descontar stock"
     },
     "template": {
       "title": "Descargar Plantilla",

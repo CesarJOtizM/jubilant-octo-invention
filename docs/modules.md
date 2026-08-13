@@ -505,8 +505,8 @@ Bulk data import from Excel (.xlsx) and CSV files. Supports five import types wi
 | Products  | `PRODUCTS`  | Import product catalog (SKU, name, price, etc.) |
 | Movements | `MOVEMENTS` | Import stock movements (IN/OUT/ADJUST)          |
 | Transfers | `TRANSFERS` | Import transfer records between warehouses      |
-| Sales     | `SALES`     | Import historical sales                         |
-| Returns   | `RETURNS`   | Import return records                           |
+| Sales     | `SALES`     | Import operational sales (group by invoice and confirm) |
+| Returns   | `RETURNS`   | Import return records (pending)                         |
 
 ### Two-Phase Workflow
 
