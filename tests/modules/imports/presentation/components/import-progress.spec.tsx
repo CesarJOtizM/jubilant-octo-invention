@@ -204,6 +204,57 @@ describe("ImportProgress", () => {
     expect(screen.getByText("errorReport.download")).toBeInTheDocument();
   });
 
+  it("Given: a completed batch with execution row errors When: rendering Then: should show download button", () => {
+    mockBatchData = ImportBatch.create("batch-1", {
+      type: "PRODUCTS",
+      status: "COMPLETED",
+      fileName: "products.csv",
+      totalRows: 2,
+      processedRows: 2,
+      validRows: 2,
+      invalidRows: 0,
+      progress: 100,
+      createdBy: "user-1",
+      createdAt: "2026-01-15T10:00:00.000Z",
+      rows: [
+        {
+          rowNumber: 2,
+          data: { sku: "SKU-1" },
+          isValid: false,
+          errors: ["Execution error: Optimistic lock conflict"],
+          warnings: [],
+        },
+      ],
+    });
+
+    render(<ImportProgress batchId="batch-1" />);
+
+    expect(screen.getByText("execute.completed")).toBeInTheDocument();
+    expect(screen.getByText("errorReport.download")).toBeInTheDocument();
+  });
+
+  it("Given: a completed batch without errors When: rendering Then: should hide download button", () => {
+    mockBatchData = ImportBatch.create("batch-1", {
+      type: "PRODUCTS",
+      status: "COMPLETED",
+      fileName: "products.csv",
+      totalRows: 100,
+      processedRows: 100,
+      validRows: 100,
+      invalidRows: 0,
+      progress: 100,
+      createdBy: "user-1",
+      createdAt: "2026-01-15T10:00:00.000Z",
+      rows: [],
+    });
+
+    render(<ImportProgress batchId="batch-1" />);
+
+    expect(
+      screen.queryByText("errorReport.download"),
+    ).not.toBeInTheDocument();
+  });
+
   it("Given: a failed batch without errorMessage When: rendering Then: should not show error text", () => {
     mockBatchData = ImportBatch.create("batch-1", {
       type: "PRODUCTS",
