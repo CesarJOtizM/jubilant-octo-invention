@@ -1,7 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Download } from "lucide-react";
 import { Badge } from "@/ui/components/badge";
+import { Button } from "@/ui/components/button";
 import { Skeleton } from "@/ui/components/skeleton";
 import {
   Sheet,
@@ -12,7 +14,10 @@ import {
   SheetBody,
 } from "@/ui/components/sheet";
 import { ImportStatusBadge } from "./import-status-badge";
-import { useImportStatus } from "@/modules/imports/presentation/hooks/use-imports";
+import {
+  useImportStatus,
+  useDownloadErrors,
+} from "@/modules/imports/presentation/hooks/use-imports";
 import type { ImportRowData } from "@/modules/imports/domain/entities/import-batch.entity";
 
 interface ImportDetailSheetProps {
@@ -26,6 +31,7 @@ export function ImportDetailSheet({
 }: ImportDetailSheetProps) {
   const t = useTranslations("imports");
   const { data: batch, isLoading } = useImportStatus(batchId);
+  const downloadErrors = useDownloadErrors();
 
   return (
     <Sheet open={!!batchId} onOpenChange={(open) => !open && onClose()}>
@@ -88,6 +94,28 @@ export function ImportDetailSheet({
                     {batch.errorMessage}
                   </div>
                 )}
+
+                {/* The backend only rejects the report for PENDING batches,
+                    which have nothing validated yet. */}
+                {batch.status !== "PENDING" &&
+                  (batch.invalidRows > 0 || batch.status === "FAILED") && (
+                    <div className="mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          downloadErrors.mutate({
+                            id: batch.id,
+                            format: "xlsx",
+                          })
+                        }
+                        disabled={downloadErrors.isPending}
+                      >
+                        <Download className="mr-1 h-4 w-4" aria-hidden />
+                        {t("errorReport.download")}
+                      </Button>
+                    </div>
+                  )}
               </div>
 
               {/* Rows data */}
