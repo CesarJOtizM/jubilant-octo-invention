@@ -18,7 +18,10 @@ import {
   useExecuteImport,
 } from "@/modules/imports/presentation/hooks/use-imports";
 import type { ImportCompanyBind } from "@/modules/imports/application/ports/import.repository.port";
-import type { ImportTypeSchema } from "@/modules/imports/domain/entities";
+import type {
+  ImportBatch,
+  ImportTypeSchema,
+} from "@/modules/imports/domain/entities";
 import type { ImportPreview } from "@/modules/imports/domain/entities/import-preview.entity";
 import { useCompanyStore } from "@/modules/companies/infrastructure/store/company.store";
 import { useCompany } from "@/modules/companies/presentation/hooks/use-companies";
@@ -48,7 +51,7 @@ export function ImportWizardDialog({
   const [step, setStep] = useState<WizardStep>("upload");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<ImportPreview | null>(null);
-  const [batchId, setBatchId] = useState<string | null>(null);
+  const [batch, setBatch] = useState<ImportBatch | null>(null);
 
   const previewMutation = usePreviewImport();
   const executeMutation = useExecuteImport();
@@ -78,7 +81,7 @@ export function ImportWizardDialog({
     setStep("upload");
     setFile(null);
     setPreview(null);
-    setBatchId(null);
+    setBatch(null);
     onOpenChange(false);
   }, [onOpenChange]);
 
@@ -102,7 +105,7 @@ export function ImportWizardDialog({
       type: schema.type,
       company: companyBind,
     });
-    setBatchId(result.id);
+    setBatch(result);
     setStep("execute");
   }, [file, schema, executeMutation, requiresCompany, companyBind]);
 
@@ -162,7 +165,7 @@ export function ImportWizardDialog({
                 </motion.div>
               )}
 
-              {step === "execute" && batchId && (
+              {step === "execute" && batch && (
                 <motion.div
                   key="execute"
                   initial={{ opacity: 0, y: 6 }}
@@ -170,7 +173,7 @@ export function ImportWizardDialog({
                   transition={{ duration: 0.2 }}
                   className="space-y-4"
                 >
-                  <ImportProgress batchId={batchId} />
+                  <ImportProgress batchId={batch.id} initialBatch={batch} />
                 </motion.div>
               )}
             </div>

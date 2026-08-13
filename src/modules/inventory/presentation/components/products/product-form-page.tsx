@@ -26,6 +26,7 @@ import {
 } from "@/modules/inventory/presentation/hooks/use-products";
 import { CategoryMultiSelector } from "@/modules/inventory/presentation/components/categories/category-multi-selector";
 import { CompanySelector } from "@/modules/companies/presentation/components/company-selector";
+import { BrandSelector } from "@/modules/brands/presentation/components/brand-selector";
 import { useOrgSettings } from "@/shared/presentation/hooks/use-org-settings";
 
 interface ProductFormPageProps {
@@ -65,6 +66,7 @@ export function ProductFormPage({ productId }: ProductFormPageProps) {
       price: 0,
       categoryIds: [],
       companyId: undefined,
+      brandId: "",
       barcode: "",
     },
   });
@@ -82,6 +84,7 @@ export function ProductFormPage({ productId }: ProductFormPageProps) {
         price: existingProduct.price,
         categoryIds: existingProduct.categories.map((c) => c.id),
         companyId: existingProduct.companyId || undefined,
+        brandId: existingProduct.brandId || "",
         barcode: existingProduct.barcode || "",
       });
     }
@@ -230,6 +233,15 @@ export function ProductFormPage({ productId }: ProductFormPageProps) {
                 />
               </FormField>
             )}
+
+            <FormField>
+              <Label>{t("fields.brand")}</Label>
+              <BrandSelector
+                value={watch("brandId")}
+                onChange={(v) => setValue("brandId", v ?? "")}
+                allowClear
+              />
+            </FormField>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField error={errors.unitOfMeasure?.message}>

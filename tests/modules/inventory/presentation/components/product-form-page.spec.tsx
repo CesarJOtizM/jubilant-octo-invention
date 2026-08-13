@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { ProductFormPage } from "@/modules/inventory/presentation/components/products/product-form-page";
 
 // --- Mocks ---
@@ -26,6 +26,7 @@ let mockProductData: {
     unitOfMeasure: string;
     price: number;
     categories: { id: string; name: string }[];
+    brandId?: string | null;
   } | null;
   isLoading: boolean;
 };
@@ -54,6 +55,12 @@ vi.mock(
     ),
   }),
 );
+
+vi.mock("@/modules/brands/presentation/components/brand-selector", () => ({
+  BrandSelector: ({ value }: { value?: string }) => (
+    <div data-testid="brand-selector">{value || "none"}</div>
+  ),
+}));
 
 vi.mock("@/modules/inventory/presentation/schemas/product.schema", () => ({
   createProductSchema: { parse: vi.fn() },
@@ -104,6 +111,7 @@ describe("ProductFormPage", () => {
     expect(screen.getByText(/fields\.name/)).toBeInTheDocument();
     expect(screen.getByText("fields.description")).toBeInTheDocument();
     expect(screen.getByText("fields.category")).toBeInTheDocument();
+    expect(screen.getByText("fields.brand")).toBeInTheDocument();
     expect(screen.getByText(/fields\.unitOfMeasure/)).toBeInTheDocument();
     expect(screen.getByText("fields.price")).toBeInTheDocument();
   });
@@ -125,6 +133,34 @@ describe("ProductFormPage", () => {
     render(<ProductFormPage />);
 
     expect(screen.getByTestId("category-multi-selector")).toBeInTheDocument();
+  });
+
+  it("Given: no productId When: rendering Then: should render brand selector with no selection", () => {
+    render(<ProductFormPage />);
+
+    expect(screen.getByTestId("brand-selector")).toHaveTextContent("none");
+  });
+
+  it("Given: productId with a brand When: rendering Then: should preselect the product brand", async () => {
+    mockProductData = {
+      data: {
+        id: "prod-1",
+        sku: "SKU-001",
+        name: "Widget A",
+        description: null,
+        unitOfMeasure: "unit",
+        price: 10,
+        categories: [],
+        brandId: "brand-1",
+      },
+      isLoading: false,
+    };
+
+    render(<ProductFormPage productId="prod-1" />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("brand-selector")).toHaveTextContent("brand-1");
+    });
   });
 
   it("Given: productId with loading state When: rendering Then: should show loading spinner", () => {

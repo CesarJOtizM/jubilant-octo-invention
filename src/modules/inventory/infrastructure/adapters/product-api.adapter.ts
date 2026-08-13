@@ -106,7 +106,8 @@ function toUpdateApiDto(data: UpdateProductDto): UpdateProductApiDto {
     dto.status = data.isActive ? "ACTIVE" : "INACTIVE";
   }
   if (data.companyId !== undefined) dto.companyId = data.companyId || undefined;
-  if (data.brandId !== undefined) dto.brandId = data.brandId || undefined;
+  // Empty string is meaningful: it tells the backend to unset the brand.
+  if (data.brandId !== undefined) dto.brandId = data.brandId;
   if (data.barcode !== undefined) dto.barcode = data.barcode || undefined;
 
   return dto;
