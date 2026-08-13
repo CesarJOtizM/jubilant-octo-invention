@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { ImportBatch } from "@/modules/imports/domain/entities/import-batch.entity";
 
 vi.mock("next-intl", () => ({
@@ -37,9 +37,15 @@ vi.mock(
 
 let mockBatchData: ImportBatch | null = null;
 let mockIsLoading = false;
+const mockDownloadErrors = vi.fn();
+let mockIsDownloading = false;
 
 vi.mock("@/modules/imports/presentation/hooks/use-imports", () => ({
   useImportStatus: () => ({ data: mockBatchData, isLoading: mockIsLoading }),
+  useDownloadErrors: () => ({
+    mutate: mockDownloadErrors,
+    isPending: mockIsDownloading,
+  }),
 }));
 
 import { ImportDetailSheet } from "@/modules/imports/presentation/components/import-detail";
@@ -48,6 +54,8 @@ describe("ImportDetailSheet", () => {
   beforeEach(() => {
     mockBatchData = null;
     mockIsLoading = false;
+    mockIsDownloading = false;
+    mockDownloadErrors.mockClear();
   });
 
   it("Given: batchId is null When: rendering Then: should not show sheet", () => {
@@ -277,5 +285,84 @@ describe("ImportDetailSheet", () => {
     render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
 
     expect(screen.getByText("history.empty")).toBeInTheDocument();
+  });
+
+  describe("error report download", () => {
+    const buildBatch = (overrides: Partial<{
+      status: string;
+      invalidRows: number;
+    }>) =>
+      ImportBatch.create("batch-1", {
+        type: "PRODUCTS",
+        status: (overrides.status ?? "COMPLETED") as never,
+        fileName: "products.csv",
+        totalRows: 100,
+        processedRows: 100,
+        validRows: 100 - (overrides.invalidRows ?? 0),
+        invalidRows: overrides.invalidRows ?? 0,
+        progress: 100,
+        createdBy: "user-1",
+        createdAt: "2026-01-15T10:00:00.000Z",
+        rows: [],
+      });
+
+    it("Given: failed batch When: rendering Then: should show download button", () => {
+      mockBatchData = buildBatch({ status: "FAILED" });
+
+      render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
+
+      expect(screen.getByText("errorReport.download")).toBeInTheDocument();
+    });
+
+    it("Given: completed batch with invalid rows When: rendering Then: should show download button", () => {
+      mockBatchData = buildBatch({ invalidRows: 5 });
+
+      render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
+
+      expect(screen.getByText("errorReport.download")).toBeInTheDocument();
+    });
+
+    it("Given: completed batch without invalid rows When: rendering Then: should hide download button", () => {
+      mockBatchData = buildBatch({ invalidRows: 0 });
+
+      render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
+
+      expect(
+        screen.queryByText("errorReport.download"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("Given: pending batch with invalid rows When: rendering Then: should hide download button", () => {
+      mockBatchData = buildBatch({ status: "PENDING", invalidRows: 5 });
+
+      render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
+
+      expect(
+        screen.queryByText("errorReport.download"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("Given: download button When: clicked Then: should request the xlsx report for the batch", () => {
+      mockBatchData = buildBatch({ status: "FAILED", invalidRows: 5 });
+
+      render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
+      fireEvent.click(screen.getByText("errorReport.download"));
+
+      expect(mockDownloadErrors).toHaveBeenCalledWith({
+        id: "batch-1",
+        format: "xlsx",
+      });
+    });
+
+    it("Given: download in progress When: rendering Then: should disable the button", () => {
+      mockBatchData = buildBatch({ status: "FAILED" });
+      mockIsDownloading = true;
+
+      render(<ImportDetailSheet batchId="batch-1" onClose={vi.fn()} />);
+
+      expect(
+        screen.getByText("errorReport.download").closest("button"),
+      ).toBeDisabled();
+    });
   });
 });
