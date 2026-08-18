@@ -12,7 +12,7 @@ import type {
 
 export type { PaginatedResult };
 
-/** Optional company bind for STOCK (and future typed) imports. */
+/** Optional company bind for STOCK, SALES, MOVEMENTS (and future typed) imports. */
 export interface ImportCompanyBind {
   companyId: string;
   companyCode?: string;
