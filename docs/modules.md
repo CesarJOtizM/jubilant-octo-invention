@@ -666,7 +666,7 @@ CRUD for roles (system and custom) with permission management.
 
 ### Purpose
 
-View system activity history with advanced filters and export.
+HTTP error log for debugging. Only responses with status >= 400 (4xx/5xx) are persisted, not successful activity.
 
 ### Available Filters
 

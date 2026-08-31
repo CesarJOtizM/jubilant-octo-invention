@@ -60,7 +60,7 @@ export function AlertConfigurationForm() {
     resolver: zodResolver(alertConfigurationSchema),
     defaultValues: {
       isEnabled: true,
-      cronFrequency: "EVERY_HOUR",
+      cronFrequency: "EVERY_DAY",
       notifyLowStock: true,
       notifyCriticalStock: true,
       notifyOutOfStock: true,
